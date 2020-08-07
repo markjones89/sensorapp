@@ -1,0 +1,5 @@
+export { default as CaretIcon } from './Caret.vue'
+export { default as CloseIcon } from './Close.vue'
+export { default as LogoutIcon } from './Logout.vue'
+export { default as PaperEditIcon } from './PaperEdit.vue'
+export { default as ProfileIcon } from './Profile.vue'

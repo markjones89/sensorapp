@@ -1,0 +1,19 @@
+{
+    "/js/app.js": "/js/app.js",
+    "/css/app.css": "/css/app.css",
+    "/css/app-login.css": "/css/app-login.css",
+    "/css/app-verify.css": "/css/app-verify.css",
+    "/js/app-login.js": "/js/app-login.js",
+    "/js/app-verify.js": "/js/app-verify.js",
+    "/js/config/clients.js": "/js/config/clients.js",
+    "/js/config/floors.js": "/js/config/floors.js",
+    "/js/config/locations.js": "/js/config/locations.js",
+    "/js/config/sensors.js": "/js/config/sensors.js",
+    "/js/config/users.js": "/js/config/users.js",
+    "/js/config/work-settings.js": "/js/config/work-settings.js",
+    "/js/insights/cost-analysis.js": "/js/insights/cost-analysis.js",
+    "/js/insights/heat-map.js": "/js/insights/heat-map.js",
+    "/js/insights/live-view.js": "/js/insights/live-view.js",
+    "/js/insights/time-graph.js": "/js/insights/time-graph.js",
+    "/js/profile.js": "/js/profile.js"
+}
