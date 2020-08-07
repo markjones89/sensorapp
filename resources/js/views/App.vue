@@ -72,7 +72,7 @@ export default {
             }
         },
         logout() {
-            axios.get(`${this.baseUrl}/logout`).then(() => {
+            axios.get('/logout').then(() => {
                 window.location = `${this.baseUrl}/login`
             })
         }

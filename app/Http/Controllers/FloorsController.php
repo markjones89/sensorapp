@@ -80,21 +80,26 @@ class FloorsController extends Controller
         $fpFolder = 'floors';
         if ($request->hasFile('floor_plan')) {
             $fid = Hashids::decode($request->id)[0];
-            $floor_plan = $request->floor_plan;
-            $filename = $floor_plan->hashName();
-            $path = $floor_plan->store($fpFolder);
             
-            // dd($path, $filename);
+            try {
+                $floor_plan = $request->floor_plan;
+                $filename = $floor_plan->hashName();
+                $path = $floor_plan->store($fpFolder);
+            
+                // dd($path, $filename);
 
-            $floor = Floor::find($fid);
+                $floor = Floor::find($fid);
 
-            // clean up old floor plan
-            if ($floor->floor_plan) {
-                Storage::delete($fpFolder.'/'.$floor->floor_plan);
+                // clean up old floor plan
+                if ($floor->floor_plan) {
+                    Storage::delete($fpFolder.'/'.$floor->floor_plan);
+                }
+
+                $floor->floor_plan = $filename;
+                $floor->save();
+            } catch(\Exception $e) {
+                return response(['r' => true, 'm' => $e->getMessage(), 'err' => $e]);
             }
-
-            $floor->floor_plan = $filename;
-            $floor->save();
 
             return response(['r' => true, 'm' => 'Floor plan uploaded', 'floor_plan' => $filename]);
         }
