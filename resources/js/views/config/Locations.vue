@@ -332,12 +332,12 @@ export default {
         toFloors(id) {
             let bldg = this.locations.find(l => l.hid === id)
 
-            this.$parent.$router.push({ name: 'floors', query: { bid: id }, params: { bldg_name: bldg.name } })
+            this.$parent.$router.push({ name: 'floors', params: { bid: id, bldg_name: bldg.name } })
         },
         toSensorMap(id) {
             let bldg = this.locations.find(l => l.hid === id)
 
-            this.$parent.$router.push({ name: 'sensors', query: { bid: id }, params: { bldg_name: bldg.name } })
+            this.$parent.$router.push({ name: 'sensors', params: { bid: id, bldg_name: bldg.name } })
         },
         /* async getContinents() {
             let { data } = await axios.get(`${api.world.base}/${api.world.continent}`, {

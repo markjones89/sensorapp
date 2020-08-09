@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Floor;
 use File;
 use Hashids;
+use Image;
 
 class FloorsController extends Controller
 {
@@ -77,28 +78,46 @@ class FloorsController extends Controller
 
     /* Floor plan upload */
     public function setFloorPlan(Request $request) {
-        $fpFolder = 'floors';
         if ($request->hasFile('floor_plan')) {
             $fid = Hashids::decode($request->id)[0];
             
             try {
+                $fpFolder = 'floors';
+                $fpThumbFolder = $fpFolder.'/thumbnail';
+
                 $floor_plan = $request->floor_plan;
                 $filename = $floor_plan->hashName();
-                $path = $floor_plan->store($fpFolder);
-            
-                // dd($path, $filename);
 
+                // save file
+                $path = $floor_plan->store($fpFolder);
+
+                // save thumbnail
+                $thumbWidth = 200;
+                $thumbHeight = 135;
+                $thumbFolder = storage_path('app/').$fpThumbFolder;
+                $thumbPath = $thumbFolder.'/'.$filename;
+
+                if (!is_dir($thumbFolder)) {  mkdir($thumbFolder, 0777, true);  }
+
+                $thumb = Image::make($floor_plan);
+                $thumb->resize($thumbWidth, $thumbHeight, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                $thumb->save($thumbPath);
+
+                // update floor
                 $floor = Floor::find($fid);
 
-                // clean up old floor plan
+                // clean up old floor plan images
                 if ($floor->floor_plan) {
                     Storage::delete($fpFolder.'/'.$floor->floor_plan);
+                    Storage::delete($fpThumbFolder.'/'.$floor->floor_plan);
                 }
 
                 $floor->floor_plan = $filename;
                 $floor->save();
             } catch(\Exception $e) {
-                return response(['r' => true, 'm' => $e->getMessage(), 'err' => $e]);
+                return response(['r' => false, 'm' => $e->getMessage(), 'err' => $e]);
             }
 
             return response(['r' => true, 'm' => 'Floor plan uploaded', 'floor_plan' => $filename]);

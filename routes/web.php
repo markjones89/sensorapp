@@ -46,7 +46,12 @@ Route::middleware(['auth'])->group(function(){
     });
 
     Route::get('/', function () { return view('app'); });
+    Route::group(['prefix' => 'locations'], function () {
+        Route::get('{bid}/floors', 'AppController@location');
+        Route::get('{bid}/sensors', 'AppController@location');
+    });
     Route::get('/{url}', 'AppController@index')
-        ->where(['url' => 'home|profile|clients|locations|floors|sensors|users|work-settings'])
+        // ->where(['url' => 'home|profile|clients|locations|floors|sensors|users|work-settings'])
+        ->where(['url' => 'home|profile|clients|locations|users|work-settings'])
         ->name('app');
 });

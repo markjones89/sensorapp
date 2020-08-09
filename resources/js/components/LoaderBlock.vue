@@ -1,7 +1,8 @@
 <template>
     <div class="loader-block" v-if="show">
         <ripple-loader v-if="type === 'ripple'" />
-        <spin-loader v-else />
+        <spin-loader v-else-if="type === 'spinner'" />
+        <span v-else>Loading...</span>
     </div>
 </template>
 <style lang="scss">
@@ -19,6 +20,10 @@
     .loader-svg {
         pointer-events: none;
         user-select: none;
+
+        svg {
+            display: block;
+        }
     }
 }
 </style>

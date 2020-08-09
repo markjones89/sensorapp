@@ -1,34 +1,51 @@
 <template>
     <div class="content">
         <h1>{{ building ? `Floors - ${building}` : 'Floors' }}</h1>
-        <template v-if="loaded">
-            <transition name="fade" appear>
-                <div id="plan-wrapper" v-if="showPlan" >
-                    <h2>{{ `${floor.ordinal_no} Floor` }}</h2>
-                    <img :src="`${baseUrl}/plans/${floor.floor_plan}`">
-                    <button class="btn btn-primary" id="back-btn" @click="togglePlan(false)">Back</button>
-                </div>
-            </transition>
-            <transition :name="listTransition" appear>
-                <div id="floor-list" v-if="!showPlan">
+        <transition name="fadeUp" appear>
+            <div id="list-wrapper" v-if="loaded">
+                <div id="floor-list">
                     <div v-if="floorList.length === 0">No floors defined</div>
                     <div class="floor" v-for="f in floorList" :key="f.hid" v-else>
-                        <div class="floor-opts">
-                            <a class="floor-opt" @click="upFloorPlan(f.hid)">Upload Floor Plan</a>
-                            <template v-if="f.floor_plan">
-                                <a class="floor-opt" @click="viewFloorPlan(f.hid, f.floor_plan)">Floor Plan</a>
-                                <a class="floor-opt" @click="viewSensors(f.hid)">Sensors</a>
-                            </template>
-                            <a class="floor-opt" @click="triggerEdit(f.hid)">Edit</a>
-                            <a class="floor-opt" @click="delFloor(f.hid)">Remove</a>
+                        <div class="floor-thumb">
+                            <div class="fp-upload-progress" v-if="f.upload_info.uploading">
+                                Uploading
+                                <circle-progress :percent="f.upload_info.progress" />
+                            </div>
+                            <div class="fp-thumb" v-if="f.floor_plan">
+                                <img :src="`${baseUrl}/plans/thumbnail/${f.floor_plan}`">
+                                <div class="fp-thumb-opts">
+                                    <a @click="upFloorPlan(f.hid)">Change</a>
+                                    <a @click="viewFloorPlan(f.hid, f.floor_plan)">Preview</a>
+                                </div>
+                            </div>
+                            <div v-else class="fp-upload-trigger" @click="upFloorPlan(f.hid)">
+                                Upload Floor Plan
+                            </div>
                         </div>
-                        {{ `${f.ordinal_no} Floor` }}
+                        <div class="floor-info">
+                            {{ `${f.ordinal_no} Floor` }}
+                            <div class="floor-opts">
+                                <template v-if="f.floor_plan">
+                                    <a class="floor-opt" @click="viewSensors(f.hid)">Sensors</a>
+                                </template>
+                                <a class="floor-opt" @click="triggerEdit(f.hid)">Edit</a>
+                                <a class="floor-opt" @click="delFloor(f.hid)">Remove</a>
+                            </div>
+                        </div>
                     </div>
-                    <input type="file" ref="fpFile" hidden accept="image/*" @change="fpFileChange" />
-                    <button class="btn btn-primary" id="add-btn" @click="triggerAdd">Add Floor</button>
                 </div>
-            </transition>
-        </template>
+                <input type="file" ref="fpFile" hidden accept="image/*" @change="fpFileChange" />
+                <button class="btn btn-primary" id="add-btn" @click="triggerAdd">Add Floor</button>
+                <div class="fp-preview" v-if="showPlan">
+                    <loader :show="!state.imgLoaded" type="spinner"/>
+                    <img v-if="state.imgLoaded" :src="`${baseUrl}/plans/${floor.floor_plan}`">
+                    <div class="preview-header">
+                        {{ `${building} - ${floor.ordinal_no} Floor` }}
+                        <span class="preview-close" @click="togglePlan(false)">Close</span>
+                    </div>
+                </div>
+            </div>
+        </transition>
         <modal :show="showEntry" @close="toggleEntry(false)">
             <template v-slot:header>
                 <h2>{{ editMode ? 'Edit' : 'Add' }} Floor</h2>
@@ -50,19 +67,101 @@
 <style lang="scss" scoped>
 #floor-list {
     margin-top: 24px;
-
-    #add-btn {
-        margin-top: 24px;
-    }
+}
+#add-btn {
+    margin-top: 24px;
 }
 .floor {
+    position: relative;
+    display: inline-block;
+    flex-direction: column;
     font-size: 20px;
     padding: 10px;
     border-radius: 10px;
-    transition: background-color .24s linear;
+    margin-right: 10px;
+    transition: background-color 0.24s linear;
 
     &:hover {
         background-color: rgba($color: #ffffff, $alpha: 0.04);
+    }
+
+    .floor-thumb {
+        position: relative;
+        width: 200px;
+        height: 135px;
+        overflow: hidden;
+
+        .fp-upload-progress {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            background-color: rgba($color: #393939, $alpha: 0.8);
+            z-index: 1;
+        }
+
+        .fp-upload-trigger {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100% - 2px);
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px dashed rgba(255, 255, 255, .1);
+        }
+
+        .fp-thumb {
+            position: relative;
+            height: 135px;
+            background-color: #ffffff;
+            
+            img {
+                display: block;
+                height: auto;
+                max-width: 100%;
+                margin: 0 auto;
+                pointer-events: none;
+                user-select: none;
+            }
+
+            .fp-thumb-opts {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                padding: 2px 6px 6px;
+                background-color: rgba($color: #393939, $alpha: 0.8);
+                transform: translateY(100%);
+                transition: transform .24s;
+
+                a {
+                    display: inline-block;
+                    font-size: 14px;
+                    cursor: pointer;
+
+                    & + a { margin-left: 4px; }
+                    
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+            }
+
+            &:hover .fp-thumb-opts {
+                transform: translateY(0);
+            }
+        }
+    }
+
+    .floor-info {
+        flex: 1 auto;
+        padding: 10px;
     }
 
     .floor-opts {
@@ -73,34 +172,54 @@
             cursor: pointer;
             user-select: none;
 
+            & + .floor-opt { margin-left: 4px; }
+
             &:hover { text-decoration: underline; }
         }
     }
 }
-#plan-wrapper {
-    position: relative;
-    padding: 16px;
 
-    h2 {
-        margin-bottom: 10px;
+.fp-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba($color: #141414, $alpha: 0.85);
+
+    .preview-header {
+        position: relative;
+        font-size: 18px;
+        padding: 10px;
+        line-height: 24px;
+        background-color: rgba($color: #141414, $alpha: 0.7);
+        z-index: 1;
+
+        .preview-close {
+            float: right;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 8px;
+        }
     }
 
     img {
-        display: block;
-        max-width: 100%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        max-height: 90%;
+        max-width: 90%;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff;
         pointer-events: none;
         user-select: none;
-        background-color: #ffffff;
-    }
-
-    #back-btn {
-        margin-top: 24px;
+        z-index: -1;
     }
 }
 </style>
 <script>
-import { Loader, Modal } from '../../components'
-import { getBaseUrl, toOrdinal }  from '../../helpers'
+import { CircleProgress, Loader, Modal } from '../../components'
+import { getBaseUrl, preloadImage, toOrdinal }  from '../../helpers'
 
 const bldgApi = '/api/locations'
 const api = '/api/floors'
@@ -108,14 +227,16 @@ const api = '/api/floors'
 export default {
     title: 'Floors Setup',
     props: ['bldg_id', 'bldg_name'],
-    components: { Loader, Modal },
+    components: { CircleProgress, Loader, Modal },
     data() {
         return {
             bldgName: null, floors: [], floor: null, listTransition: 'fadeUp',
             loaded: false, showEntry: false, editMode: false,
             entry: { id: null, fNo: 1 },
             showPlan: false, planUrl: null,
-            state: { saving: false }
+            state: {
+                saving: false, imgLoaded: false
+            }
         }
     },
     computed: {
@@ -137,6 +258,12 @@ export default {
         },
         async getFloors() {
             let { data } = await axios.get(api, { params: { bid: this.bldg_id } })
+
+            data.forEach(f => {
+                f.upload_info = {
+                    uploading: false, progress: 0
+                }
+            })
 
             this.floors = data
             this.loaded = true
@@ -162,6 +289,9 @@ export default {
                     let res = x.data
 
                     if (res.r) {
+                        res.data.upload_info = {
+                            uploading: false, progress: 0
+                        }
                         this.floors.push(res.data)
                         this.toggleEntry(false)
                     }
@@ -215,26 +345,26 @@ export default {
         },
         fpFileChange() {
             let _ = this, file = _.$refs.fpFile.files[0]
-                // loader = mdtoast('Importing vault...', { duration: null, modal: true, init: true })
 
             if (file) {
-                // loader.show()
+                let f = _.floors.find(f => f.hid === _.entry.id)
+
+                f.upload_info.uploading = true
                 _.upload(file, function(success, res) {
+                    f.upload_info.uploading = false
                     if (success) {
                         if (res.r) {
-                            let f = _.floors.find(f => f.hid === _.entry.id)
-
                             f.floor_plan = res.floor_plan
                         }
                     } else {
-                        // mdtoast(res, { type: 'error' })
                         console.error(res)
                     }
                 })
             }
         },
         async upload(file, cb) {
-            let formData = new window.FormData()
+            let formData = new window.FormData(),
+                f = this.floors.find(f => f.hid === this.entry.id)
 
             formData.append('floor_plan', file)
             formData.append('id', this.entry.id)
@@ -242,6 +372,11 @@ export default {
             axios.post(`${api}/plan`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: function(progress) {
+                    var percentCompleted = Math.round((progress.loaded * 100) / progress.total)
+
+                    f.upload_info.progress = percentCompleted
                 }
             }).then(x => cb(true, x.data))
             .catch(err => cb(false, err))
@@ -251,11 +386,17 @@ export default {
             this.listTransition = 'fade'
         },
         viewFloorPlan(id, plan) {
-            this.floor = this.floors.find(f => f.hid === id)
-            this.togglePlan(true)
+            let _ = this
+            _.floor = _.floors.find(f => f.hid === id)
+            _.togglePlan(true)
+
+            _.state.imgLoaded = false
+            preloadImage(`${_.baseUrl}/plans/${_.floor.floor_plan}`, function() {
+                _.state.imgLoaded = true
+            })
         },
         viewSensors(id) {
-            this.$parent.$router.push({ name: 'sensors', query: { bid: this.bldg_id, fid: id }, params: { bldg_name: this.bldg_name } })
+            this.$parent.$router.push({ name: 'sensors', query: { fid: id }, params: { bid: this.bldg_id, bldg_name: this.bldg_name } })
         }
     },
     created() {

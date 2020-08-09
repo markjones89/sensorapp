@@ -152,4 +152,16 @@ export function toOrdinal(number) {
 
         return number + (s[(v - 20) % 10] || s[v] || s[0]);
     }
- }
+}
+
+/**
+ * Preloads image resource
+ * @param {string} src Image url
+ * @param {Function} callback On image load callback
+ */
+export function preloadImage(src, callback) {
+    let img = new Image()
+
+    img.onload = callback
+    img.src = `${src}`
+}

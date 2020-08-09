@@ -42,13 +42,13 @@ const router = new VueRouter({
             component: () => import(/* webpackChunkName: "js/config/locations" */ './views/config/Locations.vue')
         },
         {
-            path: '/floors', name: 'floors', 
-            props: (route) => ({ bldg_id: route.query.bid, bldg_name: route.params.bldg_name }),
+            path: '/locations/:bid/floors', name: 'floors', 
+            props: (route) => ({ bldg_id: route.params.bid, bldg_name: route.params.bldg_name }),
             component: () => import(/* webpackChunkName: "js/config/floors" */ './views/config/Floors.vue')
         },
         {
-            path: '/sensors', name: 'sensors', 
-            props: (route) => ({ bldg_id: route.query.bid, bldg_name: route.params.bldg_name, floor_id: route.query.fid }),
+            path: '/locations/:bid/sensors', name: 'sensors', 
+            props: (route) => ({ bldg_id: route.params.bid, bldg_name: route.params.bldg_name, floor_id: route.query.fid }),
             component: () => import(/* webpackChunkName: "js/config/sensors" */ './views/config/SensorMapping.vue')
         },
         {
