@@ -3,20 +3,26 @@
         <h1>{{ building ? `${building} Sensors` : 'Sensors' }}</h1>
         <transition name="fade">
             <div id="sensor-mapper" v-if="loaded">
-                <div id="mapper-options">
-                    <div class="input-field">
-                        <label>Floor</label>
-                        <select v-model="floorSel" @change="floorChange">
-                            <option v-for="f in  floors" :key="f.hid" :value="f.hid">{{ f.ordinal_no }} Floor</option>
-                        </select>
+                <div class="row">
+                    <div class="col-12 col-md-3">
+                        <div id="mapper-options">
+                            <div class="input-field">
+                                <label>Floor</label>
+                                <select v-model="floorSel" @change="floorChange">
+                                    <option v-for="f in  floors" :key="f.hid" :value="f.hid">{{ f.ordinal_no }} Floor</option>
+                                </select>
+                            </div>
+                            <template v-if="editMapper">
+                                <!-- <button class="btn btn-primary">Add Sensor</button> -->
+                                <button class="btn btn-primary" @click="toggleEditMode(false)">Close Edit</button>
+                            </template>
+                            <button class="btn btn-primary" v-else @click="toggleEditMode(true)">Edit Mode</button>
+                        </div>
                     </div>
-                    <template v-if="editMapper">
-                        <!-- <button class="btn btn-primary">Add Sensor</button> -->
-                        <button class="btn btn-primary" @click="toggleEditMode(false)">Close Edit</button>
-                    </template>
-                    <button class="btn btn-primary" v-else @click="toggleEditMode(true)">Edit Mode</button>
+                    <div class="col">
+                        <div id="floor-map"></div>
+                    </div>
                 </div>
-                <div id="floor-map"></div>
             </div>
         </transition>
         <modal :show="showEntry" @close="toggleEntry(false)">
@@ -50,11 +56,12 @@
     margin-top: 24px;
 
     #mapper-options {
-        min-width: 200px;
-        padding-right: 24px;
+        margin-bottom: 24px;
     }
 }
 #floor-map {
+    overflow: hidden;
+    
     svg {
         pointer-events: initial !important;
 
@@ -97,7 +104,7 @@ export default {
         building() {
             return this.bldg_name ? this.bldg_name : 
                 this.bldg ? this.bldg.name : ''
-        },
+        }
     },
     methods: {
         async getBldg(id) {

@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-// import { store } from './store' 
 import { getBaseUrl } from './helpers'
 import spaHome from './views/Index.vue'
 
@@ -62,7 +61,7 @@ const router = new VueRouter({
     ]
 })
 
-router.beforeResolve((to, from, next) => {
+router.beforeEach((to, from, next) => {
     if (to.name) {
         NProgress.start()
     }
