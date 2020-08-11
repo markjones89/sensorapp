@@ -11,18 +11,20 @@
                 <h2>Change Photo</h2>
             </template>
             <div class="cropper-wrapper">
+                <loader type="spinner" :show="state.img_loading" />
                 <div class="cropper-opt" @click="upPhoto" v-if="!selected_photo">
-                    Choose file...
+                    Click to select a photo...
                 </div>
                 <cropper classname="cropper"
                     stencil-component="circle-stencil"
                     :src="selected_photo"
                     :stencil-props="{ aspectRatio: 1/1 }"
+                    @ready="imageReady"
                     @change="imageCropped"></cropper>
             </div>
             <template v-slot:footer>
-                <button class="btn" @click="upPhoto" id="select-btn" v-if="selected_photo">Choose file</button>
-                <button class="btn btn-primary" @click="uploadPhoto" :disabled="state.uploading" id="upload-btn">{{ state.uploading ? 'Uploading...' : 'Upload'}}</button>
+                <button class="btn" @click="upPhoto" id="select-btn" v-if="selected_photo">Select another photo</button>
+                <button class="btn btn-primary" @click="uploadPhoto" :disabled="state.uploading || !photo" id="upload-btn">{{ state.uploading ? 'Uploading...' : 'Upload'}}</button>
             </template>
         </modal>
     </div>
@@ -64,8 +66,13 @@
 }
 .cropper-wrapper {
     position: relative;
-    min-height: 250px;
-    min-width: 400px;
+    height: 380px;
+    width: 720px;
+    max-width: 100%;
+
+    .cropper {
+        overflow: hidden;
+    }
 
     .cropper-opt {
         position: absolute;
@@ -76,9 +83,13 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        border: 1px dashed rgba(255, 255, 255, .1);
         cursor: pointer;
+        color: grey;
+        font-size: 1.35em;
+        user-select: none;
         border-radius: 10px;
+        border: 1px dashed rgba(255, 255, 255, .1);
+        background-color: rgba($color: #393939, $alpha: 0.15);
     }
 }
 #select-btn {
@@ -92,20 +103,20 @@
 <script>
 import { store } from '../store'
 import { getBaseUrl } from '../helpers'
-import { Modal } from '../components'
+import { Modal, Loader } from '../components'
 import { Cropper } from 'vue-advanced-cropper'
 
 const api = '/api/users'
 
 export default {
     title: 'Profile',
-    components: { Cropper, Modal },
+    components: { Cropper, Loader, Modal },
     data() {
         return {
             user: null, photo: null, selected_photo: null,
             showUpload: false,
             state: {
-                uploading: false
+                uploading: false, img_loading: false
             }
         }
     },
@@ -117,13 +128,15 @@ export default {
         }
     },
     methods: {
-        imageCropped({canvas}) {
-            this.photo = canvas
-        },
+        imageReady() { this.state.img_loading = false },
+        imageCropped({canvas}) { this.photo = canvas },
         toggleUpPhoto(show) { 
             this.showUpload = show 
             
-            if (show) this.selected_photo = null
+            if (show) {
+                this.selected_photo = null
+                this.photo = null
+            }
         },
         upPhoto() {
             this.$refs.photoFile.click()
@@ -134,6 +147,7 @@ export default {
             if (file) {
                 let reader = new FileReader()
 
+                this.state.img_loading = true
                 reader.onload = (e) => {
                     _.selected_photo = e.target.result
                 }
