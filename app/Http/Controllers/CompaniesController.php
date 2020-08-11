@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\WorkSetting;
 use Hashids;
+use Image;
 
 class CompaniesController extends Controller
 {
@@ -59,25 +60,37 @@ class CompaniesController extends Controller
             $cid = Hashids::decode($request->id)[0];
 
             try {
-                $logoFolder = 'public/logos';
+                $storageFolder = 'public/logos';
+                $logoFolder = storage_path('app/').$storageFolder;
                 $logo = $request->logo;
                 $filename = $logo->hashName();
+                $logoPath = $logoFolder.'/'.$filename;
 
-                // save file
-                $path = $logo->store($logoFolder);
+                if (!is_dir($logoFolder)) {  mkdir($logoFolder, 0777, true);  }
 
-                // update floor
+                // save logo
+                $img = Image::make($logo);
+
+                // resize image if height is bigger than 100px
+                if ($img->height() > 100) {
+                    $img->resize(null, 100, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                }
+                $img->save($logoPath);
+
+                // update company logo field
                 $comp = Company::find($cid);
 
                 // clean up old logo
                 if ($comp->logo) {
-                    Storage::delete($logoFolder.'/'.$comp->logo);
+                    Storage::delete($storageFolder.'/'.$comp->logo);
                 }
 
                 $comp->logo = $filename;
                 $comp->save();
 
-                return response(['r' => true, 'm' => 'Floor plan uploaded', 'logo' => $filename]);
+                return response(['r' => true, 'm' => 'Company logo uploaded', 'logo' => $filename]);
             } catch(\Exception $e) {
                 return response(['r' => false, 'm' => $e->getMessage(), 'err' => $e]);
             }
