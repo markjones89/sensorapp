@@ -24,6 +24,7 @@
         "jquery": "^3.5.1",
         "nprogress": "^0.2.0",
         "vue": "^2.6.11",
+        "vue-advanced-cropper": "^0.16.10",
         "vue-router": "^3.3.4"
     }
 }

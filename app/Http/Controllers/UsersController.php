@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Mail\UserInviteMail;
@@ -12,6 +13,7 @@ use App\Models\Company;
 use App\Models\Role;
 use App\User;
 use Hashids;
+use Image;
 
 class UsersController extends Controller
 {
@@ -99,6 +101,62 @@ class UsersController extends Controller
             return response(['r' => true, 'm' => 'Password changed']);
         }
         return response(['r' => false, 'm' => 'User not found']);
+    }
+
+    public function setPhoto(Request $request, $id) {
+        if ($request->hasFile('photo')) {
+            $uid = Hashids::connection('user')->decode($id)[0];
+
+            try {
+                $folder = 'public/user-photos';
+                $thumb = $folder.'/thumbnail';
+                $photoFolder = storage_path('app/').$folder;
+                $thumbFolder = storage_path('app/').$thumb;
+                $photo = $request->photo;
+                $filename = $photo->hashName();
+                $photoPath = $photoFolder.'/'.$filename;
+                $thumbPath = $thumbFolder.'/'.$filename;
+
+                if (!is_dir($photoFolder)) {  mkdir($photoFolder, 0777, true);  }
+                if (!is_dir($thumbFolder)) {  mkdir($thumbFolder, 0777, true);  }
+
+                // save photo
+                $img = Image::make($photo);
+
+                // resize image if height is bigger than 100px
+                $photoHeight = 250;
+                if ($img->height() > $photoHeight) {
+                    $img->resize(null, $photoHeight, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                }
+                $img->save($photoPath);
+                // photo thumbnail
+                $thumbSize = 40;
+                $img->resize(null, $thumbSize, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+                $img->save($thumbPath);
+
+                // update user profile photo
+                $user = User::find($uid);
+
+                // clean up old photo
+                if ($user->photo) {
+                    Storage::delete($folder.'/'.$user->photo);
+                    Storage::delete($thumb.'/'.$user->photo);
+                }
+
+                $user->photo = $filename;
+                $user->save();
+
+                return response(['r' => true, 'm' => 'User photo uploaded', 'photo' => $filename]);
+            } catch(\Exception $e) {
+                return response(['r' => false, 'm' => $e->getMessage(), 'err' => $e]);
+            }
+        }
+
+        return response(['r' => false, 'm' => 'Logo image is expected']);
     }
 
     public function verify(Request $request, $id) {

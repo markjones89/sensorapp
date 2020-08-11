@@ -17,6 +17,13 @@ export const store = {
         this.state.user = user
     },
     /**
+     * Sets the photo of the current user
+     * @param {string} photo Photo file name
+     */
+    setUserPhoto(photo) {
+        if (this.state.user) this.state.user.photo = photo
+    },
+    /**
      * Sets the company logo of the current user
      * @param {string} logo Company logo file name
      */

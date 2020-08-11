@@ -15,5 +15,6 @@
     "/js/insights/heat-map.js": "/js/insights/heat-map.js",
     "/js/insights/live-view.js": "/js/insights/live-view.js",
     "/js/insights/time-graph.js": "/js/insights/time-graph.js",
-    "/js/profile.js": "/js/profile.js"
+    "/js/profile.js": "/js/profile.js",
+    "/vendors~js/profile.js": "/vendors~js/profile.js"
 }

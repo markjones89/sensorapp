@@ -6,7 +6,7 @@
             </span>
             <div class="user-panel">
                 <div class="profile-panel">
-                    <img class="user-pic" :src="`${baseUrl}/images/user0001.jpg`" width="40">
+                    <img class="user-pic" :src="userPhoto" width="40">
                     <span class="user-name">{{ user.name }}</span>
                     <span class="user-menus-caret" @click="showUserMenu = !showUserMenu">
                         <span class="caret">
@@ -61,6 +61,14 @@ export default {
             sharedState: store.state, showUserMenu: false, user: null
         }
     },
+    computed: {
+        baseUrl() { return getBaseUrl() },
+        userPhoto() {
+            return this.user && this.user.photo ?
+                `${this.baseUrl}/storage/user-photos/thumbnail/${this.user.photo}`:
+                `${this.baseUrl}/images/user0001.jpg`
+        }
+    },
     methods: {
         userOptsHandler(e) {
             let _ = this
@@ -79,9 +87,6 @@ export default {
                 window.location = `${this.baseUrl}/login`
             })
         }
-    },
-    computed: {
-        baseUrl() { return getBaseUrl() }
     },
     created() {
         axios.interceptors.request.use(function (config) {
