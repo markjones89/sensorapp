@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\BuildingInfo;
 use App\Models\Location;
 use Hashids;
 
@@ -14,18 +15,18 @@ class LocationsController extends Controller
         if ($request->cid) {
             $cid = Hashids::decode($request->cid)[0];
             
-            return response(Location::where('company_id', $cid)->get());
+            return response(Location::with('building_info')->where('company_id', $cid)->get());
         }
 
         // by id
         if ($request->id) {
             $id = Hashids::decode($request->id)[0];
 
-            return response(Location::find($id));
+            return response(Location::with('building_info')->find($id));
         }
 
         // all
-        return response(Location::all());
+        return response(Location::with('building_info')->all());
     }
 
     public function create(Request $request) {
@@ -46,7 +47,18 @@ class LocationsController extends Controller
             $loc->city = $request->city;
             $loc->save();
 
-            return response(['r' => true, 'm' => 'Location added', 'data' => $loc]);
+            if ($request->has('building_info')) {
+                $info = new BuildingInfo;
+
+                $info->building_id = $loc->id;
+                $info->rental_metre = $request->building_info['rental_metre'];
+                $info->rental_foot = $request->building_info['rental_foot'];
+                $info->furniture_cost = $request->building_info['furniture_cost'];
+                $info->people_alloc = $request->building_info['people_alloc'];
+                $info->save();
+            }
+
+            return response(['r' => true, 'm' => 'Location added', 'data' => Location::with('building_info')->find($loc->id)]);
         }
     }
 
@@ -63,6 +75,22 @@ class LocationsController extends Controller
             $loc->state = $request->state;
             $loc->city = $request->city;
             $loc->save();
+
+            if ($request->has('building_info')) {
+                $info = BuildingInfo::where('building_id', $lid)->first();
+
+                if (!$info) {
+                    $info = new BuildingInfo;
+
+                    $info->building_id = $lid;
+                }
+
+                $info->rental_metre = $request->building_info['rental_metre'];
+                $info->rental_foot = $request->building_info['rental_foot'];
+                $info->furniture_cost = $request->building_info['furniture_cost'];
+                $info->people_alloc = $request->building_info['people_alloc'];
+                $info->save();
+            }
 
             return response(['r' => true, 'm' => 'Location updated']);
         }

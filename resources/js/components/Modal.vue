@@ -9,7 +9,7 @@
                         <close-icon height="24" width="24" />
                     </span>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body custom-scroll">
                     <slot />
                 </div>
                 <div class="modal-footer">

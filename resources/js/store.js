@@ -15,5 +15,12 @@ export const store = {
      */
     setUser(user) {
         this.state.user = user
+    },
+    /**
+     * Sets the company logo of the current user
+     * @param {string} logo Company logo file name
+     */
+    setCompanyLogo(logo) {
+        if (this.state.user) this.state.user.company.logo = logo
     }
 }

@@ -15,6 +15,10 @@ class Location extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function building_info() {
+        return $this->hasOne(BuildingInfo::class, 'building_id', 'id');
+    }
+
     public function floors() {
         return $this->hasMany(Floor::class, 'building_id');
     }

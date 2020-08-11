@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('clients', 'CompaniesController@get');
 Route::post('clients', 'CompaniesController@create');
+Route::post('clients/logo', 'CompaniesController@setLogo');
 Route::put('clients/{id}', 'CompaniesController@update');
 Route::delete('clients/{id}', 'CompaniesController@delete');
 

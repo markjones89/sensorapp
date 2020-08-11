@@ -1,7 +1,9 @@
 <template>
     <div id="_app" class="app-wrapper" v-if="user">
         <div class="app-header">
-            <span class="logo">Newco Logo</span>
+            <span class="logo" @click="toHome">
+                <img :src="`${baseUrl}/storage/logos/${user.company.logo}`" v-if="user.company && user.company.logo">
+            </span>
             <div class="user-panel">
                 <div class="profile-panel">
                     <img class="user-pic" :src="`${baseUrl}/images/user0001.jpg`" width="40">
@@ -71,6 +73,7 @@ export default {
                 if (e.keyCode === 27) _.showUserMenu = false
             }
         },
+        toHome() { router.push({ name: 'home' }) },
         logout() {
             axios.get('/logout').then(() => {
                 window.location = `${this.baseUrl}/login`

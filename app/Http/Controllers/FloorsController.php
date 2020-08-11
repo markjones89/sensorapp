@@ -80,7 +80,7 @@ class FloorsController extends Controller
     public function setFloorPlan(Request $request) {
         if ($request->hasFile('floor_plan')) {
             $fid = Hashids::decode($request->id)[0];
-            
+
             try {
                 $fpFolder = 'floors';
                 $fpThumbFolder = $fpFolder.'/thumbnail';
@@ -116,11 +116,11 @@ class FloorsController extends Controller
 
                 $floor->floor_plan = $filename;
                 $floor->save();
+
+                return response(['r' => true, 'm' => 'Floor plan uploaded', 'floor_plan' => $filename]);
             } catch(\Exception $e) {
                 return response(['r' => false, 'm' => $e->getMessage(), 'err' => $e]);
             }
-
-            return response(['r' => true, 'm' => 'Floor plan uploaded', 'floor_plan' => $filename]);
         }
 
         return response(['r' => false, 'm' => 'Floor plan image is expected']);

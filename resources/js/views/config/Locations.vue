@@ -11,13 +11,43 @@
         </transition>
         <modal :show="showEntry" @close="toggleEntry(false)">
             <template v-slot:header>
-                <h2>{{ editMode ? 'Edit' : 'Add' }} Location</h2>
+                <h2>{{ editMode ? 'Edit' : 'Add' }} {{ entry.is_building ? 'Building' : 'Location' }}</h2>
             </template>
             <div id="loc-entry">
                 <div class="input-field">
                     <label>Name</label>
                     <input type="text" v-model="entry.name" ref="location">
                 </div>
+                <template v-if="entry.is_building">
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Rental per m<sup>2</sup></label>
+                                <input type="text" v-model="entry.info.rental_metre">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Rental per ft<sup>2</sup></label>
+                                <input type="text" v-model="entry.info.rental_foot">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Workspace Furniture Cost</label>
+                                <input type="text" v-model="entry.info.furniture_cost">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Allocated People</label>
+                                <input type="text" v-model="entry.info.people_alloc">
+                            </div>
+                        </div>
+                    </div>
+                </template>
                 <div class="input-field">
                     <label>Continent</label>
                     <select v-model="entry.continent">
@@ -61,7 +91,7 @@
 }
 #loc-entry {
     position: relative;
-    width: 350px;
+    width: 400px;
 }
 </style>
 <script>
@@ -93,7 +123,10 @@ export default {
             //     continents: [], countries: [], states: [], cities: []
             // },
             entry: {
-                parent: null, id: null, name: '', continent: '', country: '', state: '', city: ''
+                parent: null, id: null, name: '', continent: '', country: '', state: '', city: '', is_building: false,
+                info: {
+                    rental_metre: 0, rental_foot: 0, furniture_cost: 0, people_alloc: 0
+                }
             },
             loaded: false, showEntry: false, editMode: false,
             state: {
@@ -214,6 +247,12 @@ export default {
         async getData() {
             let { data } = await axios.get(api.locations, { params: { cid: this.compId } })
 
+            data.forEach(l => {
+                if (l.state && l.city) {
+                    l.is_building = true
+                }
+            })
+
             this.locations = data
             this.loaded = true
         },
@@ -224,11 +263,19 @@ export default {
         },
         toggleSaving(saving) { this.state.saving = saving },
         triggerAdd(parent, tItem, depth) {
-            let tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+            let tz = Intl.DateTimeFormat().resolvedOptions().timeZone,
+                isBuilding = depth > 0
 
             this.entry.parent = parent
             this.entry.id = null
             this.entry.name = ''
+            this.entry.is_building = isBuilding
+            
+            // building info
+            this.entry.info.rental_metre = 0
+            this.entry.info.rental_foot = 0
+            this.entry.info.furniture_cost = 0
+            this.entry.info.people_alloc = 0
 
             if (tz.startsWith('Africa')) this.entry.continent = 'Africa'
             else if (tz.startsWith('America')) this.entry.continent = 'North America'
@@ -265,6 +312,15 @@ export default {
             if (!isEdit) data.company = this.compId
             if (this.entry.parent) data.parent = this.entry.parent
 
+            if (this.entry.is_building) {
+                data.building_info = {
+                    rental_metre: this.entry.info.rental_metre,
+                    rental_foot: this.entry.info.rental_foot,
+                    furniture_cost: this.entry.info.furniture_cost,
+                    people_alloc: this.entry.info.people_alloc
+                }
+            }
+
             return data
         },
         async addLoc() {
@@ -275,6 +331,7 @@ export default {
                     let res = x.data
 
                     if (res.r) {
+                        res.data.is_building = this.entry.is_building
                         this.locations.push(res.data)
                         this.toggleEntry(false)
                     }
@@ -290,13 +347,28 @@ export default {
             this.entry.country = l.country
             this.entry.state = l.state
             this.entry.city = l.city
+            this.entry.is_building = l.is_building
+
+            if (l.building_info) {
+                this.entry.info.rental_metre = l.building_info.rental_metre
+                this.entry.info.rental_foot = l.building_info.rental_foot
+                this.entry.info.furniture_cost = l.building_info.furniture_cost
+                this.entry.info.people_alloc = l.building_info.people_alloc
+            } else {
+                this.entry.info.rental_metre = 0
+                this.entry.info.rental_foot = 0
+                this.entry.info.furniture_cost = 0
+                this.entry.info.people_alloc = 0
+            }
+
             this.editMode = true
 
             this.toggleEntry(true)
         },
         async upLoc() {
             this.toggleSaving(true)
-            axios.put(`${api.locations}/${this.entry.id}`, this.getEntry(true))
+            let _entry = this.getEntry(true)
+            axios.put(`${api.locations}/${this.entry.id}`, _entry)
                 .then(x => {
                     this.toggleSaving(false)
                     let res = x.data
@@ -309,6 +381,9 @@ export default {
                         l.country = this.entry.country
                         l.state = this.entry.state
                         l.city = this.entry.city
+
+                        if (this.entry.is_building) l.building_info = _entry.building_info
+
                         this.toggleEntry(false)
                     }
                 })

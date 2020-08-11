@@ -49,9 +49,20 @@ svg {
     .app-header {
         position: relative;
         padding: 32px 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
         .logo {
+            display: inline-flex;
             font-size: 24px;
+            cursor: pointer;
+
+            img {
+                height: 40px;
+                width: auto;
+                pointer-events: none;
+            }
         }
 
         .user-panel {
@@ -492,11 +503,57 @@ textarea {
 }
 
 .modalIn-enter-active, .modalIn-leave-active {
-    transition: opacity .24s, margin-top .24s;
+    // transition: opacity .24s, margin-top .24s;
+    transition: opacity .24s, transform .24s;
 }
 .modalIn-enter, .modalIn-leave-to {
     opacity: 0;
-    margin-top: 24px;
+    transform: scale(1.065);
+    // margin-top: 24px;
+}
+
+/* custom scrollbar */
+.custom-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+.custom-scroll::-webkit-scrollbar-button { height:0; width:0; }
+.custom-scroll::-webkit-scrollbar-button:start:decrement,
+.custom-scroll::-webkit-scrollbar-button:end:increment { display:block; }
+.custom-scroll::-webkit-scrollbar-button:vertical:start:increment,
+.custom-scroll::-webkit-scrollbar-button:vertical:end:decrement { display:none; }
+.custom-scroll::-webkit-scrollbar-track:vertical {
+    background-clip: padding-box;
+    background-color: transparent;
+    border-left-width: 4px;
+    border-right-width:0;
+}
+.custom-scroll::-webkit-scrollbar-track:horizontal {
+    background-clip: padding-box;
+    background-color: transparent;
+    border-bottom-width: 0;
+    border-top-width: 4px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    box-shadow:inset 1px 1px 0 rgba(0,0,0,.2), inset 0 -1px 0 rgba(0,0,0,.07);
+    background-clip:padding-box;
+    background-color:rgba(0,0,0,.2);
+    min-height:28px;
+    padding-top:100px;
+    border-radius: 10px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    box-shadow: inset 1px 1px 1px rgba(0,0,0,.25);
+    background-color: rgba(0,0,0,.4);
+}
+.custom-scroll::-webkit-scrollbar-thumb:active {
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,.35);
+    background-color: rgba(0,0,0,.5);
+}
+.custom-scroll::-webkit-scrollbar-track:hover {
+    box-shadow:inset 1px 0 0 rgba(0,0,0,.2);
+    background-color:rgba(0,0,0,.05);
+}
+.custom-scroll::-webkit-scrollbar-track:active {
+    box-shadow:inset 1px 0 0 rgba(0,0,0,.25), inset -1px -1px 0 rgba(0,0,0,.07);
+    background-color:rgba(0,0,0,.05);
 }
 
 /* nprogress override */

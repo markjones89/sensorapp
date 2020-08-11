@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\WorkSetting;
@@ -51,6 +52,38 @@ class CompaniesController extends Controller
 
             return response(['r' => true, 'm' => 'Company updated']);
         }
+    }
+
+    public function setLogo(Request $request) {
+        if ($request->hasFile('logo')) {
+            $cid = Hashids::decode($request->id)[0];
+
+            try {
+                $logoFolder = 'public/logos';
+                $logo = $request->logo;
+                $filename = $logo->hashName();
+
+                // save file
+                $path = $logo->store($logoFolder);
+
+                // update floor
+                $comp = Company::find($cid);
+
+                // clean up old logo
+                if ($comp->logo) {
+                    Storage::delete($logoFolder.'/'.$comp->logo);
+                }
+
+                $comp->logo = $filename;
+                $comp->save();
+
+                return response(['r' => true, 'm' => 'Floor plan uploaded', 'logo' => $filename]);
+            } catch(\Exception $e) {
+                return response(['r' => false, 'm' => $e->getMessage(), 'err' => $e]);
+            }
+        }
+
+        return response(['r' => false, 'm' => 'Logo image is expected']);
     }
 
     public function delete($id) {

@@ -4,12 +4,27 @@
         <transition name="fadeUp">
             <div id="client-list" v-if="loaded">
                 <div class="client" v-for="c in clientList" :key="c.hid">
-                    <div class="client-opts">
-                        <a class="client-opt" @click="triggerEdit(c.hid)">Edit</a>
-                        <a class="client-opt" @click="delClient(c.hid)">Remove</a>
+                    <div class="client-logo">
+                        <div class="logo-upload-progress" v-if="c.upload_info.uploading">
+                            <circle-progress :percent="c.upload_info.progress" />
+                        </div>
+                        <div class="logo-holder" v-if="c.logo">
+                            <img :src="`${baseUrl}/storage/logos/${c.logo}`">
+                            <a @click="upLogo(c.hid)" class="logo-opt">Change Logo</a>
+                        </div>
+                        <div v-else class="logo-upload-trigger" @click="upLogo(c.hid)">
+                            Add Logo
+                        </div>
                     </div>
+                    <div class="client-info">
+                        <div class="client-opts">
+                            <a class="client-opt" @click="triggerEdit(c.hid)">Edit</a>
+                            <a class="client-opt" @click="delClient(c.hid)">Remove</a>
+                        </div>
                     {{ c.name }}
+                    </div>
                 </div>
+                <input type="file" ref="logoFile" hidden accept="image/*" @change="logoFileChange" />
                 <button class="btn btn-primary" id="add-btn" @click="triggerAdd">Add Client</button>
             </div>
         </transition>
@@ -40,13 +55,91 @@
     }
 }
 .client {
+    display: flex;
     font-size: 20px;
     padding: 10px;
     border-radius: 10px;
     transition: background-color .24s linear;
 
     &:hover {
-        background-color: rgba($color: #ffffff, $alpha: 0.04);
+        background-color: rgba($color: #ffffff, $alpha: 0.025);
+    }
+
+    .client-logo {
+        position: relative;
+        width: 170px;
+        height: 68px;
+        overflow: hidden;
+
+        .logo-upload-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            background-color: #2B2B2B;
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .logo-upload-trigger {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100% - 2px);
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px dashed rgba(255, 255, 255, .1);
+            border-radius: 10px;
+        }
+
+        .logo-holder {
+            position: relative;
+            height: 48px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            overflow: hidden;
+
+            img {
+                height: 100%;
+                width: auto;
+                max-width: 100%;
+                pointer-events: none;
+            }
+
+            .logo-opt {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                font-size: 14px;
+                visibility: hidden;
+                opacity: 0;
+                transform: scale(1.25);
+                background-color: rgba($color: #393939, $alpha: 0.8);
+                transition: visibility .24s, opacity .24s, transform .24s;
+            }
+
+            &:hover .logo-opt {
+                visibility: visible;
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    }
+
+    .client-info {
+        padding-left: 16px;
     }
 
     .client-opts {
@@ -66,10 +159,14 @@
 }
 </style>
 <script>
-import { Loader, Modal } from '../../components'
+import { getBaseUrl } from '../../helpers'
+import { CircleProgress, Loader, Modal } from '../../components'
+
+const api = '/api/clients'
+
 export default {
     title: 'Clients',
-    components: { Loader, Modal },
+    components: { CircleProgress, Loader, Modal },
     data() {
         return {
             clients: [], cName: '', cId: null,
@@ -80,6 +177,7 @@ export default {
         }
     },
     computed: {
+        baseUrl() { return getBaseUrl() },
         clientList() {
             return this.clients.sort((a, b) => {
                 if (a.name > b.name) return 1
@@ -90,7 +188,13 @@ export default {
     },
     methods: {
         async getData() {
-            let { data } = await axios.get('/api/clients')
+            let { data } = await axios.get(api)
+
+            data.forEach(c => {
+                c.upload_info = {
+                    uploading: false, progress: 0
+                }
+            })
 
             this.clients = data
             this.loaded = true
@@ -110,7 +214,7 @@ export default {
         },
         async addClient() {
             this.toggleSaving(true)
-            axios.post('/api/clients', { name: this.cName })
+            axios.post(api, { name: this.cName })
                 .then(x => {
                     this.toggleSaving(false)
                     let res = x.data
@@ -134,7 +238,7 @@ export default {
         },
         async upClient() {
             this.toggleSaving(true)
-            axios.put(`/api/clients/${this.cId}`, { name: this.cName })
+            axios.put(`${api}/${this.cId}`, { name: this.cName })
                 .then(x => {
                     this.toggleSaving(false)
                     let res = x.data
@@ -152,7 +256,7 @@ export default {
 
             if (confirm(`Remove ${this.clients[idx].name} from clients?`)) {
                 this.toggleSaving(true)
-                axios.delete(`/api/clients/${id}`)
+                axios.delete(`${api}/${id}`)
                     .then(x => {
                         this.toggleSaving(false)
                         let res = x.data
@@ -162,6 +266,48 @@ export default {
                         }
                     })
             }
+        },
+        upLogo(id) {
+            this.cId = id
+            this.$refs.logoFile.click()
+        },
+        logoFileChange() {
+            let _ = this, file = _.$refs.logoFile.files[0]
+            
+            if (file) {
+                let c = _.clients.find(c => c.hid === _.cId)
+
+                c.upload_info.uploading = true
+                _.uploadLogo(file, function(success, res) {
+                    c.upload_info.uploading = false
+                    if (success) {
+                        if (res.r) {
+                            c.logo = res.logo
+                        }
+                    } else {
+                        console.error(res)
+                    }
+                })
+            }
+        },
+        async uploadLogo(file, cb) {
+            let formData = new window.FormData(),
+                c = this.clients.find(c => c.hid === this.cId)
+
+            formData.append('logo', file)
+            formData.append('id', this.cId)
+
+            axios.post(`${api}/logo`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: function(progress) {
+                    var percentCompleted = Math.round((progress.loaded * 100) / progress.total)
+
+                    c.upload_info.progress = percentCompleted
+                }
+            }).then(x => cb(true, x.data))
+            .catch(err => cb(false, err))
         }
     },
     mounted() {
