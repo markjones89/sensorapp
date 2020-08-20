@@ -12,11 +12,11 @@
     "devDependencies": {
         "axios": "^0.19",
         "cross-env": "^7.0",
-        "laravel-mix": "^5.0.1",
-        "lodash": "^4.17.13",
+        "laravel-mix": "^5.0.4",
+        "lodash": "^4.17.20",
         "resolve-url-loader": "^3.1.0",
-        "sass": "^1.15.2",
-        "sass-loader": "^8.0.0",
+        "sass": "^1.26.10",
+        "sass-loader": "^9.0.3",
         "vue-template-compiler": "^2.6.11"
     },
     "dependencies": {
@@ -25,6 +25,7 @@
         "nprogress": "^0.2.0",
         "vue": "^2.6.11",
         "vue-advanced-cropper": "^0.16.10",
-        "vue-router": "^3.3.4"
+        "vue-router": "^3.4.3",
+        "vue-switches": "^2.0.1"
     }
 }

@@ -33,6 +33,20 @@ class UsersController extends Controller
 
         return response(User::with('role')->where('company_id', $compId)->get());
     }
+
+    /**
+     * Generates a unique username using an email address
+     */
+    public function usernameFromEmail($email) {
+        return rtrim(strtr(base64_encode($email), '+/', '-_'), '=');
+    }
+
+    /**
+     * Returns the email address used to generate the unique username
+     */
+    public function usernameToEmail($username) {
+        return base64_decode(str_pad(strtr($username, '-_', '+/'), strlen($username) % 4, '=', STR_PAD_RIGHT));
+    }
     
     public function create(Request $request) {
         if ($request->name == '' || !$request->has('name')) {

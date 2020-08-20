@@ -10,6 +10,7 @@
 </head>
 <body>
     <div id="app"></div>
+    {{-- <script src="{{ asset(mix('js/vendor.js')) }}"></script> --}}
     <script src="{{ asset(mix('js/app-verify.js')) }}"></script>
 </body>
 </html>

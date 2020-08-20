@@ -19,6 +19,10 @@ class Floor extends Model
         return $this->hasMany(SensorMap::class, 'floor_id');
     }
 
+    public function areas() {
+        return $this->hasMany(AreaMap::class, 'floor_id');
+    }
+
     public function getBIdAttribute() {
         return Hashids::encode($this->attributes['building_id']);
     }

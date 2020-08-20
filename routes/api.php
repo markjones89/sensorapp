@@ -30,6 +30,7 @@ Route::put('locations/{id}', 'LocationsController@update');
 Route::delete('locations/{id}', 'LocationsController@delete');
 
 Route::get('floors', 'FloorsController@get');
+Route::get('floors/{id}/data', 'FloorsController@getData');
 Route::post('floors', 'FloorsController@create');
 Route::post('floors/plan', 'FloorsController@setFloorPlan');
 Route::put('floors/{id}', 'FloorsController@update');
@@ -40,6 +41,12 @@ Route::post('sensors', 'SensorsController@create');
 Route::put('sensors/{id}', 'SensorsController@update');
 Route::put('sensors/coord/{id}', 'SensorsController@updatePos');
 Route::delete('sensors/{id}', 'SensorsController@delete');
+
+Route::get('areas', 'AreasController@get');
+Route::post('areas', 'AreasController@create');
+Route::put('areas/{id}', 'AreasController@update');
+Route::put('areas/coord/{id}', 'AreasController@updatePos');
+Route::delete('areas/{id}', 'AreasController@delete');
 
 Route::get('work-configs', 'WorkSettingsController@get');
 Route::post('work-configs', 'WorkSettingsController@create');

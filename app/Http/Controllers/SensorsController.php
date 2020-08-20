@@ -46,6 +46,7 @@ class SensorsController extends Controller
                 $map->name = $request->name;
                 $map->pos_x = $request->pos_x;
                 $map->pos_y = $request->pos_y;
+                $map->scale = $request->scale;
                 $map->save();
 
                 return response(['r' => true, 'm' => 'Sensor added', 'data' => $map]);
@@ -70,13 +71,14 @@ class SensorsController extends Controller
 
     public function updatePos(Request $request, $id) {
         $mid = Hashids::decode($id)[0];
-        if (!$request->has('pos_x') || !$request->has('pos_y')) {
+        if (!$request->has('pos_x') || !$request->has('pos_y') || !$request->has('scale')) {
             return response(['r' => false, 'm' => 'Sensor position is required']);
         } else {
             $map = SensorMap::find($mid);
 
             $map->pos_x = $request->pos_x;
             $map->pos_y = $request->pos_y;
+            $map->scale = $request->scale;
             $map->save();
 
             return response(['r' => true, 'm' => 'Sensor position updated']);

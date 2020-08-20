@@ -14,49 +14,57 @@ const router = new VueRouter({
         { path: '/', name: 'home', component: spaHome, alias: '/home' },
         {
             path: '/cost-analysis', name: 'cost-analysis',
-            component: () => import(/* webpackChunkName: "js/insights/cost-analysis" */ './views/insights/CostAnalysis.vue')
+            component: () => import(/* webpackChunkName: "js/views/insights/cost-analysis" */ './views/insights/CostAnalysis.vue')
         },
         {
             path: '/time', name: 'time',
-            component: () => import(/* webpackChunkName: "js/insights/time-graph" */ './views/insights/TimeGraph.vue')
+            component: () => import(/* webpackChunkName: "js/views/insights/time-graph" */ './views/insights/TimeGraph.vue')
+        },
+        {
+            path: '/peak', name: 'peak',
+            component: () => import(/* webpackChunkName: "js/views/insights/peak-graph" */ './views/insights/PeakAvg.vue')
         },
         {
             path: '/live', name: 'live',
-            component: () => import(/* webpackChunkName: "js/insights/live-view" */ './views/insights/HeatMap.vue')
+            component: () => import(/* webpackChunkName: "js/views/insights/live-view" */ './views/insights/HeatMap.vue')
         },
         {
             path: '/heat-map', name: 'heat-map',
-            component: () => import(/* webpackChunkName: "js/insights/heat-map" */ './views/insights/LiveView.vue')
+            component: () => import(/* webpackChunkName: "js/views/insights/heat-map" */ './views/insights/LiveView.vue')
         },
         {
             path: '/profile', name: 'profile',
-            component: () => import(/* webpackChunkName: "js/profile" */ './views/Profile.vue')
+            component: () => import(/* webpackChunkName: "js/views/profile" */ './views/Profile.vue')
         },
         {
             path: '/clients', name: 'clients',
-            component: () => import(/* webpackChunkName: "js/config/clients" */ './views/config/Clients.vue')
+            component: () => import(/* webpackChunkName: "js/views/config/clients" */ './views/config/Clients.vue')
         },
         {
             path: '/locations', name: 'locations',
-            component: () => import(/* webpackChunkName: "js/config/locations" */ './views/config/Locations.vue')
+            component: () => import(/* webpackChunkName: "js/views/config/locations" */ './views/config/Locations.vue')
         },
         {
             path: '/locations/:bid/floors', name: 'floors', 
             props: (route) => ({ bldg_id: route.params.bid, bldg_name: route.params.bldg_name }),
-            component: () => import(/* webpackChunkName: "js/config/floors" */ './views/config/Floors.vue')
+            component: () => import(/* webpackChunkName: "js/views/config/floors" */ './views/config/Floors.vue')
         },
         {
-            path: '/locations/:bid/sensors', name: 'sensors', 
+            path: '/locations/:bid/mapper', name: 'mapper', 
             props: (route) => ({ bldg_id: route.params.bid, bldg_name: route.params.bldg_name, floor_id: route.query.fid }),
-            component: () => import(/* webpackChunkName: "js/config/sensors" */ './views/config/SensorMapping.vue')
+            component: () => import(/* webpackChunkName: "js/views/config/mapper" */ './views/config/FloorMapping.vue')
         },
         {
             path: '/work-settings', name: 'work-settings',
-            component: () => import(/* webpackChunkName: "js/config/work-settings" */ './views/config/WorkSettings.vue')
+            component: () => import(/* webpackChunkName: "js/views/config/work-settings" */ './views/config/WorkSettings.vue')
         },
         {
             path: '/users', name: 'users',
-            component: () => import(/* webpackChunkName: "js/config/users" */ './views/config/Users.vue')
+            component: () => import(/* webpackChunkName: "js/views/config/users" */ './views/config/Users.vue')
+        },
+        {
+            path: '/sync-places', name: 'sync-places',
+            component: () => import(/* webpackChunkName: "js/views/config/sync-places" */ './views/config/Places.vue')
         }
     ]
 })

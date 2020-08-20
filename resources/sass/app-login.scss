@@ -73,6 +73,11 @@ input {
         margin-left: 12px; 
     }
 
+    &.btn-block {
+        display: block;
+        width: 100%;
+    }
+
     &.btn-primary {
         background-color: $primaryColor;
 

@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/widgets/{url}', 'AppController@widget')
+    ->where(['url' => 'time-chart|live'])
+    ->name('widget');
+
 Route::middleware(['guest'])->group(function(){
     Route::get('/login', 'AuthController@login')->name('login');
     Route::post('/login/auth', 'AuthController@authenticate'); // for axios call
@@ -48,10 +52,11 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/', function () { return view('app'); });
     Route::group(['prefix' => 'locations'], function () {
         Route::get('{bid}/floors', 'AppController@location');
-        Route::get('{bid}/sensors', 'AppController@location');
+        Route::get('{bid}/mapper', 'AppController@location');
     });
+
     Route::get('/{url}', 'AppController@index')
         // ->where(['url' => 'home|profile|clients|locations|floors|sensors|users|work-settings'])
-        ->where(['url' => 'home|profile|clients|locations|users|work-settings'])
+        ->where(['url' => 'home|profile|clients|locations|users|sync-places|work-settings|time|peak|cost-analysis|live|heat-map'])
         ->name('app');
 });

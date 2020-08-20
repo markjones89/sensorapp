@@ -21,7 +21,7 @@ function circlePacker(wrapper, data) {
         .interpolate(d3.interpolateRgb)
 
     const svg = container
-        .append("svg")
+        .append("svg").attr('class', 'circle-packs')
         .attr("width", width).attr("height", height)
         .attr("viewBox", `-${width / 2} -${height / 2} ${width} ${height}`)
         .style("display", "block")

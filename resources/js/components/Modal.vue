@@ -1,7 +1,7 @@
 <template>
     <transition name="modalIn">
         <aside class="modal" v-if="show">
-            <div class="modal-overlay"></div>
+            <div class="modal-overlay" @click="close"></div>
             <div class="modal-wrapper">
                 <div class="modal-header">
                     <slot name="header" />

@@ -57,6 +57,12 @@
     </div>
 </template>
 <style lang="scss">
+.circle-packs {
+    pointer-events: all;
+    border-radius: 50%;
+}
+</style>
+<style lang="scss" scoped>
 #cost-analysis-btn {
     margin-left: 12px;
 }
@@ -64,11 +70,6 @@
 #chart {
     width: 50%;
     padding: 64px;
-
-    svg {
-        pointer-events: all;
-        border-radius: 50%;
-    }
 }
 
 #embed-wrapper {
@@ -85,10 +86,9 @@
 }
 </style>
 <script>
-import * as d3 from "d3"
 import { addEvent, getBaseUrl, removeEvent } from "../helpers"
 import { Modal, TimeSlider } from "../components"
-import circlePacker from '../components/CirclePacks.js'
+import circlePacker from '../components/graphs/CirclePacks.js'
 import { CaretIcon } from "../components/icons"
 import { store } from '../store'
 export default {
@@ -116,7 +116,7 @@ export default {
             }
         },
         viewCostAnalysis() {
-            this.$root.$router.push({ name: 'cost-analysis' })
+            this.$router.push({ name: 'cost-analysis' })
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
@@ -124,9 +124,12 @@ export default {
         },
         async renderChart() {
             let baseUrl = getBaseUrl()
-            let json = await d3.json(`${baseUrl}/data/flare-2.json`)
-
-            circlePacker('#chart', json)
+            // let json = await d3.json(`${baseUrl}/data/flare-2.json`)
+            fetch(`${baseUrl}/data/flare-2.json`)
+                .then(response => response.json())
+                .then(json => {
+                    circlePacker('#chart', json)
+                })
         },
         timeStartChange(time) {
             // console.log('from', time)

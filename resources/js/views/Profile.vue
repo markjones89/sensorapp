@@ -1,19 +1,24 @@
 <template>
     <div class="content">
         <h1>Profile</h1>
-        <div class="user-photo">
-            <img :src="photoUrl">
-            <div class="photo-opt" @click="toggleUpPhoto(true)">Change</div>
-            <input type="file" ref="photoFile" hidden accept="image/*" @change="photoFileChange" />
+        <div class="info-panel">
+            <div class="user-photo">
+                <img :src="photoUrl">
+                <button class="btn btn-primary" @click="toggleUpPhoto(true)">Change Photo</button>
+                <input type="file" ref="photoFile" hidden accept="image/*" @change="photoFileChange" />
+            </div>
         </div>
         <modal :show="showUpload" @close="toggleUpPhoto(false)">
             <template v-slot:header>
                 <h2>Change Photo</h2>
             </template>
-            <div class="cropper-wrapper">
+            <div class="cropper-wrapper" :style="{ height: `${cropperHeight}px` }" ref="cropperWrap">
                 <loader type="spinner" :show="state.img_loading" />
                 <div class="cropper-opt" @click="upPhoto" v-if="!selected_photo">
                     Click to select a photo...
+                </div>
+                <div class="photo-preview" v-if="photoPreview" title="Preview">
+                    <img :src="photoPreview">
                 </div>
                 <cropper classname="cropper"
                     stencil-component="circle-stencil"
@@ -23,52 +28,59 @@
                     @change="imageCropped"></cropper>
             </div>
             <template v-slot:footer>
-                <button class="btn" @click="upPhoto" id="select-btn" v-if="selected_photo">Select another photo</button>
+                <button class="btn" @click="upPhoto" id="select-btn" v-if="selected_photo && !state.uploading">Select another photo</button>
                 <button class="btn btn-primary" @click="uploadPhoto" :disabled="state.uploading || !photo" id="upload-btn">{{ state.uploading ? 'Uploading...' : 'Upload'}}</button>
             </template>
         </modal>
     </div>
 </template>
 <style lang="scss" scoped>
-.user-photo {
-    position: relative;
-    display: inline-flex;
-    border-radius: 50%;
-    overflow: hidden;
+.info-panel {
+    padding-top: 32px;
 
-    img {
-        height: 200px;
-        width: 200px;
-    }
-
-    .photo-opt {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
+    .user-photo {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
         justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        visibility: hidden;
-        opacity: 0;
-        transform: scale(1.2);
-        background-color: rgba($color: #2B2B2B, $alpha: 0.9);
-        transition: visibility .24s, opacity .24s, transform .24s;
-    }
+        user-select: none;
+        overflow: hidden;
 
-    &:hover .photo-opt {
-        visibility: visible;
-        opacity: 1;
-        transform: scale(1);
+        img {
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        button {
+            margin-top: 16px;
+        }
     }
 }
 .cropper-wrapper {
     position: relative;
-    height: 380px;
-    width: 720px;
+    width: 1000px;
     max-width: 100%;
+
+    .photo-preview {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #2B2B2B;
+        border: 1px dashed hsla(0,0%,100%,.5);
+        border-radius: 50%;
+        overflow: hidden;
+        z-index: 1;
+
+        img {
+            height: 150px;
+            width: 150px;
+        }
+    }
 
     .cropper {
         overflow: hidden;
@@ -102,7 +114,7 @@
 </style>
 <script>
 import { store } from '../store'
-import { getBaseUrl } from '../helpers'
+import { addEvent, getBaseUrl, removeEvent } from '../helpers'
 import { Modal, Loader } from '../components'
 import { Cropper } from 'vue-advanced-cropper'
 
@@ -113,8 +125,8 @@ export default {
     components: { Cropper, Loader, Modal },
     data() {
         return {
-            user: null, photo: null, selected_photo: null,
-            showUpload: false,
+            user: null, photo: null, photoPreview: null, selected_photo: null,
+            showUpload: false, cropperHeight: 500,
             state: {
                 uploading: false, img_loading: false
             }
@@ -125,17 +137,25 @@ export default {
         photoUrl() {
             return this.user && this.user.photo ? `${this.baseUrl}/storage/user-photos/${this.user.photo}` : 
                 `${this.baseUrl}/images/user0001.jpg`
-        }
+        },
+        // photoPreview() { return this.photo ? this.photo.toDataURL() : null }
     },
     methods: {
         imageReady() { this.state.img_loading = false },
-        imageCropped({canvas}) { this.photo = canvas },
+        imageCropped({canvas}) {
+            this.photo = canvas
+            this.photoPreview = canvas.toDataURL()
+        },
         toggleUpPhoto(show) { 
             this.showUpload = show 
             
             if (show) {
+                setTimeout(() => {
+                    this.calcCropperHeight()
+                }, 0)
                 this.selected_photo = null
                 this.photo = null
+                this.photoPreview = null
             }
         },
         upPhoto() {
@@ -175,10 +195,24 @@ export default {
                     }
                 })
             }, 'image/jpeg')
-        }
+        },
+        calcCropperHeight() {
+            if (!this.showUpload) return
+
+            let minHeight = 300, wrapper = this.$refs.cropperWrap,
+                rect = wrapper.getBoundingClientRect(),
+                height = rect.width * 0.5
+
+            this.cropperHeight = height < minHeight ? minHeight : height
+        },
     },
     mounted() {
         this.user = store.getUser()
+
+        addEvent(window, 'resize', this.calcCropperHeight)
+    },
+    destroyed() {
+        removeEvent(window, 'resize', this.calcCropperHeight)
     }
 }
 </script>

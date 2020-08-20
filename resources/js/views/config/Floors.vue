@@ -26,7 +26,7 @@
                             {{ `${f.ordinal_no} Floor` }}
                             <div class="floor-opts">
                                 <template v-if="f.floor_plan">
-                                    <a class="floor-opt" @click="viewSensors(f.hid)">Sensors</a>
+                                    <a class="floor-opt" @click="toMapper(f.hid)">Mapper</a>
                                 </template>
                                 <a class="floor-opt" @click="triggerEdit(f.hid)">Edit</a>
                                 <a class="floor-opt" @click="delFloor(f.hid)">Remove</a>
@@ -119,6 +119,9 @@
         .fp-thumb {
             position: relative;
             height: 135px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background-color: #ffffff;
             
             img {
@@ -395,8 +398,8 @@ export default {
                 _.state.imgLoaded = true
             })
         },
-        viewSensors(id) {
-            this.$parent.$router.push({ name: 'sensors', query: { fid: id }, params: { bid: this.bldg_id, bldg_name: this.bldg_name } })
+        toMapper(id) {
+            this.$parent.$router.push({ name: 'mapper', query: { fid: id }, params: { bid: this.bldg_id, bldg_name: this.bldg_name } })
         }
     },
     created() {

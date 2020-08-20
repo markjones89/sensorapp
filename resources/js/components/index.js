@@ -1,3 +1,4 @@
+export { default as Checkbox } from './Checkbox.vue'
 export { default as CircleProgress } from './CircleProgress.vue'
 export { default as LocationItem } from './LocationItem.vue'
 export { default as Loader } from './LoaderBlock.vue'

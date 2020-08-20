@@ -4,7 +4,7 @@
         <transition name="fadeUp" appear>
             <div id="location-list" v-if="loaded">
                 <location-item v-for="l in locationList" :key="l.name" :item="l" :subs="l.children" :depth="0"
-                    @onAdd="triggerAdd" @onEdit="triggerEdit" @onDel="delLoc" @onSetup="toFloors" @onSensors="toSensorMap">
+                    @onAdd="triggerAdd" @onEdit="triggerEdit" @onDel="delLoc" @onSetup="toFloors" @onMapper="toMapper">
                 </location-item>
                 <button class="btn btn-primary" id="add-btn" @click="triggerAdd(null, null, 0)">Add Location</button>
             </div>
@@ -409,10 +409,10 @@ export default {
 
             this.$parent.$router.push({ name: 'floors', params: { bid: id, bldg_name: bldg.name } })
         },
-        toSensorMap(id) {
+        toMapper(id) {
             let bldg = this.locations.find(l => l.hid === id)
 
-            this.$parent.$router.push({ name: 'sensors', params: { bid: id, bldg_name: bldg.name } })
+            this.$parent.$router.push({ name: 'mapper', params: { bid: id, bldg_name: bldg.name } })
         },
         /* async getContinents() {
             let { data } = await axios.get(`${api.world.base}/${api.world.continent}`, {

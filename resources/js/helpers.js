@@ -139,6 +139,18 @@ export function getUrlParam(name) {
 }
 
 /**
+ * Returns the parameter value from specified url
+ * @param {String} url Url string
+ * @param {String} name Query string parameter name
+ */
+export function getParam(url, name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(url);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+/**
  * Formats a number to add ordinal suffix
  * @param {Number} number The number to format
  */

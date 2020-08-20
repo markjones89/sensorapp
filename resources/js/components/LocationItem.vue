@@ -11,7 +11,7 @@
                 <a class="loc-opt" @click="add(item.hid || parent, item, depth)" v-if="!isBuilding">Add</a>
                 <template v-if="isBuilding">
                     <a class="loc-opt" @click="toSetup(item.hid)">Setup</a>
-                    <a class="loc-opt" @click="toSensor(item.hid)">Sensors</a>
+                    <a class="loc-opt" @click="toMapper(item.hid)">Mapper</a>
                 </template>
                 <template v-if="item.hid">
                     <a class="loc-opt" @click="edit(item.hid)">Edit</a>
@@ -22,7 +22,7 @@
         <div class="subs" v-if="showSubs">
             <location-item v-for="s in subs" :key="s.name"
                 :item="s" :subs="s.children" :depth="depth + 1" :parent="item.hid || parent"
-                @onAdd="add" @onEdit="edit" @onDel="del" @onSetup="toSetup" @onSensors="toSensor"></location-item>
+                @onAdd="add" @onEdit="edit" @onDel="del" @onSetup="toSetup" @onMapper="toMapper"></location-item>
         </div>
     </div>
 </template>
@@ -110,8 +110,8 @@ export default {
         toSetup(id) {
             this.$emit('onSetup', id)
         },
-        toSensor(id) {
-            this.$emit('onSensors', id)
+        toMapper(id) {
+            this.$emit('onMapper', id)
         },
         add(id, item, depth) {
             this.$emit('onAdd', id, item, depth)

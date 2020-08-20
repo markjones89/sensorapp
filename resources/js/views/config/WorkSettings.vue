@@ -24,10 +24,7 @@
                         <div class="settings-section">
                             <h2>Working Days</h2>
                             <div class="days-list">
-                                <span class="checkbox" v-for="d in daysArr" :key="d.short">
-                                    <input type="checkbox" v-model="entry.work_days" :id="`cb${d.short}`" :value="d.short">
-                                    <label :for="`cb${d.short}`">{{ d.name }}</label>
-                                </span>
+                                <checkbox v-for="d in daysArr" :key="d.short" :label="d.name" :val="d.short" v-model="entry.work_days" />
                             </div>
                         </div>
                     </div>
@@ -115,12 +112,6 @@
 
     .days-list {
         padding: 10px 0;
-
-        .checkbox {
-            display: block;
-
-            & + .checkbox { margin-top: 8px; }
-        }
     }
 
     &.hours-section {
@@ -131,13 +122,14 @@
 <script>
 import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
-import { CircleProgress, Loader, TimeSlider } from '../../components'
+import { Checkbox, CircleProgress, Loader, TimeSlider } from '../../components'
 
 const api = '/api/work-configs'
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export default {
-    components: { CircleProgress, Loader, TimeSlider },
+    title: 'Work Settings',
+    components: { Checkbox, CircleProgress, Loader, TimeSlider },
     data() {
         return {
             loaded: false, user: null, settings: null,

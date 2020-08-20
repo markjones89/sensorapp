@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Floor;
+use App\Models\AreaMap;
+use App\Models\SensorMap;
 use File;
 use Hashids;
 use Image;
@@ -28,6 +30,15 @@ class FloorsController extends Controller
 
         // all
         return response(Floor::all());
+    }
+
+    public function getData($id) {
+        $fid = Hashids::decode($id)[0];
+
+        return response([
+            'areas' => AreaMap::where('floor_id', $fid)->get(),
+            'sensors' => SensorMap::where('floor_id', $fid)->get()
+        ]);
     }
 
     public function create(Request $request) {

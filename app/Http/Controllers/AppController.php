@@ -34,4 +34,8 @@ class AppController extends Controller
             else abort(404);
         } else abort(404);
     }
+
+    public function widget(Request $request, $url) {
+        return view('widget');
+    }
 }

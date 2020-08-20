@@ -1,9 +1,8 @@
 [
 { 
-	"continent": "Africa", "countries": [
+	"continent": "Africa", "code": "AF", "countries": [
 		{ 
-			"country": "Algeria", "timezone": "", 
-			"states": [
+			"country": "Algeria", "code": "DZ", "states": [
 				{ "province": "Adrar", "cities": [] },
 				{ "province": "Algiers", "cities": [] },
 				{ "province": "Annaba", "cities": [] },
@@ -65,8 +64,7 @@
 			] 
 		},
 		{ 
-			"country": "Angola", "timezone": "", 
-			"states": [
+			"country": "Angola", "code": "AO", "states": [
 				{ "province": "Bengo", "cities": [] },
 				{ "province": "Benguela", "cities": [] },
 				{ "province": "Bié", "cities": [] },
@@ -87,12 +85,11 @@
 				{ "province": "Zaire", "cities": [] }
 			] 
 		},
-		{ "country": "Benin", "timezone": "", "states": [] },
-		{ "country": "Botswana", "timezone": "", "states": [] },
-		{ "country": "Burkina Faso", "timezone": "", "states": [] },
+		{ "country": "Benin", "code": "BJ", "states": [] },
+		{ "country": "Botswana", "code": "BW", "states": [] },
+		{ "country": "Burkina Faso", "code": "BF", "states": [] },
 		{ 
-			"country": "Burundi", "timezone": "", 
-			"states": [
+			"country": "Burundi", "code": "BI", "states": [
 				{ "province": "Bubanza", "cities": [] },
 				{ "province": "Bujumbura Mairie", "cities": [] },
 				{ "province": "Bujumbura Rural", "cities": [] },
@@ -113,14 +110,13 @@
 				{ "province": "Ruyigi", "cities": [] }
 			] 
 		},
-		{ "country": "Cameroon", "timezone": "", "states": [] },
-		{ "country": "Cape Verde", "timezone": "", "states": [] },
-		{ "country": "Central African Republic", "timezone": "", "states": [] },
-		{ "country": "Chad", "timezone": "", "states": [] },
-		{ "country": "Camoros", "timezone": "", "states": [] },
+		{ "country": "Cameroon", "code": "CM", "states": [] },
+		{ "country": "Cape Verde", "code": "CV", "states": [] },
+		{ "country": "Central African Republic", "code": "CF", "states": [] },
+		{ "country": "Chad", "code": "TD", "states": [] },
+		{ "country": "Camoros", "code": "KM", "states": [] },
 		{ 
-			"country": "Democratic Republic of the Congo", "timezone": "", 
-			"states": [
+			"country": "Democratic Republic of the Congo", "code": "CD", "states": [
 				{ "province": "Kinshasa", "cities": [] },
 				{ "province": "Kongo Central", "cities": [] },
 				{ "province": "Kwango", "cities": [] },
@@ -149,9 +145,70 @@
 				{ "province": "Haut-Katanga Province", "cities": [] }
 			] 
 		},
+		{ "country": "Djibouti", "code": "DJ", "states": [] },
+		{ "country": "Egypt", "code": "EG", "states": [] },
 		{ 
-			"country": "Republic of the Congo", "timezone": "", 
-			"states": [
+			"country": "Equatorial Guinea", "code": "GQ", "states": [
+				{ "province": "Annobón", "cities": [] },
+				{ "province": "Bioko Norte", "cities": [] },
+				{ "province": "Bioko Sur", "cities": [] },
+				{ "province": "Centro Sur", "cities": [] },
+				{ "province": "Djibloho", "cities": [] },
+				{ "province": "Kié-Ntem", "cities": [] },
+				{ "province": "Litoral", "cities": [] },
+				{ "province": "Wele-Nzas", "cities": [] }
+			]
+		},
+		{ "country": "Eritrea", "code": "ER", "states": [] },
+		{ "country": "Ethiopia", "code": "ET", "states": [] },
+		{
+			"country": "Gabon", "code": "GA", "states": [
+				{ "province": "Estuaire", "cities": [] },
+				{ "province": "Haut-Ogooué", "cities": [] },
+				{ "province": "Moyen-Ogooué", "cities": [] },
+				{ "province": "Ngounié", "cities": [] },
+				{ "province": "Nyanga", "cities": [] },
+				{ "province": "Ogooué-Ivindo", "cities": [] },
+				{ "province": "Ogooué-Lolo", "cities": [] },
+				{ "province": "Ogooué-Maritime", "cities": [] },
+				{ "province": "Woleu-Ntem", "cities": [] }
+			]
+		},
+		{ "country": "Gambia", "code": "GM", "states": [] },
+		{ "country": "Ghana", "code": "GH", "states": [] },
+		{ "country": "Guinea", "code": "GN", "states": [] },
+		{ "country": "Guinea-Bissau", "code": "GW", "states": [] },
+		{ "country": "Ivory Coast", "code": "CI", "states": [] },
+		{ "country": "Kenya", "code": "KE", "states": [] },
+		{ "country": "Lesotho", "code": "LS", "states": [] },
+		{ "country": "Liberia", "code": "LR", "states": [] },
+		{ "country": "Libya", "code": "LY", "states": [] },
+		{ "country": "Madagascar", "code": "MG", "states": [] },
+		{ "country": "Malawi", "code": "MW", "states": [] },
+		{ "country": "Mali", "code": "ML", "states": [] },
+		{ "country": "Mauritania", "code": "MR", "states": [] },
+		{ "country": "Mauritius", "code": "MU", "states": [] },
+		{ "country": "Morocco", "code": "MA", "states": [] },
+		{ 
+			"country": "Mozambique", "code": "MZ", "states": [
+				{ "province": "Cabo Delgado", "cities": [] },
+				{ "province": "Gaza", "cities": [] },
+				{ "province": "Inhambane", "cities": [] },
+				{ "province": "Manica", "cities": [] },
+				{ "province": "Maputo", "cities": [] },
+				{ "province": "Maputo City", "cities": [] },
+				{ "province": "Nampula", "cities": [] },
+				{ "province": "Niassa", "cities": [] },
+				{ "province": "Sofala", "cities": [] },
+				{ "province": "Tete", "cities": [] },
+				{ "province": "Zambezia", "cities": [] }
+			]
+		},
+		{ "country": "Namibia", "code": "NA", "states": [] },
+		{ "country": "Niger", "code": "NE", "states": [] },
+		{ "country": "Nigeria", "code": "NG", "states": [] },
+		{ 
+			"country": "Republic of the Congo", "code": "CG", "states": [
 				{ "state": "Bouenza", "cities": [] },
 				{ "state": "Brazzaville", "cities": [] },
 				{ "state": "Cuvette", "cities": [] },
@@ -166,95 +223,37 @@
 				{ "state": "Sangha", "cities": [] }
 			]
 		},
-		{ "country": "Djibouti", "timezone": "", "states": [] },
-		{ "country": "Egypt", "timezone": "", "states": [] },
-		{ 
-			"country": "Equatorial Guinea", "timezone": "", 
-			"states": [
-				{ "province": "Annobón", "cities": [] },
-				{ "province": "Bioko Norte", "cities": [] },
-				{ "province": "Bioko Sur", "cities": [] },
-				{ "province": "Centro Sur", "cities": [] },
-				{ "province": "Djibloho", "cities": [] },
-				{ "province": "Kié-Ntem", "cities": [] },
-				{ "province": "Litoral", "cities": [] },
-				{ "province": "Wele-Nzas", "cities": [] }
-			]
-		},
-		{ "country": "Eritrea", "timezone": "", "states": [] },
-		{ "country": "Ethiopia", "timezone": "", "states": [] },
-		{
-			"country": "Gabon", "timezone": "", 
-			"states": [
-				{ "province": "Estuaire", "cities": [] },
-				{ "province": "Haut-Ogooué", "cities": [] },
-				{ "province": "Moyen-Ogooué", "cities": [] },
-				{ "province": "Ngounié", "cities": [] },
-				{ "province": "Nyanga", "cities": [] },
-				{ "province": "Ogooué-Ivindo", "cities": [] },
-				{ "province": "Ogooué-Lolo", "cities": [] },
-				{ "province": "Ogooué-Maritime", "cities": [] },
-				{ "province": "Woleu-Ntem", "cities": [] }
-			]
-		},
-		{ "country": "Gambia", "timezone": "", "states": [] },
-		{ "country": "Ghana", "timezone": "", "states": [] },
-		{ "country": "Guinea", "timezone": "", "states": [] },
-		{ "country": "Guinea-Bissau", "timezone": "", "states": [] },
-		{ "country": "Ivory Coast", "timezone": "", "states": [] },
-		{ "country": "Kenya", "timezone": "", "states": [] },
-		{ "country": "Lesotho", "timezone": "", "states": [] },
-		{ "country": "Liberia", "timezone": "", "states": [] },
-		{ "country": "Libya", "timezone": "", "states": [] },
-		{ "country": "Madagascar", "timezone": "", "states": [] },
-		{ "country": "Malawi", "timezone": "", "states": [] },
-		{ "country": "Mali", "timezone": "", "states": [] },
-		{ "country": "Mauritania", "timezone": "", "states": [] },
-		{ "country": "Mauritius", "timezone": "", "states": [] },
-		{ "country": "Morocco", "timezone": "", "states": [] },
-		{ 
-			"country": "Mozambique", "timezone": "", 
-			"states": [
-				{ "province": "Cabo Delgado", "cities": [] },
-				{ "province": "Gaza", "cities": [] },
-				{ "province": "Inhambane", "cities": [] },
-				{ "province": "Manica", "cities": [] },
-				{ "province": "Maputo", "cities": [] },
-				{ "province": "Maputo City", "cities": [] },
-				{ "province": "Nampula", "cities": [] },
-				{ "province": "Niassa", "cities": [] },
-				{ "province": "Sofala", "cities": [] },
-				{ "province": "Tete", "cities": [] },
-				{ "province": "Zambezia", "cities": [] }
-			]
-		},
-		{ "country": "Namibia", "timezone": "", "states": [] },
-		{ "country": "Niger", "timezone": "", "states": [] },
-		{ "country": "Nigeria", "timezone": "", "states": [] },
-		{ "country": "Rwanda", "timezone": "", "states": [] },
-		{ "country": "Sao Tome and Principe", "timezone": "", "states": [] },
-		{ "country": "Senegal", "timezone": "", "states": [] },
-		{ "country": "Seychelles", "timezone": "", "states": [] },
-		{ "country": "Sierra Leone", "timezone": "", "states": [] },
-		{ "country": "Somalia", "timezone": "", "states": [] },
-		{ "country": "South Africa", "timezone": "", "states": [] },
-		{ "country": "South Sudan", "timezone": "", "states": [] },
-		{ "country": "Sudan", "timezone": "", "states": [] },
-		{ "country": "Swaziland", "timezone": "", "states": [] },
-		{ "country": "Tanzania", "timezone": "", "states": [] },
-		{ "country": "Togo", "timezone": "", "states": [] },
-		{ "country": "Tunisia", "timezone": "", "states": [] },
-		{ "country": "Uganda", "timezone": "", "states": [] },
-		{ "country": "Zambia", "timezone": "", "states": [] },
-		{ "country": "Zimbabwe", "timezone": "", "states": [] }
+		{ "country": "Rwanda", "code": "RW", "states": [] },
+		{ "country": "Sao Tome and Principe", "code": "ST", "states": [] },
+		{ "country": "Senegal", "code": "SN", "states": [] },
+		{ "country": "Seychelles", "code": "SC", "states": [] },
+		{ "country": "Sierra Leone", "code": "SL", "states": [] },
+		{ "country": "Somalia", "code": "SO", "states": [] },
+		{ "country": "South Africa", "code": "ZA", "states": [] },
+		{ "country": "South Sudan", "code": "SS", "states": [] },
+		{ "country": "Sudan", "code": "SD", "states": [] },
+		{ "country": "Swaziland", "code": "SZ", "states": [] },
+		{ "country": "Tanzania", "code": "TZ", "states": [] },
+		{ "country": "Togo", "code": "TG", "states": [] },
+		{ "country": "Tunisia", "code": "TN", "states": [] },
+		{ "country": "Uganda", "code": "UG", "states": [] },
+		{ "country": "Zambia", "code": "ZM", "states": [] },
+		{ "country": "Zimbabwe", "code": "ZW", "states": [] }
 	]
 },
-{ "continent": "Antarctica", "countries": [] },
+{
+	"continent": "Antarctica", "code": "AN", "countries": [
+		{ "country": "Antarctica", "code": "AQ", "states": [] },
+		{ "country": "Bouvet Island", "code": "BV", "states": [] },
+		{ "country": "French Southern Territories", "code": "TF", "states": [] },
+		{ "country": "Heard Island and McDonald Islands", "code": "HM", "states": [] },
+		{ "country": "South Georgia and the South Sandwich Islands", "code": "GS", "states": [] }
+	]
+},
 { 
-	"continent": "Asia", "countries": [
+	"continent": "Asia", "code": "AS", "countries": [
 		{
-			"country": "Afghanistan", "timezone": "", 
-			"states": [
+			"country": "Afghanistan", "code": "AF", "states": [
 				{ "province": "Badakhshan", "cities": [] },
 				{ "province": "Badghis", "cities": [] },
 				{ "province": "Baghlan", "cities": [] },
@@ -292,8 +291,7 @@
 			]
 		},
 		{
-			"country": "Armenia", "timezone": "", 
-			"states": [
+			"country": "Armenia", "code": "AM", "states": [
 				{ "province": "Aragatsotn Province", "cities": [] },
 				{ "province": "Ararat Province", "cities": [] },
 				{ "province": "Armavir Province", "cities": [] },
@@ -307,14 +305,13 @@
 				{ "province": "Vayots Dzor Province", "cities": [] }
 			]
 		},
-		{ "country": "Azerbaijan", "timezone": "", "states": [] },
-		{ "country": "Bahrain", "timezone": "", "states": [] },
-		{ "country": "Bangladesh", "timezone": "", "states": [] },
-		{ "country": "Bhutan", "timezone": "", "states": [] },
-		{ "country": "Brunei", "timezone": "", "states": [] },
+		{ "country": "Azerbaijan", "code": "AZ", "states": [] },
+		{ "country": "Bahrain", "code": "BH", "states": [] },
+		{ "country": "Bangladesh", "code": "BD", "states": [] },
+		{ "country": "Bhutan", "code": "BT", "states": [] },
+		{ "country": "Brunei", "code": "BN", "states": [] },
 		{
-			"country": "Cambodia", "timezone": "", 
-			"states": [
+			"country": "Cambodia", "code": "KH",  "states": [
 				{ "province": "Banteay Meanchey", "cities": [] },
 				{ "province": "Battambang", "cities": [] },
 				{ "province": "Kampong Cham", "cities": [] },
@@ -343,8 +340,7 @@
 			]
 		},
 		{
-			"country": "China", "timezone": "",
-			"states": [
+			"country": "China", "code": "CN", "states": [
 				{ "province": "Anhui Province", "cities": [] },
 				{ "province": "Beijing Municipality", "cities": [] },
 				{ "province": "Chongqing Municipality", "cities": [] },
@@ -381,11 +377,10 @@
 				{ "province": "Zhejiang Province", "cities": [] }
 			]
 		},
-		{ "country": "Georgia", "timezone": "", "states": [] },
-		{ "country": "Hong Kong", "timezone": "", "states": [] },
+		{ "country": "Georgia", "code": "GE", "states": [] },
+		{ "country": "Hong Kong", "code": "HK", "states": [] },
 		{
-			"country": "India", "timezone": "",
-			"states": [
+			"country": "India", "code": "IN", "states": [
 				{ "state": "Andhra Pradesh", "cities": [] },
 				{ "state": "Arunachal Pradesh", "cities": [] },
 				{ "state": "Assam", "cities": [] },
@@ -417,8 +412,7 @@
 			]
 		},
 		{
-			"country": "Indonesia", "timezone": "", 
-			"states": [
+			"country": "Indonesia", "code": "ID", "states": [
 				{ "province": "Aceh", "cities": [] },
 				{ "province": "Bali", "cities": [] },
 				{ "province": "Bangka Belitung Islands", "cities": [] },
@@ -456,8 +450,7 @@
 			]
 		},
 		{
-			"country": "Iran", "timezone": "", 
-			"states": [
+			"country": "Iran", "code": "IR", "states": [
 				{ "province": "Alborz", "cities": [] },
 				{ "province": "Ardabil", "cities": [] },
 				{ "province": "Azerbaijan, East", "cities": [] },
@@ -491,11 +484,10 @@
 				{ "province": "Zanjan", "cities": [] }
 			]
 		},
-		{ "country": "Iraq", "timezone": "", "states": [] },
-		{ "country": "Israel", "timezone": "", "states": [] },
+		{ "country": "Iraq", "code": "IQ", "states": [] },
+		{ "country": "Israel", "code": "IL", "states": [] },
 		{
-			"country": "Japan", "timezone": "", 
-			"states": [
+			"country": "Japan", "code": "JP", "states": [
 				{ "state": "Aichi", "cities": [] },
 				{ "state": "Akita", "cities": [] },
 				{ "state": "Aomori", "cities": [] },
@@ -545,16 +537,15 @@
 				{ "state": "Ōita", "cities": [] }
 			]
 		},
-		{ "country": "Jordan", "timezone": "", "states": [] },
-		{ "country": "Kazakhstan", "timezone": "", "states": [] },
-		{ "country": "Kuwait", "timezone": "", "states": [] },
-		{ "country": "Kyrgyzstan", "timezone": "", "states": [] },
-		{ "country": "Laos", "timezone": "", "states": [] },
-		{ "country": "Lebanon", "timezone": "", "states": [] },
-		{ "country": "Macau", "timezone": "", "states": [] },
+		{ "country": "Jordan", "code": "JO", "states": [] },
+		{ "country": "Kazakhstan", "code": "KZ", "states": [] },
+		{ "country": "Kuwait", "code": "KW", "states": [] },
+		{ "country": "Kyrgyzstan", "code": "KG", "states": [] },
+		{ "country": "Laos", "code": "LA", "states": [] },
+		{ "country": "Lebanon", "code": "LB", "states": [] },
+		{ "country": "Macau", "code": "MO", "states": [] },
 		{
-			"country": "Malaysia", "timezone": "", 
-			"states": [
+			"country": "Malaysia", "code": "MY", "states": [
 				{ "state": "Johor", "cities": [] },
 				{ "state": "Kedah", "cities": [] },
 				{ "state": "Kelantan", "cities": [] },
@@ -573,10 +564,9 @@
 				{ "state": "Terengganu", "cities": [] }
 			]
 		},
-		{ "country": "Maldives", "timezone": "", "states": [] },
+		{ "country": "Maldives", "code": "MV", "states": [] },
 		{
-			"country": "Mongolia", "timezone": "", 
-			"states": [
+			"country": "Mongolia", "code": "MN", "states": [
 				{ "province": "Arkhangai", "cities": [] },
 				{ "province": "Bayan-Ulgii (Bayan-Ölgii)", "cities": [] },
 				{ "province": "Bayankhongor", "cities": [] },
@@ -601,10 +591,9 @@
 				{ "province": "Zavkhan", "cities": [] }
 			]
 		},
-		{ "country": "Myanmar", "timezone": "", "states": [] },
+		{ "country": "Myanmar", "code": "MM", "states": [] },
 		{
-			"country": "Nepal", "timezone": "", 
-			"states": [
+			"country": "Nepal", "code": "NP", "states": [
 				{ "province": "Bagmati Pradesh", "cities": [] },
 				{ "province": "Gandaki Pradesh", "cities": [] },
 				{ "province": "Karnali Pradesh", "cities": [] },
@@ -615,8 +604,7 @@
 			]
 		},
 		{
-			"country": "North Korea", "timezone": "", 
-			"states": [
+			"country": "North Korea", "code": "KP", "states": [
 				{ "province": "Chagang", "cities": [] },
 				{ "province": "Kangwon", "cities": [] },
 				{ "province": "North Hamgyong", "cities": [] },
@@ -628,54 +616,954 @@
 				{ "province": "South Pyongan", "cities": [] }
 			]
 		},
-		{ "country": "Oman", "timezone": "", "states": [] },
-		{ "country": "Pakistan", "timezone": "", "states": [] },
-		{ "country": "Palestine", "timezone": "", "states": [] },
-		{ "country": "Philippines", "timezone": "", "states": [] },
-		{ "country": "Qatar", "timezone": "", "states": [] },
-		{ "country": "Russia", "timezone": "", "states": [] },
-		{ "country": "Saudi Arabia", "timezone": "", "states": [] },
-		{ "country": "Singapore", "timezone": "", "states": [] },
+		{ "country": "Oman", "code": "OM", "states": [] },
+		{ "country": "Pakistan", "code": "PK", "states": [] },
+		{ "country": "Palestine", "code": "PS", "states": [] },
 		{
-			"country": "South Korea", "timezone": "", 
-			"states": [
-				{ "province": "None", "cities": [ "Busan", "Daegu", "Daejeon", "Gwangju", "Incheon", "Seoul", "Sejong", "Ulsan" ]},
+			"country": "Philippines", "code": "PH", "states": [
+				{
+					"province":"Abra", "type":"Province", "cities":[
+						"Bangued", "Boliney", "Bucay", "Bucloc", "Daguioman", "Danglas", "Dolores", "La Paz", "Lacub", "Lagangilang", "Lagayan", "Langiden", "Licuan-Baay (Licuan)", "Luba", "Malibcong", "Manabo", "Peñarrubia", "Pidigan", "Pilar", "Sallapadan", "San Isidro", "San Juan", "San Quintin", "Tayum", "Tineg", "Tubo", "Villaviciosa"
+					]
+				},
+				{
+					"province":"Agusan del Norte", "type":"Province", "cities":[
+						"Buenavista", "Butuan", "Cabadbaran", "Carmen", "Jabonga", "Kitcharao", "Las Nieves", "Magallanes", "Nasipit", "Remedios T. Romualdez", "Santiago", "Tubay"
+					]
+				},
+				{
+					"province":"Agusan del Sur", "type":"Province", "cities":[
+						"Bayugan", "Bunawan", "Esperanza", "La Paz", "Loreto", "Prosperidad", "Rosario", "San Francisco", "San Luis", "Santa Josefa", "Sibagat", "Talacogon", "Trento", "Veruela"
+					]
+				},
+				{
+					"province":"Aklan", "type":"Province", "cities":[
+						"Altavas", "Balete", "Banga", "Batan", "Buruanga", "Ibajay", "Kalibo", "Lezo", "Libacao", "Madalag", "Makato", "Malay", "Malinao", "Nabas", "New Washington", "Numancia", "Tangalan"
+					]
+				},
+				{
+					"province":"Albay", "type":"Province", "cities":[
+						"Bacacay", "Camalig", "Daraga", "Guinobatan", "Jovellar", "Legazpi", "Libon", "Ligao", "Malilipot", "Malinao", "Manito", "Oas", "Pio Duran", "Polangui", "Rapu-Rapu", "Santo Domingo", "Tabaco", "Tiwi"
+					]
+				},
+				{
+					"province":"Antique", "type":"Province", "cities":[
+						"Anini-y", "Barbaza", "Belison", "Bugasong", "Caluya", "Culasi", "Hamtic", "Laua-an", "Libertad", "Pandan", "Patnongon", "San Jose de Buenavista", "San Remigio", "Sebaste", "Sibalom", "Tibiao", "Tobias Fornier", "Valderrama"
+					]
+				},
+				{
+					"province":"Apayao", "type":"Province", "cities":[
+						"Calanasan", "Conner", "Flora", "Kabugao", "Luna", "Pudtol", "Santa Marcela"
+					]
+				},
+				{
+					"province":"Aurora", "type":"Province", "cities":[
+						"Baler", "Casiguran", "Dilasag", "Dinalungan", "Dingalan", "Dipaculao", "Maria Aurora", "San Luis"
+					]
+				},
+				{
+					"province":"Basilan", "type":"Province", "cities":[
+						"Akbar", "Al-Barka", "Hadji Mohammad Ajul", "Hadji Muhtamad", "Isabela City", "Lamitan", "Lantawan", "Maluso", "Sumisip", "Tabuan-Lasa", "Tipo-Tipo", "Tuburan", "Ungkaya Pukan"
+					]
+				},
+				{
+					"province":"Bataan", "type":"Province", "cities":[
+						"Abucay", "Bagac", "Balanga", "Dinalupihan", "Hermosa", "Limay", "Mariveles", "Morong", "Orani", "Orion", "Pilar", "Samal"
+					]
+				},
+				{
+					"province":"Batanes", "type":"Province", "cities":[
+						"Basco", "Itbayat", "Ivana", "Mahatao", "Sabtang", "Uyugan"
+					]
+				},
+				{
+					"province":"Batangas", "type":"Province", "cities":[
+						"Agoncillo", "Alitagtag", "Balayan", "Balete", "Batangas City", "Bauan", "Calaca", "Calatagan", "Cuenca", "Ibaan", "Laurel", "Lemery", "Lian", "Lipa", "Lobo", "Mabini", "Malvar", "Mataasnakahoy", "Nasugbu", "Padre Garcia", "Rosario", "San Jose", "San Juan", "San Luis", "San Nicolas", "San Pascual", "Santa Teresita", "Santo Tomas", "Taal", "Talisay", "Tanauan", "Taysan", "Tingloy", "Tuy"
+					]
+				},
+				{
+					"province":"Benguet", "type":"Province", "cities":[
+						"Atok", "Baguio", "Bakun", "Bokod", "Buguias", "Itogon", "Kabayan", "Kapangan", "Kibungan", "La Trinidad", "Mankayan", "Sablan", "Tuba", "Tublay"
+					]
+				},
+				{
+					"province":"Biliran", "type":"Province", "cities":[
+						"Almeria", "Biliran", "Cabucgayan", "Caibiran", "Culaba", "Kawayan", "Maripipi", "Naval"
+					]
+				},
+				{
+					"province":"Bohol", "type":"Province", "cities":[
+						"Alburquerque", "Alicia", "Anda", "Antequera", "Baclayon", "Balilihan", "Batuan", "Bien Unido", "Bilar", "Buenavista", "Calape", "Candijay", "Carmen", "Catigbian", "Clarin", "Corella", "Cortes", "Dagohoy", "Danao", "Dauis", "Dimiao", "Duero", "Garcia Hernandez", "Getafe", "Guindulman", "Inabanga", "Jagna", "Lila", "Loay", "Loboc", "Loon", "Mabini", "Maribojoc", "Panglao", "Pilar", " Pres. Carlos P. Garcia", "Sagbayan", "San Isidro", "San Miguel", "Sevilla", "Sierra Bullones", "Sikatuna", "Tagbilaran City", "Talibon", "Trinidad", "Tubigon", "Ubay", "Valencia"
+					]
+				},
+				{
+					"province":"Bukidnon", "type":"Province", "cities":[
+						"Baungon", "Cabanglasan", "Damulog", "Dangcagan", "Don Carlos", "Impasugong", "Kadingilan", "Kalilangan", "Kibawe", "Kitaotao", "Lantapan", "Libona", "Malaybalay", "Malitbog", "Manolo Fortich", "Maramag", "Pangantucan", "Quezon", "San Fernando", "Sumilao", "Talakag", "Valencia"
+					]
+				},
+				{
+					"province":"Bulacan", "type":"Province", "cities":[
+						"Angat", "Balagtas", "Baliuag", "Bocaue", "Bulakan", "Bustos", "Calumpit", "Doña Remedios Trinidad", "Guiguinto", "Hagonoy", "Malolos", "Marilao", "Meycauayan", "Norzagaray", "Obando", "Pandi", "Paombong", "Plaridel", "Pulilan", "San Ildefonso", "San Jose del Monte", "San Miguel", "San Rafael", "Santa Maria"
+					]
+				},
+				{
+					"province":"Cagayan", "type":"Province", "cities":[
+						"Abulug", "Alcala", "Allacapan", "Amulung", "Aparri", "Baggao", "Ballesteros", "Buguey", "Calayan", "Camalaniugan", "Claveria", "Enrile", "Gattaran", "Gonzaga", "Iguig", "Lal-lo", "Lasam", "Pamplona", "Peñablanca", "Piat", "Rizal", "Sanchez-Mira", "Santa Ana", "Santa Praxedes", "Santa Teresita", "Santo Niño (Faire)", "Solana", "Tuao", "Tuguegarao City"
+					]
+				},
+				{
+					"province":"Camarines Norte", "type":"Province", "cities":[
+						"Basud", "Capalonga", "Daet", "Jose Panganiban", "Labo", "Mercedes", "Paracale", "San Lorenzo Ruiz", "San Vicente", "Santa Elena", "Talisay", "Vinzons"
+					]
+				},
+				{
+					"province":"Camarines Sur", "type":"Province", "cities":[
+						"Baao", "Balatan", "Bato", "Bombon", "Buhi", "Bula", "Cabusao", "Calabanga", "Camaligan", "Canaman", "Caramoan", "Del Gallego", "Gainza", "Garchitorena", "Goa", "Iriga", "Lagonoy", "Libmanan", "Lupi", "Magarao", "Milaor", "Minalabac", "Nabua", "Naga", "Ocampo", "Pamplona", "Pasacao", "Pili", "Presentacion", "Ragay", "Sagñay", "San Fernando", "San Jose", "Sipocot", "Siruma", "Tigaon", "Tinambac"
+					]
+				},
+				{
+					"province":"Camiguin", "type":"Province", "cities":[
+						"Catarman", "Guinsiliban", "Mahinog", "Mambajao", "Sagay"
+					]
+				},
+				{
+					"province":"Capiz", "type":"Province", "cities":[
+						"Cuartero", "Dao", "Dumalag", "Dumarao", "Ivisan", "Jamindan", "Maayon", "Mambusao", "Panay", "Panitan", "Pilar", "Pontevedra", "President Roxas", "Roxas City", "Sapian", "Sigma", "Tapaz"
+					]
+				},
+				{
+					"province":"Catanduanes", "type":"Province", "cities":[
+						"Bagamanoc", "Baras", "Bato", "Caramoran", "Gigmoto", "Pandan", "Panganiban", "San Andres", "San Miguel", "Viga", "Virac"
+					]
+				},
+				{
+					"province":"Cavite", "type":"Province", "cities":[
+						"Alfonso", "Amadeo", "Bacoor", "Carmona", "Cavite City", "Dasmariñas", "General Emilio Aguinaldo", "General Mariano Alvarez", "General Trias", "Imus", "Indang", "Kawit", "Magallanes", "Maragondon", "Mendez", "Naic", "Noveleta", "Rosario", "Silang", "Tagaytay", "Tanza", "Ternate", "Trece Martires"
+					]
+				},
+				{
+					"province":"Cebu", "type":"Province", "cities":[
+						"Alcantara", "Alcoy", "Alegria", "Aloguinsan", "Argao", "Asturias", "Badian", "Balamban", "Bantayan", "Barili", "Bogo", "Boljoon", "Borbon", "Carcar", "Carmen", "Catmon", "Cebu City", "Compostela", "Consolacion", "Cordova", "Daanbantayan", "Dalaguete", "Danao", "Dumanjug", "Ginatilan", "Lapu-Lapu", "Liloan", "Madridejos", "Malabuyoc", "Mandaue", "Medellin", "Minglanilla", "Moalboal", "Naga", "Oslob", "Pilar", "Pinamungajan", "Poro", "Ronda", "Samboan", "San Fernando", "San Francisco", "San Remigio", "Santa Fe", "Santander", "Sibonga", "Sogod", "Tabogon", "Tabuelan", "Talisay", "Toledo", "Tuburan", "Tudela"
+					]
+				},
+				{
+					"province":"Cotabato", "type":"Province", "cities":[
+						"Alamada", "Aleosan", "Antipas", "Arakan", "Banisilan", "Carmen", "Kabacan", "Kidapawan", "Libungan", "M'lang", "Magpet", "Makilala", "Matalam", "Midsayap", "Pigcawayan", "Pikit", "President Roxas", "Tulunan"
+					]
+				},
+				{
+					"province":"Davao de Oro (Compostela Valley)", "type":"Province", "cities":[
+						"Compostela", "Laak", "Mabini", "Maco", "Maragusan", "Mawab", "Monkayo", "Montevista", "Nabunturan", "New Bataan", "Pantukan"
+					]
+				},
+				{
+					"province":"Davao Occidental", "type":"Province", "cities":[
+						"Don Marcelino", "Jose Abad Santos", "Malita", "Santa Maria", "Sarangani"
+					]
+				},
+				{
+					"province":"Davao Oriental", "type":"Province", "cities":[
+						"Baganga", "Banaybanay", "Boston", "Caraga", "Cateel", "Governor Generoso", "Lupon", "Manay", "Mati", "San Isidro", "Tarragona"
+					]
+				},
+				{
+					"province":"Davao del Norte", "type":"Province", "cities":[
+						"Asuncion", "Braulio E. Dujali", "Carmen", "Kapalong", "New Corella", "Panabo", "Samal", "San Isidro", "Santo Tomas", "Tagum", "Talaingod"
+					]
+				},
+				{
+					"province":"Davao del Sur", "type":"Province", "cities":[
+						"Bansalan", "Davao City", "Digos", "Hagonoy", "Kiblawan", "Magsaysay", "Malalag", "Matanao", "Padada", "Santa Cruz", "Sulop"
+					]
+				},
+				{
+					"province":"Dinagat Islands", "type":"Province", "cities":[
+						"Basilisa", "Cagdianao", "Dinagat", "Libjo", "Loreto", "San Jose", "Tubajon"
+					]
+				},
+				{
+					"province":"Eastern Samar", "type":"Province", "cities":[
+						"Arteche", "Balangiga", "Balangkayan", "Borongan", "Can-avid", "Dolores", "General MacArthur", "Giporlos", "Guiuan", "Hernani", "Jipapad", "Lawaan", "Llorente", "Maslog", "Maydolong", "Mercedes", "Oras", "Quinapondan", "Salcedo", "San Julian", "San Policarpo", "Sulat", "Taft"
+					]
+				},
+				{
+					"province":"Guimaras", "type":"Province", "cities":[
+						"Buenavista", "Jordan", "Nueva Valencia", "San Lorenzo", "Sibunag"
+					]
+				},
+				{
+					"province":"Ifugao", "type":"Province", "cities":[
+						"Aguinaldo", "Alfonso Lista", "Asipulo", "Banaue", "Hingyon", "Hungduan", "Kiangan", "Lagawe", "Lamut", "Mayoyao", "Tinoc"
+					]
+				},
+				{
+					"province":"Ilocos Norte", "type":"Province", "cities":[
+						"Adams", "Bacarra", "Badoc", "Bangui", "Banna", "Batac", "Burgos", "Carasi", "Currimao", "Dingras", "Dumalneg", "Laoag", "Marcos", "Nueva Era", "Pagudpud", "Paoay", "Pasuquin", "Piddig", "Pinili", "San Nicolas", "Sarrat", "Solsona", "Vintar"
+					]
+				},
+				{
+					"province":"Ilocos Sur", "type":"Province", "cities":[
+						"Alilem", "Banayoyo", "Bantay", "Burgos", "Cabugao", "Candon", "Caoayan", "Cervantes", "Galimuyod", "Gregorio del Pilar", "Lidlidda", "Magsingal", "Nagbukel", "Narvacan", "Quirino", "Salcedo", "San Emilio", "San Esteban", "San Ildefonso", "San Juan", "San Vicente", "Santa", "Santa Catalina", "Santa Cruz", "Santa Lucia", "Santa Maria", "Santiago", "Santo Domingo", "Sigay", "Sinait", "Sugpon", "Suyo", "Tagudin", "Vigan"
+					]
+				},
+				{
+					"province":"Iloilo", "type":"Province", "cities":[
+						"Ajuy", "Alimodian", "Anilao", "Badiangan", "Balasan", "Banate", "Barotac Nuevo", "Barotac Viejo", "Batad", "Bingawan", "Cabatuan", "Calinog", "Carles", "Concepcion", "Dingle", "Dueñas", "Dumangas", "Estancia", "Guimbal", "Igbaras", "Iloilo City", "Janiuay", "Lambunao", "Leganes", "Lemery", "Leon", "Maasin", "Miagao", "Mina", "New Lucena", "Oton", "Passi", "Pavia", "Pototan", "San Dionisio", "San Enrique", "San Joaquin", "San Miguel", "San Rafael", "Santa Barbara", "Sara", "Tigbauan", "Tubungan", "Zarraga"
+					]
+				},
+				{
+					"province":"Isabela", "type":"Province", "cities":[
+						"Alicia", "Angadanan", "Aurora", "Benito Soliven", "Burgos", "Cabagan", "Cabatuan", "Cauayan", "Cordon", "Delfin Albano", "Dinapigue", "Divilacan", "Echague", "Gamu", "Ilagan", "Jones", "Luna", "Maconacon", "Mallig", "Naguilian", "Palanan", "Quezon", "Quirino", "Ramon", "Reina Mercedes", "Roxas", "San Agustin", "San Guillermo", "San Isidro", "San Manuel", "San Mariano", "San Mateo", "San Pablo", "Santa Maria", "Santiago", "Santo Tomas", "Tumauini"
+					]
+				},
+				{
+					"province":"Kalinga-Apayao", "type":"Province", "cities":[
+						"Balbalan", "Lubuagan", "Pasil", "Pinukpuk", "Rizal", "Tabuk", "Tanudan", "Tinglayan"
+					]
+				},
+				{
+					"province":"La Union", "type":"Province", "cities":[
+						"Agoo", "Aringay", "Bacnotan", "Bagulin", "Balaoan", "Bangar", "Bauang", "Burgos", "Caba", "Luna", "Naguilian", "Pugo", "Rosario", "San Fernando", "San Gabriel", "San Juan", "Santo Tomas", "Santol", "Sudipen", "Tubao"
+					]
+				},
+				{
+					"province":"Laguna", "type":"Province", "cities":[
+						"Alaminos", "Bay", "Biñan", "Cabuyao", "Calamba", "Calauan", "Cavinti", "Famy", "Kalayaan", "Liliw", "Los Baños", "Luisiana", "Lumban", "Mabitac", "Magdalena", "Majayjay", "Nagcarlan", "Paete", "Pagsanjan", "Pakil", "Pangil", "Pila", "Rizal", "San Pablo", "San Pedro", "Santa Cruz", "Santa Maria", "Santa Rosa", "Siniloan", "Victoria"
+					]
+				},
+				{
+					"province":"Lanao del Norte", "type":"Province", "cities":[
+						"Bacolod", "Baloi", "Baroy", "Iligan", "Kapatagan", "Kauswagan", "Kolambugan", "Lala", "Linamon", "Magsaysay", "Maigo", "Matungao", "Munai", "Nunungan", "Pantao Ragat", "Pantar", "Poona Piagapo", "Salvador", "Sapad", "Sultan Naga Dimaporo (Karomatan)", "Tagoloan", "Tangcal", "Tubod"
+					]
+				},
+				{
+					"province":"Lanao del Sur", "type":"Province", "cities":[
+						"Amai Manabilang (Bumbaran)", "Bacolod-Kalawi (Bacolod-Grande)", "Balabagan", "Balindong (Watu)", "Bayang", "Binidayan", "Buadiposo-Buntong", "Bubong", "Butig", "Calanogas", "Ditsaan-Ramain", "Ganassi", "Kapai", "Kapatagan", "Lumba-Bayabao (Maguing)", "Lumbaca-Unayan", "Lumbatan", "Lumbayanague", "Madalum", "Madamba", "Maguing", "Malabang", "Marantao", "Marawi", "Marogong", "Masiu", "Mulondo", "Pagayawan (Tatarikan)", "Piagapo", "Picong (Sultan Gumander)", "Poona Bayabao (Gata)", "Pualas", "Saguiaran", "Sultan Dumalondong", "Tagoloan II", "Tamparan", "Taraka", "Tubaran", "Tugaya", "Wao"
+					]
+				},
+				{
+					"province":"Leyte", "type":"Province", "cities":[
+						"Abuyog", "Alangalang", "Albuera", "Babatngon", "Barugo", "Bato", "Baybay", "Burauen", "Calubian", "Capoocan", "Carigara", "Dagami", "Dulag", "Hilongos", "Hindang", "Inopacan", "Isabel", "Jaro", "Javier (Bugho)", "Julita", "Kananga", "La Paz", "Leyte", "MacArthur", "Mahaplag", "Matag-ob", "Matalom", "Mayorga", "Merida", "Ormoc", "Palo", "Palompon", "Pastrana", "San Isidro", "San Miguel", "Santa Fe", "Tabango", "Tabontabon", "Tacloban", "Tanauan", "Tolosa", "Tunga", "Villaba"
+					]
+				},
+				{
+					"province":"Maguindanao", "type":"Province", "cities":[
+						"Ampatuan", "Barira", "Buldon", "Buluan", "Cotabato City", "Datu Abdullah Sangki", "Datu Anggal Midtimbang", "Datu Blah T. Sinsuat", "Datu Hoffer Ampatuan", "Datu Montawal", "Datu Odin Sinsuat", "Datu Paglas", "Datu Piang", "Datu Salibo", "Datu Saudi-Ampatuan", "Datu Unsay", "General Salipada K. Pendatun", "Guindulungan", "Kabuntalan", "Mamasapano", "Mangudadatu", "Matanog", "Northern Kabuntalan", "Pagalungan", "Paglat", "Pandag", "Parang", "Rajah Buayan", "Shariff Aguak", "Shariff Saydona Mustapha", "South Upi", "Sultan Kudarat", "Sultan Mastura", "Sultan sa Barongis", "Sultan Sumagka", "Talayan", "Upi"
+					]
+				},
+				{
+					"province":"Marinduque", "type":"Province", "cities":[
+						"Boac", "Buenavista", "Gasan", "Mogpog", "Santa Cruz", "Torrijos"
+					]
+				},
+				{
+					"province":"Masbate", "type":"Province", "cities":[
+						"Aroroy", "Baleno", "Balud", "Batuan", "Cataingan", "Cawayan", "Claveria", "Dimasalang", "Esperanza", "Mandaon", "Masbate City", "Milagros", "Mobo", "Monreal", "Palanas", "Pio V. Corpuz", "Placer", "San Fernando", "San Jacinto", "San Pascual", "Uson"
+					]
+				},
+				{
+					"province":"Mindoro Occidental", "type":"Province", "cities":[
+						"Abra de Ilog", "Calintaan", "Looc", "Lubang", "Magsaysay", "Mamburao", "Paluan", "Rizal", "Sablayan", "San Jose", "Santa Cruz"
+					]
+				},
+				{
+					"province":"Mindoro Oriental", "type":"Province", "cities":[
+						"Baco", "Bansud", "Bongabong", "Bulalacao (San Pedro)", "Calapan", "Gloria", "Mansalay", "Naujan", "Pinamalayan", "Pola", "Puerto Galera", "Roxas", "San Teodoro", "Socorro", "Victoria"
+					]
+				},
+				{
+					"province":"Misamis Occidental", "type":"Province", "cities":[
+						"Aloran", "Baliangao", "Bonifacio", "Calamba", "Clarin", "Concepcion", "Don Victoriano Chiongbian(Don Mariano Marcos)", "Jimenez", "Lopez Jaena", "Oroquieta", "Ozamiz", "Panaon", "Plaridel", "Sapang Dalaga", "Sinacaban", "Tangub", "Tudela"
+					]
+				},
+				{
+					"province":"Misamis Oriental", "type":"Province", "cities":[
+						"Alubijid", "Balingasag", "Balingoan", "Binuangan", "Cagayan de Oro", "Claveria", "El Salvador", "Gingoog", "Gitagum", "Initao", "Jasaan", "Kinoguitan", "Lagonglong", "Laguindingan", "Libertad", "Lugait", "Magsaysay", "Manticao", "Medina", "Naawan", "Opol", "Salay", "Sugbongcogon", "Tagoloan", "Talisayan", "Villanueva"
+					]
+				},
+				{
+					"province":"Mountain Province", "type":"Province", "cities":[
+						"Barlig", "Bauko", "Besao", "Bontoc", "Natonin", "Paracelis", "Sabangan", "Sadanga", "Sagada", "Tadian"
+					]
+				},
+				{
+					"province":"National Capital Region (Metro Manila)", "type":"Region", "cities":[
+						"Caloocan", "Las Piñas", "Makati", "Malabon", "Mandaluyong", "Manila", "Marikina", "Muntinlupa", "Navotas", "Parañaque", "Pasay", "Pasig", "Pateros", "Quezon City", "San Juan", "Taguig", "Valenzuela"
+					]
+				},
+				{
+					"province":"Negros Occidental", "type":"Province", "cities":[
+						"Bacolod", "Bago", "Binalbagan", "Cadiz", "Calatrava", "Candoni", "Cauayan", "Enrique B. Magalona", "Escalante", "Himamaylan", "Hinigaran", "Hinoba-an", "Ilog", "Isabela", "Kabankalan", "La Carlota", "La Castellana", "Manapla", "Moises Padilla", "Murcia", "Pontevedra", "Pulupandan", "Sagay", "Salvador Benedicto", "San Carlos", "San Enrique", "Silay", "Sipalay", "Talisay", "Toboso", "Valladolid", "Victorias"
+					]
+				},
+				{
+					"province":"Negros Oriental", "type":"Province", "cities":[
+						"Amlan (Ayuquitan)", "Ayungon", "Bacong", "Bais", "Basay", "Bayawan (Tulong)", "Bindoy (Payabon)", "Canlaon", "Dauin", "Dumaguete", "Guihulngan", "Jimalalud", "La Libertad", "Mabinay", "Manjuyod", "Pamplona", "San Jose", "Santa Catalina", "Siaton", "Sibulan", "Tanjay", "Tayasan", "Valencia (Luzurriaga)", "Vallehermoso", "Zamboanguita"
+					]
+				},
+				{
+					"province":"Northern Samar", "type":"Province", "cities":[
+						"Allen", "Biri", "Bobon", "Capul", "Catarman", "Catubig", "Gamay", "Laoang", "Lapinig", "Las Navas", "Lavezares", "Lope de Vega", "Mapanas", "Mondragon", "Palapag", "Pambujan", "Rosario", "San Antonio", "San Isidro", "San Jose", "San Roque", "San Vicente", "Silvino Lobos", "Victoria"
+					]
+				},
+				{
+					"province":"Nueva Ecija", "type":"Province", "cities":[
+						"Aliaga", "Bongabon", "Cabanatuan", "Cabiao", "Carranglan", "Cuyapo", "Gabaldon (Bitulok & Sabani)", "Gapan", "General Mamerto Natividad", "General Tinio (Papaya)", "Guimba", "Jaen", "Laur", "Licab", "Llanera", "Lupao", "Muñoz", "Nampicuan", "Palayan", "Pantabangan", "Peñaranda", "Quezon", "Rizal", "San Antonio", "San Isidro", "San Jose (Cabaritan)", "San Leonardo", "Santa Rosa", "Santo Domingo", "Talavera", "Talugtug", "Zaragoza"
+					]
+				},
+				{
+					"province":"Nueva Vizcaya", "type":"Province", "cities":[
+						"Alfonso Castañeda", "Ambaguio", "Aritao", "Bagabag", "Bambang", "Bayombong", "Diadi", "Dupax del Norte", "Dupax del Sur", "Kasibu", "Kayapa", "Quezon", "Santa Fe", "Solano", "Villaverde"
+					]
+				},
+				{
+					"province":"Palawan", "type":"Province", "cities":[
+						"Aborlan", "Agutaya", "Araceli", "Balabac", "Bataraza", "Brooke's Point", "Busuanga", "Cagayancillo", "Coron", "Culion", "Cuyo", "Dumaran", "El Nido", "Kalayaan", "Linapacan", "Magsaysay", "Narra", "Puerto Princesa", "Quezon", "Rizal", "Roxas", "San Vicente", "Sofronio Española", "Taytay"
+					]
+				},
+				{
+					"province":"Pampanga", "type":"Province", "cities":[
+						"Angeles", "Apalit", "Arayat", "Bacolor", "Candaba", "Floridablanca", "Guagua", "Lubao", "Mabalacat", "Macabebe", "Magalang", "Masantol", "Mexico", "Minalin", "Porac", "San Fernando", "San Luis", "San Simon", "Santa Ana", "Santa Rita", "Santo Tomas", "Sasmuan"
+					]
+				},
+				{
+					"province":"Pangasinan", "type":"Province", "cities":[
+						"Agno", "Aguilar", "Alaminos", "Alcala", "Anda", "Asingan", "Balungao", "Bani", "Basista", "Bautista", "Bayambang", "Binalonan", "Binmaley", "Bolinao", "Bugallon", "Burgos", "Calasiao", "Dagupan", "Dasol", "Infanta", "Labrador", "Laoac", "Lingayen", "Mabini", "Malasiqui", "Manaoag", "Mangaldan", "Mangatarem", "Mapandan", "Natividad", "Pozorrubio", "Rosales", "San Carlos", "San Fabian", "San Jacinto", "San Manuel", "San Nicolas", "San Quintin", "Santa Barbara", "Santa Maria", "Santo Tomas", "Sison", "Sual", "Tayug", "Umingan", "Urbiztondo", "Urdaneta", "Villasis"
+					]
+				},
+				{
+					"province":"Quezon", "type":"Province", "cities":[
+						"Agdangan", "Alabat", "Atimonan", "Buenavista", "Burdeos", "Calauag", "Candelaria", "Catanauan", "Dolores", "General Luna", "General Nakar", "Guinayangan", "Gumaca", "Infanta", "Jomalig", "Lopez", "Lucban", "Lucena", "Macalelon", "Mauban", "Mulanay", "Padre Burgos", "Pagbilao", "Panukulan", "Patnanungan", "Perez", "Pitogo", "Plaridel", "Polillo", "Quezon", "Real", "Sampaloc", "San Andres", "San Antonio", "San Francisco", "San Narciso", "Sariaya", "Tagkawayan", "Tayabas", "Tiaong", "Unisan"
+					]
+				},
+				{
+					"province":"Quirino", "type":"Province", "cities":[
+						"Aglipay", "Cabarroguis", "Diffun", "Maddela", "Nagtipunan", "Saguday"
+					]
+				},
+				{
+					"province":"Rizal", "type":"Province", "cities":[
+						"Angono", "Antipolo", "Baras", "Binangonan", "Cainta", "Cardona", "Jalajala", "Morong", "Pililla", "Rodriguez", "San Mateo", "Tanay", "Taytay", "Teresa"
+					]
+				},
+				{
+					"province":"Romblon", "type":"Province", "cities":[
+						"Alcantara", "Banton", "Cajidiocan", "Calatrava", "Concepcion", "Corcuera", "Ferrol", "Looc", "Magdiwang", "Odiongan", "Romblon", "San Agustin", "San Andres", "San Fernando", "San Jose", "Santa Fe", "Santa Maria"
+					]
+				},
+				{
+					"province":"Sarangani", "type":"Province", "cities":[
+						"Alabel", "Glan", "Kiamba", "Maasim", "Maitum", "Malapatan", "Malungon"
+					]
+				},
+				{
+					"province":"Siquijor", "type":"Province", "cities":[
+						"Enrique Villanueva", "Larena", "Lazi", "Maria", "San Juan", "Siquijor"
+					]
+				},
+				{
+					"province":"Sorsogon", "type":"Province", "cities":[
+						"Barcelona", "Bulan", "Bulusan", "Casiguran", "Castilla", "Donsol", "Gubat", "Irosin", "Juban", "Magallanes", "Matnog", "Pilar", "Prieto Diaz", "Santa Magdalena", "Sorsogon City"
+					]
+				},
+				{
+					"province":"South Cotabato", "type":"Province", "cities":[
+						"Banga", "General Santos", "Koronadal", "Lake Sebu", "Norala", "Polomolok", "Santo Niño", "Surallah", "T'Boli", "Tampakan", "Tantangan", "Tupi"
+					]
+				},
+				{
+					"province":"Southern Leyte", "type":"Province", "cities":[
+						"Anahawan", "Bontoc", "Hinunangan", "Hinundayan", "Libagon", "Liloan", "Limasawa", "Maasin", "Macrohon", "Malitbog", "Padre Burgos", "Pintuyan", "Saint Bernard", "San Francisco", "San Juan", "San Ricardo", "Silago", "Sogod", "Tomas Oppus"
+					]
+				},
+				{
+					"province":"Sultan Kudarat", "type":"Province", "cities":[
+						"Bagumbayan", "Columbio", "Esperanza", "Isulan", "Kalamansig", "Lambayong (Mariano Marcos)", "Lebak", "Lutayan", "Palimbang", "President Quirino", "Senator Ninoy Aquino", "Tacurong"
+					]
+				},
+				{
+					"province":"Sulu", "type":"Province", "cities":[
+						"Banguingui", "Hadji Panglima Tahil", "Indanan", "Jolo", "Kalingalan Caluang", "Lugus", "Luuk", "Maimbung", "Old Panamao", "Omar", "Pandami", "Panglima Estino", "Pangutaran", "Parang", "Pata", "Patikul", "Siasi", "Talipao", "Tapul"
+					]
+				},
+				{
+					"province":"Surigao del Norte", "type":"Province", "cities":[
+						"Alegria", "Bacuag", "Burgos", "Claver", "Dapa", "Del Carmen", "General Luna", "Gigaquit", "Mainit", "Malimono", "Pilar", "Placer", "San Benito", "San Francisco (Anao-Aon)", "San Isidro", "Santa Monica (Sapao)", "Sison", "Socorro", "Surigao City", "Tagana-an", "Tubod"
+					]
+				},
+				{
+					"province":"Surigao del Sur", "type":"Province", "cities":[
+						"Barobo", "Bayabas", "Bislig", "Cagwait", "Cantilan", "Carmen", "Carrascal", "Cortes", "Hinatuan", "Lanuza", "Lianga", "Lingig", "Madrid", "Marihatag", "San Agustin", "San Miguel", "Tagbina", "Tago", "Tandag"
+					]
+				},
+				{
+					"province":"Tarlac", "type":"Province", "cities":[
+						"Anao", "Bamban", "Camiling", "Capas", "Concepcion", "Gerona", "La Paz", "Mayantoc", "Moncada", "Paniqui", "Pura", "Ramos", "San Clemente", "San Jose", "San Manuel", "Santa Ignacia", "Tarlac City", "Victoria"
+					]
+				},
+				{
+					"province":"Tawi-Tawi", "type":"Province", "cities":[
+						"Bongao", "Languyan", "Mapun", "Panglima Sugala", "Sapa-Sapa", "Sibutu", "Simunul", "Sitangkai", "South Ubian", "Tandubas", "Turtle Islands"
+					]
+				},
+				{
+					"province":"Western Samar", "type":"Province", "cities":[
+						"Almagro", "Basey", "Calbayog", "Calbiga", "Catbalogan", "Daram", "Gandara", "Hinabangan", "Jiabong", "Marabut", "Matuguinao", "Motiong", "Pagsanghan", "Paranas (Wright)", "Pinabacdao", "San Jorge", "San Jose de Buan", "San Sebastian", "Santa Margarita", "Santa Rita", "Santo Niño", "Tagapul-an", "Talalora", "Tarangnan", "Villareal", "Zumarraga"
+					]
+				},
+				{	
+					"province":"Zambales", "type":"Province", "cities":[
+						"Botolan", "Cabangan", "Candelaria", "Castillejos", "Iba", "Masinloc", "Olongapo", "Palauig", "San Antonio", "San Felipe", "San Marcelino", "San Narciso", "Santa Cruz", "Subic"
+					]
+				},
+				{
+					"province":"Zamboanga Sibugay", "type":"Province", "cities":[
+						"Alicia", "Buug", "Diplahan", "Imelda", "Ipil", "Kabasalan", "Mabuhay", "Malangas", "Naga", "Olutanga", "Payao", "Roseller Lim", "Siay", "Talusan", "Titay", "Tungawan"
+					]
+				},
+				{
+					"province":"Zamboanga del Norte", "type":"Province", "cities":[
+						"Baliguian", "Dapitan", "Dipolog", "Godod", "Gutalac", "Jose Dalman", "Kalawit", "Katipunan", "La Libertad", "Labason", "Leon B. Postigo", "Liloy", "Manukan", "Mutia", "Piñan", "Polanco", "President Manuel A. Roxas", "Rizal", "Salug", "Sergio Osmeña Sr.", "Siayan", "Sibuco", "Sibutad", "Sindangan", "Siocon", "Sirawai", "Tampilisan"
+					]
+				},
+				{
+					"province":"Zamboanga del Sur", "type":"Province", "cities":[
+						"Aurora", "Bayog", "Dimataling", "Dinas", "Dumalinao", "Dumingag", "Guipos", "Josefina", "Kumalarang", "Labangan", "Lakewood", "Lapuyan", "Mahayag", "Margosatubig", "Midsalip", "Molave", "Pagadian", "Pitogo", "Ramon Magsaysay (Liargo)", "San Miguel", "San Pablo", "Sominot (Don Mariano Marcos)", "Tabina", "Tambulig", "Tigbao", "Tukuran", "Vincenzo A. Sagun", "Zamboanga City"
+					]
+				}
+			]
+		},
+		{
+			"country": "Qatar", "code": "QA", "states": [
+				{
+					"state":"Ad Dawhah", "type":"Municipality", "cities":[
+						"Barahat Al Jufairi", "Al Bidda", "Dahl Al Hamam", "Doha International Airport", "Doha Port", "Duhail", "Al Dafna", "Ad Dawhah al Jadidah", "Al Egla", "Fereej Abdel Aziz", "Fereej Bin Durham", "Fereej Bin Mahmoud", "Fereej Bin Omran", "Fereej Kulaib", "Fereej Mohammed Bin Jassim", "Fereej Al Asmakh", "Fereej Al Nasr", "Hamad Medical City", "Hazm Al Markhiya", "Al Hilal", "Industrial Area", "Jabal Thuaileb", "Jelaiah", "Jeryan Nejaima", "Al Jasrah", "Al Kharayej", "Al Khulaifat", "Lejbailat", "Lekhwair", "Leqtaifiya", "Madinat Khalifa North", "Madinat Khalifa South", "Al Messila", "Mushayrib", "Al Mansoura", "Al Markhiyah", "Al Mearad", "Al Mirqab", "Najma", "New Al Hitmi", "New Al Mirqab", "New Salata", "Nu`ayjah", "Al Najada", "Old Airport", "Old Al Ghanim", "Old Al Hitmi", "Onaiza", "The Pearl", "Al Qassar", "Ras Abu Aboud", "Rawdat Al Khail", "Rumeilah", "Al Rufaa", "Al Sadd", "As Salatah", "Al Souq", "Al Seej", "Al Tarfa", "Al Thumama", "Umm Ghuwailina", "Umm Lekhba", "Wadi Al Banat", "Wadi Al Sail"
+					]
+				},
+				{
+					"state":"Al Daayen", "type":"Municipality", "cities":[
+						"Al Daayen", "Al Ebb", "Jeryan Jenaihat", "Al Kheesa", "Leabaib", "Lusail", "Al Masrouhiya", "Rawdat Al Hamama", "Al Sakhama", "Umm Qarn", "Wadi Al Wasaah", "Wadi Lusail"
+					]
+				},
+				{
+					"state":"Al Khor", "type":"Municipality", "cities":[
+						"Al Ghuwariyah", "Al Jeryan", "Al Khor", "Ras Lafan", "Simaisma", "Al Thakhira", "Umm Birka"
+					]
+				},
+				{
+					"state":"Al Rayyan", "type":"Municipality", "cities":[
+						"Abu Hamour", "Abu Samra", "Ain Khaled", "Al Aziziya", "Baaya", "Bani Hajer", "Bu Samra", "Bu Sidra", "Fereej Al Amir", "Fereej Al Asiri", "Fereej Al Murra", "Fereej Al Manaseer", "Fereej Al Soudan", "Fereej Al Zaeem", "Gharrafat Al Rayyan", "Al Gharrafa", "Izghawa", "Lebday", "Lijmiliya", "Luaib", "Al Luqta", "Mebaireek", "Mehairja", "Mesaimeer", "Muaither", "Muraikh", "Al Mamoura", "New Al Rayyan", "New Fereej Al Ghanim", "New Fereej Al Khulaifat", "Old Al Rayyan", "Rawdat Egdaim", "Sawda Natheel", "Al Sailiya", "Al Shagub", "Al Themaid", "Al Waab", "Al Wajba"
+					]
+				},
+				{
+					"state":"Al Shamal", "type":"Municipality", "cities":[
+						"Abu Dhalouf", "Ain Sinan", "Fuwayrit", "Madinat ash Shamal", "Madinat Al Kaaban", "Ar Ru'ays", "Al Zubarah"
+					]
+				},
+				{
+					"state":"Al Wakrah", "type":"Municipality", "cities":[
+						"Khawr al Udayd", "Al Karaana", "Al Kharrara", "Mesaieed", "Mesaieed Industrial Area", "Al Mashaf", "Shagra", "Al Thumama", "Al Wakrah", "Al Wukair"
+					]
+				},
+				{
+					"state":"Al-Shahaniya", "type":"Municipality", "cities":[
+						"Al Utouriya", "Al Jemailiya", "Al-Shahaniya City", "Rawdat Rashed", "Umm Bab", "Al Nasraniya", "Dukhan"
+					]
+				},
+				{
+					"state":"Umm Salal", "type":"Municipality", "cities":[
+						"Bu Fasseela", "Izghawa", "Al Kharaitiyat", "Umm Salal Ali", "Umm Salal Mohammed", "Saina Al-Humaidi", "Umm Al Amad", "Umm Ebairiya"
+					]
+				}
+			]
+		},
+		{
+			"country": "Saudi Arabia", "code": "SA", "states": [
+				{ "state":"'Asir", "type":"Region", "cities":[] },
+				{ "state":"AI Bahah", "type":"Region", "cities":[] },
+				{ "state":"AI Hudud ash Shamaliyah", "type":"Region", "cities":[] },
+				{ "state":"AI Jawf", "type":"Region", "cities":[] },
+				{ "state":"AI Qasim", "type":"Region", "cities":[] },
+				{ "state":"Al Madinah al Munawwarah", "type":"Region", "cities":[] },
+				{ "state":"Ar Riyad", "type":"Region", "cities":[] },
+				{ "state":"Ash Sharqiyah", "type":"Region", "cities":[] },
+				{ "state":"Ha'il", "type":"Region", "cities":[] },
+				{ "state":"Jazan", "type":"Region", "cities":[] },
+				{ "state":"Makkah al Mukarramah", "type":"Region", "cities":[] },
+				{ "state":"Najran", "type":"Region", "cities":[] },
+				{ "state":"Tabuk", "type":"Region", "cities":[] }
+			]
+		},
+		{
+			"country": "Singapore", "code": "SG", "states": [
+				{
+					"state":"Central Region", "tytpe":"Region", "cities":[
+						"Bishan", "Bukit Merah", "Bukit Timah", "Geylang", "Kallang", "Marine Parade", "Novena", "Queenstown", "Southern Islands", "Tanglin", "Toa Payoh"
+					]
+				},
+				{
+					"state":"East Region", "tytpe":"Region", "cities":[
+						"Bedok", "Changi", "Changi Bay", "Pasir Ris", "Paya Lebar", "Tampines"
+					]
+				},
+				{
+					"state":"North Region", "tytpe":"Region", "cities":[
+						"Central Water Catchment", "Lim Chu Kang", "Mandai", "Sembawang", "Simpang", "Sungei Kadut", "Woodlands", "Yishun"
+					]
+				},
+				{
+					"state":"North-East Region", "tytpe":"Region", "cities":[
+						"Ang Mo Kio", "Hougang", "North-Eastern Islands", "Punggol", "Seletar", "Sengkang", "Serangoon"
+					]
+				},
+				{
+					"state":"West Region", "tytpe":"Region", "cities":[
+						"Boon Lay", "Bukit Batok", "Bukit Panjang", "Choa Chu Kang", "Clementi", "Jurong East", "Jurong West", "Pioneer", "Tengah", "Tuas", "Western Islands", "Western Water Catchment"
+					]
+				}
+			]
+		},
+		{
+			"country": "South Korea", "code": "KR", "states": [
+				{ "province":"Busan", "type":"Metropolitan city", "cities":[ "Busan" ] },
 				{ "province": "Chungcheongbuk-do", "cities": [ "Cheongju", "Chungju", "Jecheon" ]},
 				{ "province": "Chungcheongnam-do", "cities": [ "Asan", "Boryeong", "Cheonan", "Dangjin", "Gongju", "Gyeryong", "Nonsan", "Seosan" ]},
+				{ "province":"Daegu", "type":"Metropolitan city", "cities":[ "Daegu" ] },
+				{ "province":"Daejeon", "type":"Metropolitan city", "cities":[ "Daejeon" ] },
 				{ "province": "Gangwon-do", "cities": [ "Chuncheon", "Donghae", "Gangneung", "Samcheok", "Sokcho", "Taebaek", "Wonju" ]},
+				{ "province":"Gwangju", "type":"Metropolitan city", "cities":[ "Gwangju" ] },
 				{
-					"province": "Gyeonggi-do", 
-					"cities": [
+					"province": "Gyeonggi-do", "cities": [
 						"Ansan", "Anseong", "Anyang", "Bucheon", "Dongducheon", "Gimpo", "Goyang", "Gunpo", "Guri", "Gwacheon", "Gwangju", "Gwangmyeong", "Hanam", "Hwaseong", "Icheon", "Namyangju", "Osan", "Paju", "Pocheon", "Pyeongtaek", "Seongnam", "Siheung", "Suwon", "Uijeongbu", "Uiwang", "Yangju", "Yeoju", "Yongin"
 					]
 				},
 				{ "province": "Gyeongsangbuk-do", "cities": [ "Andong", "Gimcheon", "Gumi", "Gyeongju", "Gyeongsan", "Mungyeong", "Pohang", "Sangju", "Yeongcheon", "Yeongju" ]},
 				{ "province": "Gyeongsangnam-do", "cities": [ "Changwon", "Geoje", "Gimhae", "Jinju", "Miryang", "Sacheon", "Tongyeong", "Yangsan" ]},
+				{ "province":"Incheon", "type":"Metropolitan city", "cities":[ "Incheon" ] },
+				{ "province": "Jeju-do", "cities": [ "Jeju", "Seogwipo" ]},
 				{ "province": "Jeollabuk-do", "cities": [ "Gimje", "Gunsan", "Iksan", "Jeongeup", "Jeonju", "Namwon" ]},
 				{ "province": "Jeollanam-do", "cities": [ "Gwangyang", "Naju", "Mokpo", "Suncheon", "Yeosu" ]},
-				{ "province": "Jeju-do", "cities": [ "Jeju", "Seogwipo" ]}
+				{ "province":"Sejong", "type":"Special self-governing city", "cities":[ "Sejong" ] },
+				{ "province":"Seoul", "type":"Special city", "cities":[ "Seoul" ] },
+				{ "province":"Ulsan", "type":"Metropolitan city", "cities":[ "Ulsan" ] }
 			]
 		},
-		{ "country": "Sri Lanka", "timezone": "", "states": [] },
-		{ "country": "Syria", "timezone": "", "states": [] },
-		{ "country": "Taiwan", "timezone": "", "states": [] },
-		{ "country": "Tajikistan", "timezone": "", "states": [] },
-		{ "country": "Thailand", "timezone": "", "states": [] },
-		{ "country": "Timor-Leste", "timezone": "", "states": [] },
-		{ "country": "Total", "timezone": "", "states": [] },
-		{ "country": "Turkey", "timezone": "", "states": [] },
-		{ "country": "Turkmenistan", "timezone": "", "states": [] },
-		{ "country": "United Arab Emirates", "timezone": "", "states": [] },
-		{ "country": "Uzbekistan", "timezone": "", "states": [] },
-		{ "country": "Vietnam", "timezone": "", "states": [] },
-		{ "country": "Yemen", "timezone": "", "states": [] }
+		{
+			"country": "Sri Lanka", "code": "LK", "states": [
+				{ "state":"Ampara", "type":"District", "cities":[] },
+				{ "state":"Anuradhapura", "type":"District", "cities":[] },
+				{ "state":"Badulla", "type":"District", "cities":[] },
+				{ "state":"Basnahira pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Batticaloa", "type":"District", "cities":[] },
+				{ "state":"Colombo", "type":"District", "cities":[] },
+				{ "state":"Daku?u pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Galle", "type":"District", "cities":[] },
+				{ "state":"Gampaha", "type":"District", "cities":[] },
+				{ "state":"Hambantota", "type":"District", "cities":[] },
+				{ "state":"Jaffna", "type":"District", "cities":[] },
+				{ "state":"Kalutara", "type":"District", "cities":[] },
+				{ "state":"Kandy", "type":"District", "cities":[] },
+				{ "state":"Kegalla", "type":"District", "cities":[] },
+				{ "state":"Kilinochchi", "type":"District", "cities":[] },
+				{ "state":"Kurunegala", "type":"District", "cities":[] },
+				{ "state":"Madhyama pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Mannar", "type":"District", "cities":[] },
+				{ "state":"Matale", "type":"District", "cities":[] },
+				{ "state":"Matara", "type":"District", "cities":[] },
+				{ "state":"Monaragala", "type":"District", "cities":[] },
+				{ "state":"Mullaittivu", "type":"District", "cities":[] },
+				{ "state":"N_?genahira pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Nuwara Eliya", "type":"District", "cities":[] },
+				{ "state":"Polonnaruwa", "type":"District", "cities":[] },
+				{ "state":"Puttalam", "type":"District", "cities":[] },
+				{ "state":"Ratnapura", "type":"District", "cities":[] },
+				{ "state":"Sabaragamuva pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Trincomalee", "type":"District", "cities":[] },
+				{ "state":"Uturu pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Uturum_?da pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Uva pa?ata", "type":"Province", "cities":[] },
+				{ "state":"Vavuniya", "type":"District", "cities":[] },
+				{ "state":"Vayamba pa?ata", "type":"Province", "cities":[] }
+			]
+		},
+		{
+			"country": "Syria", "code": "SY", "states": [
+				{ "province":"AI Hasakah", "type":"Province", "cities":[] },
+				{ "province":"AI Ladhiqiyah", "type":"Province", "cities":[] },
+				{ "province":"AI Qunaytirah", "type":"Province", "cities":[] },
+				{ "province":"Ar Raqqah", "type":"Province", "cities":[] },
+				{ "province":"As Suwayda'", "type":"Province", "cities":[] },
+				{ "province":"Dar'a", "type":"Province", "cities":[] },
+				{ "province":"Dayr az Zawr", "type":"Province", "cities":[] },
+				{ "province":"Dimashq", "type":"Province", "cities":[] },
+				{ "province":"Halab", "type":"Province", "cities":[] },
+				{ "province":"Hamah", "type":"Province", "cities":[] },
+				{ "province":"Hims", "type":"Province", "cities":[] },
+				{ "province":"Idlib", "type":"Province", "cities":[] },
+				{ "province":"Rif Dimashq", "type":"Province", "cities":[] },
+				{ "province":"Tartus", "type":"Province", "cities":[] }
+			]
+		},
+		{
+			"country": "Taiwan", "code": "TW", "states": [
+				{ "state":"Changhua", "type":"County", "cities":[] },
+				{ "state":"Chiayi", "type":"County", "cities":[] },
+				{ "state":"Chiayi", "type":"City", "cities":[] },
+				{ "state":"Hsinchu", "type":"County", "cities":[] },
+				{ "state":"Hsinchu", "type":"City", "cities":[] },
+				{ "state":"Hualien", "type":"County", "cities":[] },
+				{ "state":"Kaohsiung", "type":"special municipality", "cities":[] },
+				{ "state":"Keelung", "type":"City", "cities":[] },
+				{ "state":"Kinmen", "type":"County", "cities":[] },
+				{ "state":"Lienchiang", "type":"County", "cities":[] },
+				{ "state":"Miaoli", "type":"County", "cities":[] },
+				{ "state":"Nantou", "type":"County", "cities":[] },
+				{ "state":"New Taipei", "type":"special municipality", "cities":[] },
+				{ "state":"Penghu", "type":"County", "cities":[] },
+				{ "state":"Pingtung", "type":"County", "cities":[] },
+				{ "state":"Taichung", "type":"special municipality", "cities":[] },
+				{ "state":"Tainan", "type":"special municipality", "cities":[] },
+				{ "state":"Taipei", "type":"special municipality", "cities":[] },
+				{ "state":"Taitung", "type":"County", "cities":[] },
+				{ "state":"Taoyuan", "type":"special municipality", "cities":[] },
+				{ "state":"Yilan", "type":"County", "cities":[] },
+				{ "state":"Yunlin", "type":"County", "cities":[] }
+			]
+		},
+		{ "country": "Tajikistan", "code": "TJ", "states": [] },
+		{
+			"country": "Thailand", "code": "TH", "states": [
+				{ "province":"Amnat Charoen", "type":"Province", "cities":[] },
+				{ "province":"Ang Thong", "type":"Province", "cities":[] },
+				{ "province":"Bueng Kan", "type":"Province", "cities":[] },
+				{ "province":"Buri Ram", "type":"Province", "cities":[] },
+				{ "province":"Chachoengsao", "type":"Province", "cities":[] },
+				{ "province":"Chai Nat", "type":"Province", "cities":[] },
+				{ "province":"Chaiyaphum", "type":"Province", "cities":[] },
+				{ "province":"Chanthaburi", "type":"Province", "cities":[] },
+				{ "province":"Chiang Mai", "type":"Province", "cities":[] },
+				{ "province":"Chiang Rai", "type":"Province", "cities":[] },
+				{ "province":"Chon Buri", "type":"Province", "cities":[] },
+				{ "province":"Chumphon", "type":"Province", "cities":[] },
+				{ "province":"Kalasin", "type":"Province", "cities":[] },
+				{ "province":"Kamphaeng Phet", "type":"Province", "cities":[] },
+				{ "province":"Kanchanaburi", "type":"Province", "cities":[] },
+				{ "province":"Khon Kaen", "type":"Province", "cities":[] },
+				{ "province":"Krabi", "type":"Province", "cities":[] },
+				{ "province":"Krung Thep Maha Nakhon [Bangkok]", "type":"Metropolitan administration", "cities":[] },
+				{ "province":"Lampang", "type":"Province", "cities":[] },
+				{ "province":"Lamphun", "type":"Province", "cities":[] },
+				{ "province":"Loei", "type":"Province", "cities":[] },
+				{ "province":"Lop Buri", "type":"Province", "cities":[] },
+				{ "province":"Mae Hong Son", "type":"Province", "cities":[] },
+				{ "province":"Maha Sarakham", "type":"Province", "cities":[] },
+				{ "province":"Mukdahan", "type":"Province", "cities":[] },
+				{ "province":"Nakhon Nayok", "type":"Province", "cities":[] },
+				{ "province":"Nakhon Pathom", "type":"Province", "cities":[] },
+				{ "province":"Nakhon Phanom", "type":"Province", "cities":[] },
+				{ "province":"Nakhon Ratchasima", "type":"Province", "cities":[] },
+				{ "province":"Nakhon Sawan", "type":"Province", "cities":[] },
+				{ "province":"Nakhon Si Thammarat", "type":"Province", "cities":[] },
+				{ "province":"Nan", "type":"Province", "cities":[] },
+				{ "province":"Narathiwat", "type":"Province", "cities":[] },
+				{ "province":"Nong Bua Lam Phu", "type":"Province", "cities":[] },
+				{ "province":"Nong Khai", "type":"Province", "cities":[] },
+				{ "province":"Nonthaburi", "type":"Province", "cities":[] },
+				{ "province":"Pathum Thani", "type":"Province", "cities":[] },
+				{ "province":"Pattani", "type":"Province", "cities":[] },
+				{ "province":"Phangnga", "type":"Province", "cities":[] },
+				{ "province":"Phatthalung", "type":"Province", "cities":[] },
+				{ "province":"Phatthaya", "type":"Special administrative city", "cities":[] },
+				{ "province":"Phayao", "type":"Province", "cities":[] },
+				{ "province":"Phetchabun", "type":"Province", "cities":[] },
+				{ "province":"Phetchaburi", "type":"Province", "cities":[] },
+				{ "province":"Phichit", "type":"Province", "cities":[] },
+				{ "province":"Phitsanulok", "type":"Province", "cities":[] },
+				{ "province":"Phra Nakhon Si Ayutthaya", "type":"Province", "cities":[] },
+				{ "province":"Phrae", "type":"Province", "cities":[] },
+				{ "province":"Phuket", "type":"Province", "cities":[] },
+				{ "province":"Prachin Buri", "type":"Province", "cities":[] },
+				{ "province":"Prachuap Khiri Khan", "type":"Province", "cities":[] },
+				{ "province":"Ranong", "type":"Province", "cities":[] },
+				{ "province":"Ratchaburi", "type":"Province", "cities":[] },
+				{ "province":"Rayong", "type":"Province", "cities":[] },
+				{ "province":"Roi Et", "type":"Province", "cities":[] },
+				{ "province":"Sa Kaeo", "type":"Province", "cities":[] },
+				{ "province":"Sakon Nakhon", "type":"Province", "cities":[] },
+				{ "province":"Samut Prakan", "type":"Province", "cities":[] },
+				{ "province":"Samut Sakhon", "type":"Province", "cities":[] },
+				{ "province":"Samut Songkhram", "type":"Province", "cities":[] },
+				{ "province":"Saraburi", "type":"Province", "cities":[] },
+				{ "province":"Satun", "type":"Province", "cities":[] },
+				{ "province":"Si Sa Ket", "type":"Province", "cities":[] },
+				{ "province":"Sing Buri", "type":"Province", "cities":[] },
+				{ "province":"Songkhla", "type":"Province", "cities":[] },
+				{ "province":"Sukhothai", "type":"Province", "cities":[] },
+				{ "province":"Suphan Buri", "type":"Province", "cities":[] },
+				{ "province":"Surat Thani", "type":"Province", "cities":[] },
+				{ "province":"Surin", "type":"Province", "cities":[] },
+				{ "province":"Tak", "type":"Province", "cities":[] },
+				{ "province":"Trang", "type":"Province", "cities":[] },
+				{ "province":"Trat", "type":"Province", "cities":[] },
+				{ "province":"Ubon Ratchathani", "type":"Province", "cities":[] },
+				{ "province":"Udon Thani", "type":"Province", "cities":[] },
+				{ "province":"Uthai Thani", "type":"Province", "cities":[] },
+				{ "province":"Uttaradit", "type":"Province", "cities":[] },
+				{ "province":"Yala", "type":"Province", "cities":[] },
+				{ "province":"Yasothon", "type":"Province", "cities":[] }
+			]
+		},
+		{ "country": "Timor-Leste", "code": "", "states": [] },
+		{
+			"country": "Turkey", "code": "TR", "states": [
+				{ "province":"Adana", "type":"Province", "cities":[] },
+				{ "province":"Adiyaman", "type":"Province", "cities":[] },
+				{ "province":"Afyonkarahisar", "type":"Province", "cities":[] },
+				{ "province":"Agri", "type":"Province", "cities":[] },
+				{ "province":"Aksaray", "type":"Province", "cities":[] },
+				{ "province":"Amasya", "type":"Province", "cities":[] },
+				{ "province":"Ankara", "type":"Province", "cities":[] },
+				{ "province":"Antalya", "type":"Province", "cities":[] },
+				{ "province":"Ardahan", "type":"Province", "cities":[] },
+				{ "province":"Artvin", "type":"Province", "cities":[] },
+				{ "province":"Aydin", "type":"Province", "cities":[] },
+				{ "province":"Balikesir", "type":"Province", "cities":[] },
+				{ "province":"Bartin", "type":"Province", "cities":[] },
+				{ "province":"Batman", "type":"Province", "cities":[] },
+				{ "province":"Bayburt", "type":"Province", "cities":[] },
+				{ "province":"Bilecik", "type":"Province", "cities":[] },
+				{ "province":"Bing_l", "type":"Province", "cities":[] },
+				{ "province":"Bitlis", "type":"Province", "cities":[] },
+				{ "province":"Bolu", "type":"Province", "cities":[] },
+				{ "province":"Burdur", "type":"Province", "cities":[] },
+				{ "province":"Bursa", "type":"Province", "cities":[] },
+				{ "province":"Canakkale", "type":"Province", "cities":[] },
+				{ "province":"Corum", "type":"Province", "cities":[] },
+				{ "province":"Denizli", "type":"Province", "cities":[] },
+				{ "province":"Diyarbakir", "type":"Province", "cities":[] },
+				{ "province":"D�zce", "type":"Province", "cities":[] },
+				{ "province":"Edirne", "type":"Province", "cities":[] },
+				{ "province":"Elazig", "type":"Province", "cities":[] },
+				{ "province":"Erzincan", "type":"Province", "cities":[] },
+				{ "province":"Erzurum", "type":"Province", "cities":[] },
+				{ "province":"Eskisehir", "type":"Province", "cities":[] },
+				{ "province":"Gaziantep", "type":"Province", "cities":[] },
+				{ "province":"Giresun", "type":"Province", "cities":[] },
+				{ "province":"G�m�shane", "type":"Province", "cities":[] },
+				{ "province":"Hakkari", "type":"Province", "cities":[] },
+				{ "province":"Hatay", "type":"Province", "cities":[] },
+				{ "province":"Igdir", "type":"Province", "cities":[] },
+				{ "province":"Isparta", "type":"Province", "cities":[] },
+				{ "province":"Istanbul", "type":"Province", "cities":[] },
+				{ "province":"Izmir", "type":"Province", "cities":[] },
+				{ "province":"Kahramanmaras", "type":"Province", "cities":[] },
+				{ "province":"Karabuk", "type":"Province", "cities":[] },
+				{ "province":"Karaman", "type":"Province", "cities":[] },
+				{ "province":"Kars", "type":"Province", "cities":[] },
+				{ "province":"Kastamonu", "type":"Province", "cities":[] },
+				{ "province":"Kayseri", "type":"Province", "cities":[] },
+				{ "province":"Kilis", "type":"Province", "cities":[] },
+				{ "province":"Kirikkale", "type":"Province", "cities":[] },
+				{ "province":"Kirklareli", "type":"Province", "cities":[] },
+				{ "province":"Kirsehir", "type":"Province", "cities":[] },
+				{ "province":"Kocaeli", "type":"Province", "cities":[] },
+				{ "province":"Konya", "type":"Province", "cities":[] },
+				{ "province":"K�tahya", "type":"Province", "cities":[] },
+				{ "province":"Malatya", "type":"Province", "cities":[] },
+				{ "province":"Manisa", "type":"Province", "cities":[] },
+				{ "province":"Mardin", "type":"Province", "cities":[] },
+				{ "province":"Mersin", "type":"Province", "cities":[] },
+				{ "province":"Mugla", "type":"Province", "cities":[] },
+				{ "province":"Mus", "type":"Province", "cities":[] },
+				{ "province":"Nevsehir", "type":"Province", "cities":[] },
+				{ "province":"Nigde", "type":"Province", "cities":[] },
+				{ "province":"Ordu", "type":"Province", "cities":[] },
+				{ "province":"Osmaniye", "type":"Province", "cities":[] },
+				{ "province":"Rize", "type":"Province", "cities":[] },
+				{ "province":"Sakarya", "type":"Province", "cities":[] },
+				{ "province":"Samsun", "type":"Province", "cities":[] },
+				{ "province":"Sanliurfa", "type":"Province", "cities":[] },
+				{ "province":"Siirt", "type":"Province", "cities":[] },
+				{ "province":"Sinop", "type":"Province", "cities":[] },
+				{ "province":"Sirnak", "type":"Province", "cities":[] },
+				{ "province":"Sivas", "type":"Province", "cities":[] },
+				{ "province":"Tekirdag", "type":"Province", "cities":[] },
+				{ "province":"Tokat", "type":"Province", "cities":[] },
+				{ "province":"Trabzon", "type":"Province", "cities":[] },
+				{ "province":"Tunceli", "type":"Province", "cities":[] },
+				{ "province":"Usak", "type":"Province", "cities":[] },
+				{ "province":"Van", "type":"Province", "cities":[] },
+				{ "province":"Yalova", "type":"Province", "cities":[] },
+				{ "province":"Yozgat", "type":"Province", "cities":[] },
+				{ "province":"Zonguldak", "type":"Province", "cities":[] },
+				{ "province":"�ankiri", "type":"Province", "cities":[] }
+			]
+		},
+		{ "country": "Turkmenistan", "code": "TM", "states": [] },
+		{
+			"country": "United Arab Emirates", "code": "AE", "states": [
+				{
+					"state":"Abu Dhabi", "type":"Emirate", "citites":[
+						"Abu Dhabi", "Al Ain", "Madinat Zayed", "Ruwais", "Liwa Oasis", "Ghayathi",
+						"Abu al Abyad", "Al Ajban", "Al Aryam", "Al Mirfa", "Al Shuwaib", "Al Yahar", "Dalma", "Habshan", "Marawah", "Nahil", "Sila", "Sir Bani Yas", "Sweihan", "Al Faqa"
+					]
+				},
+				{
+					"state":"Ajman", "type":"Emirate", "citites":[
+						"Ajman", "Al Manama", "Masfut"
+					]
+				},
+				{
+					"state":"Dubai", "type":"Emirate", "citites":[
+						"Dubai", "Hatta", "Jebel Ali",
+						"Al Awir", "Al Khawaneej", "Al Lisaili", "Lahbab"
+					]
+				},
+				{
+					"state":"Fujairah", "type":"Emirate", "citites":[
+						"Dibba Al-Fujairah", "Fujairah",
+						"Al Badiyah", "Al Bithnah", "Al Halah", "Dadna", "Ghub", "Mirbah", "Zubarah"
+					]
+				},
+				{
+					"state":"Ras Al Khaimah", "type":"Emirate", "citites":[
+						"Ar-Rams", "RAK City",
+						"Adhen", "Al Hamraniyah", "Al Jazirah Al Hamra", "Al Jeer", "Al Qusaidat", "Al Qor", "Asimah", "Digdaga", "Ghalilah", "Huwaylat", "Khatt", "Khor Khwair", "Sha'am", "Wadi Shah", "Masafi"
+					]
+				},
+				{
+					"state":"Sharjah", "type":"Emirate", "citites":[
+						"Al Madam", "Dibba Al-Hisn", "Dhaid", "Kalba", "Khor Fakkan", "Sharjah",
+						"Al Bataeh", "Al Hamriyah", "Mleiha"
+					]
+				},
+				{
+					"state":"Umm Al Quwain", "type":"Emirate", "citites":[
+						"Umm Al Quwain", "Al Rafaah", "Al Rashidya", "Falaj Al Mualla"
+					]
+				}
+			]
+		},
+		{ "country": "Uzbekistan", "code": "UZ", "states": [] },
+		{
+			"country": "Vietnam", "code": "VN", "states": [
+				{
+					"province": "An Giang Province", "cities":[
+						"An Phú", "Châu Phú", "Châu Thành", "Chợ Mới", "Phú Tân", "Thoại Sơn", "Tịnh Biên", "Tri Tôn", "Tân Châu", "Châu Đốc", "Long Xuyên"
+					]
+				},
+				{
+					"province": "Bà Rịa-Vũng Tàu Province", "cities":[
+						"Châu Đức", "Côn Đảo ", "Đất Đỏ", "Long Điền", "Xuyên Mộc", "Phú Mỹ", "Bà Rịa", "Vũng Tàu"
+					]
+				},
+				{
+					"province": "Bắc Giang Province", "cities":[
+						"Bắc Giang", "Hiệp Hòa", "Lạng Giang", "Lục Nam", "Lục Ngạn", "Sơn Động", "Tân Yên", "Việt Yên", "Yên Dũng", "Yên Thế"
+					]
+				},
+				{
+					"province": "Bắc Kạn Province", "cities":[
+						"Bắc Kạn", "Ba Bể", "Bạch Thông", "Chợ Đồn", "Chợ Mới", "Na Rì", "Ngân Sơn", "Pác Nặm"
+					]
+				},
+				{
+					"province": "Bạc Liêu Province", "cities":[
+						"Đông Hải", "Hòa Binh", "Hồng Dân", "Phước Long", "Vĩnh Lợi", "Giá Rai", "Bạc Liêu"
+					]
+				},
+				{
+					"province": "Bắc Ninh Province", "cities":[
+						"Bắc Ninh", "Từ Sơn", "Thuận Thành", "Quế Võ", "Tiên Du", "Yên Phong", "Gia Bình", "Lương Tài"
+					]
+				},
+				{
+					"province": "Bến Tre Province", "cities":[
+						"Ba Tri", "Bình Đại", "Châu Thành", "Chợ Lách", "Giồng Trôm", "Mỏ Cày Bắc", "Mỏ Cày Nam", "Thạnh Phú", "Bến Tre"
+					]
+				},
+				{
+					"province": "Bình Định Province", "cities":[
+						"An Lão", "Hoài Ân", "Phù Cát", "Phù Mỹ", "Tuy Phước", "Tây Sơn", "Vân Canh", "Vĩnh Thạnh", "An Nhơn", "Hoài Nhơn", "Quy Nhơn"
+					]
+				},
+				{
+					"province": "Bình Dương Province", "cities":[
+						"Dĩ An", "Thủ Dầu Một", "Thuận An", "Bắc Tân Uyên", "Bàu Bàng", "Dầu Tiếng", "Phú Giáo"
+					]
+				},
+				{
+					"province": "Bình Phước Province", "cities":[
+						"Đồng Xoài", "Bình Long", "Phước Long", "Bù Đăng", "Bù Đốp", "Bù Gia Mập", "Chơn Thành", "Đồng Phú", "Hớn Quản", "Lộc Ninh", "Phú Riềng"
+					]
+				},
+				{
+					"province": "Bình Thuận Province", "cities":[
+						"Phan Thiết", "Bắc Bình", "Đức Linh", "Hàm Thuận Bắc", "Hàm Thuận Nam", "Hàm Tân", "Phú Quý", "Tánh Linh", "Tuy Phong"
+					]
+				},
+				{ "province": "Cà Mau Province", "cities":[] },
+				{ "province": "Cần Thơ City", "cities":[] },
+				{ "province": "Cao Bằng Province", "cities":[] },
+				{ "province": "Đà Nẵng City", "cities":[] },
+				{ "province": "Đắk Lắk Province", "cities":[] },
+				{ "province": "Đắk Nông Province", "cities":[] },
+				{ "province": "Điện Biên Province", "cities":[] },
+				{ "province": "Đồng Nai Province", "cities":[] },
+				{ "province": "Đồng Tháp Province", "cities":[] },
+				{ "province": "Gia Lai Province", "cities":[] },
+				{ "province": "Hà Giang Province", "cities":[] },
+				{ "province": "Hà Nam Province", "cities":[] },
+				{ "province": "Hà Nội City", "cities":[] },
+				{ "province": "Hà Tĩnh Province", "cities":[] },
+				{ "province": "Hải Dương Province", "cities":[] },
+				{ "province": "Hải Phòng City", "cities":[] },
+				{ "province": "Hậu Giang Province", "cities":[] },
+				{ "province": "Hồ Chí Minh City", "cities":[] },
+				{ "province": "Hòa Bình Province", "cities":[] },
+				{ "province": "Hưng Yên Province", "cities":[] },
+				{ "province": "Khánh Hòa Province", "cities":[] },
+				{ "province": "Kiên Giang Province", "cities":[] },
+				{ "province": "Kon Tum Province", "cities":[] },
+				{ "province": "Lai Châu Province", "cities":[] },
+				{ "province": "Lâm Đồng Province", "cities":[] },
+				{ "province": "Lạng Sơn Province", "cities":[] },
+				{ "province": "Lào Cai Province", "cities":[] },
+				{ "province": "Long An Province", "cities":[] },
+				{ "province": "Nam Định Province", "cities":[] },
+				{ "province": "Nghệ An Province", "cities":[] },
+				{ "province": "Ninh Bình Province", "cities":[] },
+				{ "province": "Ninh Thuận Province", "cities":[] },
+				{ "province": "Phú Thọ Province", "cities":[] },
+				{ "province": "Phú Yên Province", "cities":[] },
+				{ "province": "Quảng Bình Province", "cities":[] },
+				{ "province": "Quảng Nam Province", "cities":[] },
+				{ "province": "Quảng Ngãi Province", "cities":[] },
+				{ "province": "Quảng Ninh Province", "cities":[] },
+				{ "province": "Quảng Trị Province", "cities":[] },
+				{ "province": "Sóc Trăng Province", "cities":[] },
+				{ "province": "Sơn La Province", "cities":[] },
+				{ "province": "Tây Ninh Province", "cities":[] },
+				{ "province": "Thái Bình Province", "cities":[] },
+				{ "province": "Thái Nguyên Province", "cities":[] },
+				{ "province": "Thanh Hóa Province", "cities":[] },
+				{ "province": "Thừa Thiên-Huế Province", "cities":[] },
+				{ "province": "Tiền Giang Province", "cities":[] },
+				{ "province": "Trà Vinh Province", "cities":[] },
+				{ "province": "Tuyên Quang Province", "cities":[] },
+				{ "province": "Vĩnh Long Province", "cities":[] },
+				{ "province": "Vĩnh Phúc Province", "cities":[] },
+				{ "province": "Yên Bái Province", "cities":[] }
+			]
+		},
+		{ "country": "Yemen", "code": "YE", "states": [] }
 	] 
 },
 { 
-	"continent": "Australia/Oceania", "countries": [
+	"continent": "Australia/Oceania", "code": "OC", "countries": [
+		{ "country": "American Samoa", "code":"AS", "states": [] },
 		{
-			"country": "Australia", "timezone": "", 
-			"states": [
+			"country": "Australia", "code":"AU", "states": [
 				{
 					"state": "New South Wales", "cities": [
 						"Albury", "Armidale", "Ballina", "Batemans Bay", "Bathurst", "Bellbird", "Bomaderry", "Bowral", "Broken Hill", "Casino", "Central Coast", "Cessnock", "Coffs Harbour", "Dubbo", "Forster", "Goulburn", "Grafton", "Griffith", "Hazelbrook", "Inverell", "Katoomba", "Kiama", "Kurri Kurri", "Lawson", "Lismore", "Lithgow", "Maitland", "Moree", "Muswellbrook", "Newcastle", "Nowra", "Orange", "Parkes", "Port Macquarie", "Queanbeyan", "Raymond Terrace", "Richmond", "Sawtell", "Singleton", "Sydney", "Tamworth", "Taree", "Tuncurry", "Tweed Heads", "Ulladulla", "Wagga Wagga", "Wentworth Falls", "Weston", "Windsor", "Wollongong"
@@ -708,22 +1596,22 @@
 				}
 			]
 		},
-		{ "country": "Fiji", "timezone": "", "states": [] },
-		{ "country": "Kiribati", "timezone": "", "states": [] },
-		{ "country": "Marshall Islands", "timezone": "", "states": [] },
+		{ "country": "Cook Islands", "code":"CK", "states": [] },
+		{ "country": "East Timor", "code":"TL", "states": [] },
+		{ "country": "Fiji", "code":"FJ", "states": [] },
+		{ "country": "Kiribati", "code":"KI", "states": [] },
+		{ "country": "Marshall Islands", "code":"MH", "states": [] },
 		{
-			"country": "Micronesia", "timezone": "", 
-			"states": [
+			"country": "Micronesia", "code":"FM", "states": [
 				{ "state": "Chuuk", "cities": [] },
 				{ "state": "Kosrae", "cities": [] },
 				{ "state": "Pohnpei", "cities": [] },
 				{ "state": "Yap", "cities": [] }
 			]
 		},
-		{ "country": "Nauru", "timezone": "", "states": [] },
+		{ "country": "Nauru", "code":"NR", "states": [] },
 		{
-			"country": "New Zealand", "timezone": "", 
-			"states": [
+			"country": "New Zealand", "code":"NZ", "states": [
 				{
 					"state": "Auckland", "cities": [
 						"Auckland", "Clarks Beach", "Drury", "Helensville", "Kumeu", "Orewa", "Papakura", "Parakai", "Pukekohe", "Red Beach", "Riverhead", "Silverdale", "Snells Beach", "Takanini", "Waiheke Island", "Waimauku", "Waiuku"
@@ -802,22 +1690,21 @@
 				}
 			]
 		},
-		{ "country": "Palau", "timezone": "", "states": [] },
-		{ "country": "Papua New Guinea", "timezone": "", "states": [] },
-		{ "country": "Samoa", "timezone": "", "states": [] },
-		{ "country": "Solomon Islands", "timezone": "", "states": [] },
-		{ "country": "Tonga", "timezone": "", "states": [] },
-		{ "country": "Tuvalu", "timezone": "", "states": [] },
-		{ "country": "Vanuatu", "timezone": "", "states": [] }
+		{ "country": "Palau", "code":"PW", "states": [] },
+		{ "country": "Papua New Guinea", "code":"PG", "states": [] },
+		{ "country": "Samoa", "code":"WS", "states": [] },
+		{ "country": "Solomon Islands", "code":"SB", "states": [] },
+		{ "country": "Tonga", "code":"TO", "states": [] },
+		{ "country": "Tuvalu", "code":"TV", "states": [] },
+		{ "country": "Vanuatu", "code":"VU", "states": [] }
 	] 
 },
 { 
-	"continent": "Europe", "countries": [
-		{ "country": "Albania", "timezone": "", "states":[] },
-		{ "country": "Andorra", "timezone": "", "states":[] },
+	"continent": "Europe", "code": "EU", "countries": [
+		{ "country": "Albania", "code":"AL", "states":[] },
+		{ "country": "Andorra", "code":"AD", "states":[] },
 		{
-			"country": "Austria", "timezone": "", 
-			"states":[
+			"country": "Austria", "code":"AT", "states":[
 				 { "state": "Burgenland", "cities": [] },
 				 { "state": "Carinthia (Kärnten)", "cities": [] },
 				 { "state": "Lower Austria (Niederösterreich)", "cities": [] },
@@ -829,12 +1716,11 @@
 				 { "state": "Vorarlberg", "cities": [] }
 			]
 		},
-		{ "country": "Belarus", "timezone": "", "states":[] },
-		{ "country": "Belgium", "timezone": "", "states":[] },
-		{ "country": "Bosnia and Herzegovina", "timezone": "", "states":[] },
+		{ "country": "Belarus", "code":"BY", "states":[] },
+		{ "country": "Belgium", "code":"BE", "states":[] },
+		{ "country": "Bosnia and Herzegovina", "code":"BA", "states":[] },
 		{
-			"country": "Bulgaria", "timezone": "", 
-			"states":[
+			"country": "Bulgaria", "code":"BG", "states":[
 				{ "province": "Blagoevgrad", "cities": [] },
 				{ "province": "Burgas", "cities": [] },
 				{ "province": "Dobrich", "cities": [] },
@@ -866,8 +1752,7 @@
 			]
 		},
 		{
-			"country": "Croatia", "timezone": "", 
-			"states":[
+			"country": "Croatia", "code":"HR", "states":[
 				{ "state": "Bjelovar-Bilogora", "cities": [] },
 				{ "state": "Brod-Posavina", "cities": [] },
 				{ "state": "City of Zagreb", "cities": [] },
@@ -891,14 +1776,13 @@
 				{ "state": "Šibenik-Knin", "cities": [] }
 			]
 		},
-		{ "country": "Czech Republic (Czechia)", "timezone": "", "states":[] },
-		{ "country": "Denmark", "timezone": "", "states":[] },
-		{ "country": "Estonia", "timezone": "", "states":[] },
-		{ "country": "Finland", "timezone": "", "states":[] },
-		{ "country": "France", "timezone": "", "states":[] },
+		{ "country": "Czech Republic (Czechia)", "code":"CZ", "states":[] },
+		{ "country": "Denmark", "code":"DK", "states":[] },
+		{ "country": "Estonia", "code":"EE", "states":[] },
+		{ "country": "Finland", "code":"FI", "states":[] },
+		{ "country": "France", "code":"FR", "states":[] },
 		{
-			"country": "Germany", "timezone": "", 
-			"states":[
+			"country": "Germany", "code":"DE", "states":[
 				{ "province": "Baden-Württemberg", "cities": [] },
 				{ "province": "Bavaria(Bayern)", "cities": [] },
 				{ "province": "Berlin", "cities": [] },
@@ -917,14 +1801,13 @@
 				{ "province": "Thuringia(Thüringen)", "cities": [] }
 			]
 		},
-		{ "country": "Greece", "timezone": "", "states":[] },
-		{ "country": "Holy See", "timezone": "", "states":[] },
-		{ "country": "Hungary", "timezone": "", "states":[] },
-		{ "country": "Iceland", "timezone": "", "states":[] },
-		{ "country": "Ireland", "timezone": "", "states":[] },
+		{ "country": "Greece", "code":"GR", "states":[] },
+		{ "country": "Holy See", "code": "", "states":[] },
+		{ "country": "Hungary", "code":"HU", "states":[] },
+		{ "country": "Iceland", "code":"IS", "states":[] },
+		{ "country": "Ireland", "code":"IE", "states":[] },
 		{
-			"country": "Italy", "timezone": "", 
-			"states":[
+			"country": "Italy", "code":"IT", "states":[
 				{ "province": "Agrigento", "cities": [] },
 				{ "province": "Alessandria", "cities": [] },
 				{ "province": "Ancona", "cities": [] },
@@ -1034,37 +1917,123 @@
 				{ "province": "Viterbo", "cities": [] }
 			]
 		},
-		{ "country": "Latvia", "timezone": "", "states":[] },
-		{ "country": "Liechtenstein", "timezone": "", "states":[] },
-		{ "country": "Lithuania", "timezone": "", "states":[] },
-		{ "country": "Luxembourg", "timezone": "", "states":[] },
-		{ "country": "Malta", "timezone": "", "states":[] },
-		{ "country": "Moldova", "timezone": "", "states":[] },
-		{ "country": "Monaco", "timezone": "", "states":[] },
-		{ "country": "Montenegro", "timezone": "", "states":[] },
-		{ "country": "Netherlands", "timezone": "", "states":[] },
-		{ "country": "North Macedonia", "timezone": "", "states":[] },
-		{ "country": "Norway", "timezone": "", "states":[] },
-		{ "country": "Poland", "timezone": "", "states":[] },
-		{ "country": "Portugal", "timezone": "", "states":[] },
-		{ "country": "Romania", "timezone": "", "states":[] },
-		{ "country": "Russia", "timezone": "", "states":[] },
-		{ "country": "San Marino", "timezone": "", "states":[] },
-		{ "country": "Serbia", "timezone": "", "states":[] },
-		{ "country": "Slovakia", "timezone": "", "states":[] },
-		{ "country": "Slovenia", "timezone": "", "states":[] },
-		{ "country": "Spain", "timezone": "", "states":[] },
-		{ "country": "Sweden", "timezone": "", "states":[] },
-		{ "country": "Switzerland", "timezone": "", "states":[] },
-		{ "country": "Ukraine", "timezone": "", "states":[] },
-		{ "country": "United Kingdom", "timezone": "", "states":[] }
+		{ "country": "Latvia", "code":"LV", "states":[] },
+		{ "country": "Liechtenstein", "code":"LI", "states":[] },
+		{ "country": "Lithuania", "code":"LT", "states":[] },
+		{ "country": "Luxembourg", "code":"LU", "states":[] },
+		{ "country": "Malta", "code":"MT", "states":[] },
+		{ "country": "Moldova", "code":"MD", "states":[] },
+		{ "country": "Monaco", "code":"MC", "states":[] },
+		{ "country": "Montenegro", "code":"ME", "states":[] },
+		{ "country": "Netherlands", "code":"NL", "states":[] },
+		{ "country": "North Macedonia", "code":"MK", "states":[] },
+		{ "country": "Norway", "code":"NO", "states":[] },
+		{ "country": "Poland", "code":"PL", "states":[] },
+		{ "country": "Portugal", "code":"PT", "states":[] },
+		{ "country": "Romania", "code":"RO", "states":[] },
+		{
+			"country": "Russia", "code":"RU", "states": [
+				{ "state":"Adygeya, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Altay, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Altayskiy kray", "type":"Administrative territory", "cities":[] },
+				{ "state":"Amurskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Arkhangel'skaya oblast,", "type":"Administrative region", "cities":[] },
+				{ "state":"Astrakhanskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Bashkortostan, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Belgorodskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Bryanskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Buryatiya, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Chechenskaya Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Chelyabinskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Chukotskiy avtonomnyy okrug", "type":"Autonomous district", "cities":[] },
+				{ "state":"Chuvashskaya Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Dagestan, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Ingushskaya Respublika [Respublika Ingushetiya]", "type":"Republic", "cities":[] },
+				{ "state":"Irkutskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Ivanovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Kabardino-Balkarskaya Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Kaliningradskaya oblast,", "type":"Administrative region", "cities":[] },
+				{ "state":"Kalmykiya, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Kaluzhskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Kamchatskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Karachayevo-Cherkesskaya Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Kareliya, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Kemerovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Khabarovskiy kray", "type":"Administrative territory", "cities":[] },
+				{ "state":"Khakasiya, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Khanty-Mansiyskiy avtonomnyy okrug", "type":"Autonomous district", "cities":[] },
+				{ "state":"Kirovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Komi, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Kostromskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Krasnodarskiy kray", "type":"Administrative territory", "cities":[] },
+				{ "state":"Krasnoyarskiy kray", "type":"Administrative territory", "cities":[] },
+				{ "state":"Kurganskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Kurskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Leningradskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Lipetskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Magadanskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Mariy El, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Mordoviya, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Moskovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Moskva", "type":"Autonomous city", "cities":[] },
+				{ "state":"Murmanskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Nenetskiy avtonomnyy okrug", "type":"Autonomous district", "cities":[] },
+				{ "state":"Nizhegorodskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Novgorodskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Novosibirskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Omskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Orenburgskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Orlovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Penzenskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Perm", "type":"Administrative territory", "cities":[] },
+				{ "state":"Primorskiy kray", "type":"Administrative territory", "cities":[] },
+				{ "state":"Pskovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Rostovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Ryazanskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Sakha, Respublika [Yakutiya]", "type":"Republic", "cities":[] },
+				{ "state":"Sakhalinskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Samarskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Sankt-Peterburg", "type":"Autonomous city", "cities":[] },
+				{ "state":"Saratovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Severnaya Osetiya, Respublika Alaniya] [Respublika Severnaya Osetiya-Alaniya]", "type":"Republic", "cities":[] },
+				{ "state":"Smolenskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Stavropol'skiy kray", "type":"Administrative territory", "cities":[] },
+				{ "state":"Sverdlovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Tambovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Tatarstan, Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Tomskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Tul'skaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Tverskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Tyumenskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Tyva, Respublika [Tuva]", "type":"Republic", "cities":[] },
+				{ "state":"Udmurtskaya Respublika", "type":"Republic", "cities":[] },
+				{ "state":"Ul'yanovskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Vladimirskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Volgogradskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Vologodskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Voronezhskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Yamalo-Nenetskiy avtonomnyy okrug", "type":"Autonomous district", "cities":[] },
+				{ "state":"Yaroslavskaya oblast'", "type":"Administrative region", "cities":[] },
+				{ "state":"Yevreyskaya avtonomnaya oblast'", "type":"Autonomous region", "cities":[] },
+				{ "state":"Zabaykal'skiy kray", "type":"Administrative territory", "cities":[] }
+			]
+		},
+		{ "country": "San Marino", "code":"SM", "states":[] },
+		{ "country": "Serbia", "code":"RS", "states":[] },
+		{ "country": "Slovakia", "code":"SK", "states":[] },
+		{ "country": "Slovenia", "code":"SI", "states":[] },
+		{ "country": "Spain", "code":"ES", "states":[] },
+		{ "country": "Sweden", "code":"SE", "states":[] },
+		{ "country": "Switzerland", "code":"CH", "states":[] },
+		{ "country": "Ukraine", "code":"UA", "states":[] },
+		{ "country": "United Kingdom", "code":"GB", "states":[] },
+		{ "country": "Vatican City", "code":"VA", "states": [] }
 	] 
 },
 { 
-	"continent": "North America", "countries": [
+	"continent": "North America", "code": "NA", "countries": [
 		{
-			"country": "Antigua and Barbuda", "timezone": "", 
-			"states": [
+			"country": "Antigua and Barbuda", "code":"AG", "states": [
 				{ "state": "Saint George", "cities": [ "Piggotts", "Sea View Farm" ] },
 				{ "state": "Saint John", "cities": [ "Cedar Grove", "Saint John's" ] },
 				{ "state": "Saint Mary", "cities": [ "Bolands", "Jennings", "Old Road" ] },
@@ -1075,12 +2044,46 @@
 				{ "state": "Redonda", "cities": [] }
 			]
 		},
-		{ "country": "Bahamas", "timezone": "", "states": [] },
-		{ "country": "Barbados", "timezone": "", "states": [] },
-		{ "country": "Belize", "timezone": "", "states": [] },
 		{
-			"country": "Canada", "timezone": "", 
-			"states": [
+			"country": "Bahamas", "code":"BS", "states": [
+				{ "state":"Acklins", "type":"District", "cities":[] },
+				{ "state":"Berry Islands", "type":"District", "cities":[] },
+				{ "state":"Bimini", "type":"District", "cities":[] },
+				{ "state":"Black Point", "type":"District", "cities":[] },
+				{ "state":"Cat Island", "type":"District", "cities":[] },
+				{ "state":"Central Abaco", "type":"District", "cities":[] },
+				{ "state":"Central Andros", "type":"District", "cities":[] },
+				{ "state":"Central Eleuthera", "type":"District", "cities":[] },
+				{ "state":"City of Freeport", "type":"District", "cities":[] },
+				{ "state":"Crooked Island and Long Cay", "type":"District", "cities":[] },
+				{ "state":"East Grand Bahama", "type":"District", "cities":[] },
+				{ "state":"Exuma", "type":"District", "cities":[] },
+				{ "state":"Grand Cay", "type":"District", "cities":[] },
+				{ "state":"Harbour Island", "type":"District", "cities":[] },
+				{ "state":"Hope Town", "type":"District", "cities":[] },
+				{ "state":"Inagua", "type":"District", "cities":[] },
+				{ "state":"Long Island", "type":"District", "cities":[] },
+				{ "state":"Mangrove Cay", "type":"District", "cities":[] },
+				{ "state":"Mayaguana", "type":"District", "cities":[] },
+				{ "state":"Moore's Island", "type":"District", "cities":[] },
+				{ "state":"New Providence", "type":"Island", "cities":[] },
+				{ "state":"North Abaco", "type":"District", "cities":[] },
+				{ "state":"North Andros", "type":"District", "cities":[] },
+				{ "state":"North Eleuthera", "type":"District", "cities":[] },
+				{ "state":"Ragged Island", "type":"District", "cities":[] },
+				{ "state":"Rum Cay", "type":"District", "cities":[] },
+				{ "state":"San Salvador", "type":"District", "cities":[] },
+				{ "state":"South Abaco", "type":"District", "cities":[] },
+				{ "state":"South Andros", "type":"District", "cities":[] },
+				{ "state":"South Eleuthera", "type":"District", "cities":[] },
+				{ "state":"Spanish Wells", "type":"District", "cities":[] },
+				{ "state":"West Grand Bahama", "type":"District", "cities":[] }
+			]
+		},
+		{ "country": "Barbados", "code":"BB", "states": [] },
+		{ "country": "Belize", "code":"BZ", "states": [] },
+		{
+			"country": "Canada", "code":"CA", "states": [
 				{
 					"province": "Alberta", 
 						"cities": [
@@ -1134,8 +2137,7 @@
 			]
 		},
 		{ 
-			"country": "Costa Rica", "timezone": "", 
-			"states": [
+			"country": "Costa Rica", "code":"CR", "states": [
 				{
 					"province": "Alajuela", 
 					"cities": [
@@ -1181,8 +2183,7 @@
 			] 
 		},
 		{
-			"country": "Cuba", "timezone": "", 
-			"states": [
+			"country": "Cuba", "code":"CU", "states": [
 				{ "province": "Artemisa", "cities": [ "Artemisa", "Bauta", "Guanajay", "Güira de Melena", "San Antonio de los Baños", "San Cristóbal" ] },
 				{ "province": "Camagüey", "cities": [ "Camagüey", "Florida", "Nuevitas", "Vertientes" ] },
 				{ "province": "Ciego de Ávila", "cities": [ "Ciego de Ávila", "Morón" ] },
@@ -1206,10 +2207,9 @@
 				{ "province": "VilLa Clara", "cities": [ "Caibarién", "Camajuaní", "Manicaragua", "Placetas", "Sagua la Grande", "Santa Clara" ] }
 			]
 		},
-		{ "country": "Dominica", "timezone": "", "states": [] },
+		{ "country": "Dominica", "code":"DM", "states": [] },
 		{
-			"country": "Dominican Republic", "timezone": "", 
-			"states": [
+			"country": "Dominican Republic", "code":"DO", "states": [
 				{ "province": "Azua", "cities": ["Azua de Compostela"] },
 				{ "province": "Baoruco", "cities": [] },
 				{ "province": "Barahona", "cities": ["Santa Cruz de Barahona"] },
@@ -1245,8 +2245,7 @@
 			]
 		},
 		{
-			"country": "El Salvador", "timezone": "", 
-			"states": [
+			"country": "El Salvador", "code":"SV", "states": [
 				{
 					"province": "Ahuachapán", 
 					"cities": [
@@ -1333,14 +2332,14 @@
 				}
 			]
 		},
-		{ "country": "Grenada", "timezone": "", "states": [] },
-		{ "country": "Guatemala", "timezone": "", "states": [] },
-		{ "country": "Haiti", "timezone": "", "states": [] },
-		{ "country": "Honduras", "timezone": "", "states": [] },
-		{ "country": "Jamaica", "timezone": "", "states": [] },
+		{ "country": "Grenada", "states": [] },
+		{ "country": "Greenland", "code":"GL", "states": [] },
+		{ "country": "Guatemala", "code":"GT", "states": [] },
+		{ "country": "Haiti", "code":"HT", "states": [] },
+		{ "country": "Honduras", "code":"HN", "states": [] },
+		{ "country": "Jamaica", "code":"JM", "states": [] },
 		{
-			"country": "Mexico", "timezone": "", 
-			"states": [
+			"country": "Mexico", "code":"MX", "states": [
 				{ "state": "Aguascalientes", "cities": ["Aguascalientes"] },
 				{ "state": "Baja California", "cities": ["Ensenada", "Mexicali", "Tijuana"] },
 				{ "state": "Baja California Sur", "cities": ["La Paz"] },
@@ -1380,15 +2379,15 @@
 				{ "state": "Zacatecas", "cities": ["Fresnillo", "Guadalupe", "Zacatecas City"] }
 			]
 		},
-		{ "country": "Nicaragua", "timezone": "", "states": [] },
-		{ "country": "Panama", "timezone": "", "states": [] },
-		{ "country": "Saint Kitts and Nevis", "timezone": "", "states": [] },
-		{ "country": "Saint Lucia", "timezone": "", "states": [] },
-		{ "country": "Saint Vincent and the Grenadines", "timezone": "", "states": [] },
-		{ "country": "Trinidad and Tobago", "timezone": "", "states": [] },
+		{ "country": "Nicaragua", "code":"NI", "states": [] },
+		{ "country": "Panama", "code":"PA", "states": [] },
+		{ "country": "Puerto Rico", "code":"PR", "states": [] },
+		{ "country": "Saint Kitts and Nevis", "code":"KN", "states": [] },
+		{ "country": "Saint Lucia", "code":"LC", "states": [] },
+		{ "country": "Saint Vincent and the Grenadines", "code":"VC", "states": [] },
+		{ "country": "Trinidad and Tobago", "code":"TT", "states": [] },
 		{
-			"country": "United States", "timezone": "", 
-			"states": [
+			"country": "United States", "code":"US", "states": [
 				{
 					"state": "Alabama", "cities": [
 						"Abbeville", "Adamsville", "Alabaster", "Albertville", "Alexander City", "Aliceville", "Andalusia", "Anniston", "Arab", "Ashville", "Athens", "Atmore", "Attalla", "Auburn", "Bay Minette", "Bayou La Batre", "Bessemer", "Birmingham", "Boaz[c]", "Brent", "Brewton", "Bridgeport", "Brighton", "Brundidge", "Calera", "Camden", "Carbon Hill", "Center Point[d]", "Centre", "Centreville", "Chelsea", "Chickasaw", "Childersburg", "Citronelle", "Clanton", "Clay[e]", "Clio", "Columbiana", "Cordova", "Creola", "Cullman", "Dadeville", "Daleville", "Daphne", "Decatur", "Demopolis", "Dora", "Dothan", "East Brewton", "Elba", "Enterprise", "Eufaula", "Eutaw", "Evergreen", "Fairfield", "Fairhope", "Fayette", "Florence", "Foley", "Fort Payne", "Fultondale", "Gadsden", "Gardendale", "Geneva", "Glencoe", "Graysville", "Greensboro", "Greenville", "Guin", "Gulf Shores", "Guntersville", "Haleyville", "Hamilton", "Hanceville", "Hartford", "Hartselle", "Headland", "Heflin", "Helena", "Henagar", "Hokes Bluff", "Homewood", "Hoover", "Hueytown", "Huntsville", "Irondale", "Jackson", "Jacksonville", "Jasper", "Jemison", "Kimberly", "LaFayette", "Lanett", "Leeds", "Level Plains", "Lincoln", "Linden", "Lineville", "Lipscomb", "Livingston", "Luverne", "Madison", "Margaret", "Marion", "Midfield", "Millbrook", "Mobile", "Monroeville", "Montevallo", "Montgomery", "Moody", "Moulton", "Mountain Brook", "Muscle Shoals", "New Hope", "Northport", "Oneonta", "Opelika", "Opp", "Orange Beach", "Oxford", "Ozark", "Pelham", "Pell City", "Phenix City", "Piedmont", "Pinson[l]", "Pleasant Grove", "Prattville", "Prichard", "Rainbow City", "Rainsville", "Red Bay", "Reform", "Roanoke", "Robertsdale", "Russellville", "Samson", "Saraland", "Satsuma", "Scottsboro", "Selma", "Sheffield", "Slocomb", "Smiths Station[m]", "Southside", "Spanish Fort", "Springville", "Stevenson", "Sulligent", "Sumiton", "Sylacauga", "Talladega", "Tallassee", "Tarrant", "Thomasville", "Troy", "Trussville", "Tuscaloosa", "Tuscumbia", "Tuskegee", "Union Springs", "Uniontown", "Valley", "Valley Grande[o]", "Vernon", "Vestavia Hills", "Warrior", "Weaver", "Westover[p]", "Wetumpka", "Winfield", "York"
@@ -1644,10 +2643,9 @@
 	] 
 },
 { 
-	"continent": "South America", "countries": [
+	"continent": "South America", "code": "SA", "countries": [
 		{
-			"country": "Argentina", "timezone": "", 
-			"states": [
+			"country": "Argentina", "code":"AR", "states": [
 				 { "province": "Buenos Aires", "cities": [] },
 				 { "province": "Catamarca", "cities": [] },
 				 { "province": "Chaco", "cities": [] },
@@ -1674,10 +2672,9 @@
 				 { "province": "Tucumán", "cities": [] }
 			]
 		},
-		{ "country": "Bolivia", "timezone": "", "states": [] },
+		{ "country": "Bolivia", "code":"BO", "states": [] },
 		{
-			"country": "Brazil", "timezone": "", 
-			"states": [
+			"country": "Brazil", "code":"BR", "states": [
 				{ "state": "Acre", "cities": [] },
 				{ "state": "Alagoas", "cities": [] },
 				{ "state": "Amapá", "cities": [] },
@@ -1707,10 +2704,9 @@
 				{ "state": "Tocantins", "cities": [] }
 			]
 		},
-		{ "country": "Chile", "timezone": "", "states": [] },
+		{ "country": "Chile", "code":"CL", "states": [] },
 		{
-			"country": "Colombia", "timezone": "", 
-			"states": [
+			"country": "Colombia", "code":"CO", "states": [
 				{ "state": "Amazonas", "cities": [] },
 				{ "state": "Antioquia", "cities": [] },
 				{ "state": "Arauca", "cities": [] },
@@ -1747,8 +2743,7 @@
 			]
 		},
 		{
-			"country": "Ecuador", "timezone": "", 
-			"states": [
+			"country": "Ecuador", "code":"EC", "states": [
 				{ "province": "Azuay", "cities": [] },
 				{ "province": "Bolívar", "cities": [] },
 				{ "province": "Carchi", "cities": [] },
@@ -1775,14 +2770,140 @@
 				{ "province": "Zamora Chinchipe", "cities": [] }
 			]
 		},
-		{ "country": "Falkland Islands", "timezone": "", "states": [] },
-		{ "country": "French Guiana", "timezone": "", "states": [] },
-		{ "country": "Guyana", "timezone": "", "states": [] },
-		{ "country": "Paraguay", "timezone": "", "states": [] },
-		{ "country": "Peru", "timezone": "", "states": [] },
-		{ "country": "Suriname", "timezone": "", "states": [] },
-		{ "country": "Uruguay", "timezone": "", "states": [] },
-		{ "country": "Venezuela", "timezone": "", "states": [] }
+		{ "country": "Falkland Islands", "code":"FK", "states": [] },
+		{ "country": "French Guiana", "code":"GF", "states": [] },
+		{
+			"country": "Guyana", "code":"GY", "states": [
+				{ "state":"Barima-Waini", "type":"Region", "cities":[] },
+				{ "state":"Cuyuni-Mazaruni", "type":"Region", "cities":[] },
+				{ "state":"Demerara-Mahaica", "type":"Region", "cities":[] },
+				{ "state":"East Berbice-Corentyne", "type":"Region", "cities":[] },
+				{ "state":"Essequibo Islands-West Demerara", "type":"Region", "cities":[] },
+				{ "state":"Mahaica-Berbice", "type":"Region", "cities":[] },
+				{ "state":"Pomeroon-Supenaam", "type":"Region", "cities":[] },
+				{ "state":"Potaro-Siparuni", "type":"Region", "cities":[] },
+				{ "state":"Upper Demerara-Berbice", "type":"Region", "cities":[] },
+				{ "state":"Upper Takutu-Upper Essequibo", "type":"Region", "cities":[] }
+			]
+		},
+		{
+			"country": "Paraguay", "code":"PY", "states": [
+				{ "state":"Alto Paraguay", "type":"Department", "cities":[] },
+				{ "state":"Alto Paran�", "type":"Department", "cities":[] },
+				{ "state":"Amambay", "type":"Department", "cities":[] },
+				{ "state":"Asunci�n", "type":"Capital", "cities":[] },
+				{ "state":"Boquer�n", "type":"Department", "cities":[] },
+				{ "state":"Caaguaz�", "type":"Department", "cities":[] },
+				{ "state":"Caazap�", "type":"Department", "cities":[] },
+				{ "state":"Canindey�", "type":"Department", "cities":[] },
+				{ "state":"Central", "type":"Department", "cities":[] },
+				{ "state":"Concepci�n", "type":"Department", "cities":[] },
+				{ "state":"Cordillera", "type":"Department", "cities":[] },
+				{ "state":"Guair�", "type":"Department", "cities":[] },
+				{ "state":"Itap�a", "type":"Department", "cities":[] },
+				{ "state":"Misiones", "type":"Department", "cities":[] },
+				{ "state":"Paraguar�", "type":"Department", "cities":[] },
+				{ "state":"Presidente Hayes", "type":"Department", "cities":[] },
+				{ "state":"San Pedro", "type":"Department", "cities":[] },
+				{ "state":"�eembuc�", "type":"Department", "cities":[] }
+			]
+		},
+		{
+			"country": "Peru", "code":"PE", "states": [
+				{ "state":"Amazonas", "type":"Region", "cities":[] },
+				{ "state":"Ancash", "type":"Region", "cities":[] },
+				{ "state":"Apur�mac", "type":"Region", "cities":[] },
+				{ "state":"Arequipa", "type":"Region", "cities":[] },
+				{ "state":"Ayacucho", "type":"Region", "cities":[] },
+				{ "state":"Cajamarca", "type":"Region", "cities":[] },
+				{ "state":"Cuzco [Cusco]", "type":"Region", "cities":[] },
+				{ "state":"El Callao", "type":"Region", "cities":[] },
+				{ "state":"Huancavelica", "type":"Region", "cities":[] },
+				{ "state":"Hu�nuco", "type":"Region", "cities":[] },
+				{ "state":"Ica", "type":"Region", "cities":[] },
+				{ "state":"Jun�n", "type":"Region", "cities":[] },
+				{ "state":"La Libertad", "type":"Region", "cities":[] },
+				{ "state":"Lambayeque", "type":"Region", "cities":[] },
+				{ "state":"Lima", "type":"Region", "cities":[] },
+				{ "state":"Lima hatun llaqta", "type":"Municipality", "cities":[] },
+				{ "state":"Loreto", "type":"Region", "cities":[] },
+				{ "state":"Madre de Dios", "type":"Region", "cities":[] },
+				{ "state":"Moquegua", "type":"Region", "cities":[] },
+				{ "state":"Pasco", "type":"Region", "cities":[] },
+				{ "state":"Piura", "type":"Region", "cities":[] },
+				{ "state":"Puno", "type":"Region", "cities":[] },
+				{ "state":"San Mart�n", "type":"Region", "cities":[] },
+				{ "state":"Tacna", "type":"Region", "cities":[] },
+				{ "state":"Tumbes", "type":"Region", "cities":[] },
+				{ "state":"Ucayali", "type":"Region", "cities":[] }
+			]
+		},
+		{
+			"country": "Suriname", "code":"SR", "states": [
+				{ "state":"Brokopondo", "type":"District", "cities":[] },
+				{ "state":"Commewijne", "type":"District", "cities":[] },
+				{ "state":"Coronie", "type":"District", "cities":[] },
+				{ "state":"Marowijne", "type":"District", "cities":[] },
+				{ "state":"Nickerie", "type":"District", "cities":[] },
+				{ "state":"Para", "type":"District", "cities":[] },
+				{ "state":"Paramaribo", "type": "", "cities":[] },
+				{ "state":"Saramacca", "type":"District", "cities":[] },
+				{ "state":"Sipaliwini", "type":"District", "cities":[] },
+				{ "state":"Wanica", "type":"District", "cities":[] }
+			]
+		},
+		{
+			"country": "Uruguay", "code":"UY", "states": [
+				{ "state":"Artigas", "type":"Department", "cities":[] },
+				{ "state":"Canelones", "type":"Department", "cities":[] },
+				{ "state":"Cerro Largo", "type":"Department", "cities":[] },
+				{ "state":"Colonia", "type":"Department", "cities":[] },
+				{ "state":"Durazno", "type":"Department", "cities":[] },
+				{ "state":"Flores", "type":"Department", "cities":[] },
+				{ "state":"Florida", "type":"Department", "cities":[] },
+				{ "state":"Lavalleja", "type":"Department", "cities":[] },
+				{ "state":"Maldonado", "type":"Department", "cities":[] },
+				{ "state":"Montevideo", "type":"Department", "cities":[] },
+				{ "state":"Paysandú", "type":"Department", "cities":[] },
+				{ "state":"Rivera", "type":"Department", "cities":[] },
+				{ "state":"Rocha", "type":"Department", "cities":[] },
+				{ "state":"Río Negro", "type":"Department", "cities":[] },
+				{ "state":"Salto", "type":"Department", "cities":[] },
+				{ "state":"San Jos_", "type":"Department", "cities":[] },
+				{ "state":"Soriano", "type":"Department", "cities":[] },
+				{ "state":"Tacuarembó", "type":"Department", "cities":[] },
+				{ "state":"Treinta y Tres", "type":"Department", "cities":[] }
+			]
+		},
+		{
+			"country": "Venezuela", "code":"VE", "states": [
+				{ "state":"Amazonas", "type":"State", "cities":[] },
+				{ "state":"Anzoátegui", "type":"State", "cities":[] },
+				{ "state":"Apure", "type":"State", "cities":[] },
+				{ "state":"Aragua", "type":"State", "cities":[] },
+				{ "state":"Barinas", "type":"State", "cities":[] },
+				{ "state":"Bolívar", "type":"State", "cities":[] },
+				{ "state":"Carabobo", "type":"State", "cities":[] },
+				{ "state":"Cojedes", "type":"State", "cities":[] },
+				{ "state":"Delta Amacuro", "type":"State", "cities":[] },
+				{ "state":"Dependencias Federales", "type":"Federal dependencies", "cities":[] },
+				{ "state":"Distrito Capital", "type":"Capital district", "cities":[] },
+				{ "state":"Falcón", "type":"State", "cities":[] },
+				{ "state":"Guárico", "type":"State", "cities":[] },
+				{ "state":"Lara", "type":"State", "cities":[] },
+				{ "state":"M_rida", "type":"State", "cities":[] },
+				{ "state":"Miranda", "type":"State", "cities":[] },
+				{ "state":"Monagas", "type":"State", "cities":[] },
+				{ "state":"Nueva Esparta", "type":"State", "cities":[] },
+				{ "state":"Portuguesa", "type":"State", "cities":[] },
+				{ "state":"Sucre", "type":"State", "cities":[] },
+				{ "state":"Trujillo", "type":"State", "cities":[] },
+				{ "state":"Táchira", "type":"State", "cities":[] },
+				{ "state":"Yaracuy", "type":"State", "cities":[] },
+				{ "state":"Zulia", "type":"State", "cities":[] },
+				{ "state":"vargas", "type":"State", "cities":[] }
+			]
+		}
 	] 
 }
 ]

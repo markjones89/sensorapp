@@ -20,6 +20,7 @@ class CreateSensorMapTable extends Migration
             $table->string('name')->nullable();
             $table->integer('pos_x')->unsigned();
             $table->integer('pos_y')->unsigned();
+            $table->double('scale');
             $table->timestamps();
 
             $table->foreign('floor_id')->references('id')->on('floors')->onDelete('cascade');

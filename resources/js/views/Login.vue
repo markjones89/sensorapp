@@ -10,7 +10,7 @@
                 <label>Password</label>
                 <input type="password" v-model="password" placeholder="Password" @keydown="inputKeydown" :disabled="loggingIn">
             </div>
-            <button class="btn btn-primary" @click="login" :disabled="loggingIn">{{loggingIn ? 'Working...' : 'Login'}}</button>
+            <button class="btn btn-primary btn-block" @click="login" :disabled="loggingIn">{{loggingIn ? 'Logging in...' : 'Login'}}</button>
         </div>
     </div>
 </template>
