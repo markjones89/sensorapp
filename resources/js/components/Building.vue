@@ -24,7 +24,7 @@
                 <path d="M122.159 35.99L88.5918 55.7152V51.9086L122.159 32.5294V35.99Z" fill="#485B66"/>
                 <path d="M104.855 22.1477L122.158 32.5294L88.5903 51.9086L70.9414 41.873L104.855 22.1477Z" fill="#597281"/>
             </g>
-            <g class="floor" v-for="(f, i) in floors" :key="f.hid" :style="{ transform: `translateY(${((floorCount - (i + 1)) * floorHeight)}px)` }" :floor="f.floor_no"
+            <g class="floor" v-for="(f, i) in floors" :key="f.hid" :style="{ transform: `translateY(${i * floorHeight}px)` }" :floor="f.floor_no"
                 :class="getLiveColor(f.occupancy_live, f.occupancy_limit)">
                 <path d="M341.559 175L243.971 231.5V267.5L341.559 211.5V175Z" fill="#F0A718"/>
                 <path d="M12.457 133L243.969 267.5V231.5L12.457 96.5V133Z" fill="#F0A718"/>
