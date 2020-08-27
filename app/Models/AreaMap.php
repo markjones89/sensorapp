@@ -8,11 +8,19 @@ use Hashids;
 class AreaMap extends Model
 {
     protected $table = 'area_map';
-    protected $hidden = ['pivot', 'id', 'floor_id', 'points'];
-    protected $appends = ['hid', 'fid', 'poly_points'];
+    protected $hidden = ['pivot', 'id', 'floor_id', 'type_id', 'points'];
+    protected $appends = ['hid', 'fid', 'tid', 'poly_points'];
 
     public function floor() {
         return $this->belongsTo(Floor::class, 'floor_id');
+    }
+
+    public function type() {
+        return $this->belongsTo(AreaType::class, 'type_id');
+    }
+
+    public function sensors() {
+        return $this->hasMany(SensorMap::class, 'area_id');
     }
 
     public function getHIdAttribute() {
@@ -21,6 +29,10 @@ class AreaMap extends Model
 
     public function getFIdAttribute() {
         return Hashids::encode($this->attributes['floor_id']);
+    }
+
+    public function getTIdAttribute() {
+        return Hashids::encode($this->attributes['type_id']);
     }
 
     public function getPolyPointsAttribute() {

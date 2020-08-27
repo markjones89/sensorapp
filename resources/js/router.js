@@ -25,12 +25,33 @@ const router = new VueRouter({
             component: () => import(/* webpackChunkName: "js/views/insights/peak-graph" */ './views/insights/PeakAvg.vue')
         },
         {
+            path: '/user-peak', name: 'user-peak',
+            component: () => import(/* webpackChunkName: "js/views/insights/user-peak" */ './views/insights/UserPeak.vue')
+        },
+        {
+            path: '/occupancy', name: 'occupancy',
+            props: (route) => ({ bldg_id: route.query.bid }),
+            component: () => import(/* webpackChunkName: "js/views/insights/occupancy" */ './views/insights/Occupancy.vue')
+        },
+        {
+            path: '/wfh', name: 'wfh',
+            component: () => import(/* webpackChunkName: "js/views/insights/wfh" */ './views/insights/WorkFromHome.vue')
+        },
+        {
+            path: '/compare', name: 'compare-room',
+            component: () => import(/* webpackChunkName: "js/views/insights/compare-room" */ './views/insights/CompareRoom.vue')
+        },
+        {
             path: '/live', name: 'live',
-            component: () => import(/* webpackChunkName: "js/views/insights/live-view" */ './views/insights/HeatMap.vue')
+            component: () => import(/* webpackChunkName: "js/views/insights/live-view" */ './views/insights/LiveView.vue')
         },
         {
             path: '/heat-map', name: 'heat-map',
-            component: () => import(/* webpackChunkName: "js/views/insights/heat-map" */ './views/insights/LiveView.vue')
+            component: () => import(/* webpackChunkName: "js/views/insights/heat-map" */ './views/insights/HeatMap.vue')
+        },
+        {
+            path: '/comfort-map', name: 'comfort-map',
+            component: () => import(/* webpackChunkName: "js/views/insights/comfort-map" */ './views/insights/ComfortMap.vue')
         },
         {
             path: '/profile', name: 'profile',

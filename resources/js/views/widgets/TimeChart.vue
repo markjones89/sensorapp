@@ -4,7 +4,7 @@
     </div>
 </template>
 <script>
-import { getUrlParam } from '../../helpers'
+import { getBaseUrl, getUrlParam } from '../../helpers'
 import { timeGraph } from '../../components/graphs/TimeGraph'
 export default {
     data() {
@@ -22,7 +22,7 @@ export default {
         this.$refs.chart.style.width = `${this.width}px`
         this.$refs.chart.style.height = `${this.height}px`
 
-        timeGraph('#time-chart', true)
+        timeGraph('#time-chart', `${getBaseUrl()}/data/time-chart-data.json`, true)
     }
 }
 </script>

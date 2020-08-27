@@ -8,18 +8,16 @@ import * as d3 from 'd3'
  */
 function mapper(wrapper, data, callbacks) {
     const container = d3.select(wrapper)
-    const
-        width = 800, 
-        // width = container.node().getBoundingClientRect().width - 16,
-        height = 487
-    // height = 600
+    const maxWidth = container.node().getBoundingClientRect().width - 16
+    let width = 800, height = 487
     let floor = data,
         sensors = floor.sensors || [],
         areas = floor.areas || [],
         config = { edit: false },
         offset = { x: 0, y: 0, scale: 0 },
+        tooltipOffsetX = 15,
         state = {
-            sensorPlotting: false, showSensors: false,
+            sensorMapping: false, showSensors: false,
             areaMapping: false, showAreas: false,
             drawing: false, polyMoved: false
         },
@@ -32,20 +30,53 @@ function mapper(wrapper, data, callbacks) {
         _ = this
 
     container.selectAll('svg').remove() //clean up
+    container.selectAll('.tooltip').remove()
 
+    const tooltip = container.append('div').attr('class', 'tooltip')
     const svg = container
         .append('svg')
         .attr('width', width)
         .attr('height', height)
         .style('display', 'block')
         .style('background', '#ffffff')
+        .on('click', function() {
+            if (!config.edit) return
+
+            let evt = d3.event,
+                elem = document.elementFromPoint(evt.x, evt.y)
+            
+            if (elem.tagName === 'svg') return
+
+            let t = mapLayer.__transform,
+                _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
+                _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY
+
+            if ((t && t.z === 1) || !t) {
+                _x -= offset.x
+                _y -= offset.y
+            }
+
+            if (state.sensorMapping) {
+                let area = elem.tagName === 'polygon' ? d3.select(elem.parentNode).data()[0] : null
+
+                return events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale, area })
+            } else if (state.areaMapping) {
+                let point = {
+                    x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
+                    y: t ? (evt.offsetY - t.y) / t.k : evt.offsetY
+                }, drawLayer = areaLayer.select('g.area-draw')
+
+                if (drawLayer.empty()) startAreaDraw(point)
+                else addPoint(drawLayer, point)
+            }
+        })
 
     const mapLayer = svg.selectAll('.map-layer').data([0])
         .enter().append('g').attr('class', 'map-layer')
 
     const imgLayer = mapLayer.append('g').attr('class', 'image-layer')
-    const sensorLayer = mapLayer.append('g').attr('class', 'sensor-layer')
     const areaLayer = mapLayer.append('g').attr('class', 'area-layer')
+    const sensorLayer = mapLayer.append('g').attr('class', 'sensor-layer')
 
     const zoom = d3.zoom().scaleExtent([1, 8])
         .on('zoom', () => {
@@ -71,27 +102,59 @@ function mapper(wrapper, data, callbacks) {
 
             drawLayer.select('line').remove()
 
-            let lastPoint = drawPoints[drawPoints.length - 1]
+            let lastPoint = drawPoints[drawPoints.length - 1],
+                evt = d3.event,
+                t = mapLayer.__transform,
+                _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
+                _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY
 
             drawLayer.insert('line', ':nth-child(2)')
                 .attr('x1', lastPoint.x)
                 .attr('y1', lastPoint.y)
-                .attr('x2', d3.mouse(this)[0] + 3)
-                .attr('y2', d3.mouse(this)[1])
+                .attr('x2', _x)
+                .attr('y2', _y)
                 .attr('stroke', '#53DBF3')
                 .attr('stroke-width', 1)
                 .style('pointer-events', 'none')
         })
 
+    /**
+     * Sets the size of the canvas
+     * @param {number} w Canvas width
+     * @param {number} h Canvas height
+     */
+    function setSize(w, h) {
+        width = w
+        height = h
+
+        x = d3.scaleLinear().domain([0, xDMax]).range([0, w])
+        y = d3.scaleLinear().domain([0, yDMax]).range([0, h])
+        svg.attr('width', w).attr('height', h)
+    }
+
+    /**
+     * Gets the floor plan dimension, and adjusts the canvas size to fit
+     * @param {string} src Image url
+     * @param {Function} cb Callback function
+     */
     function getImageDim(src, cb) {
         let img = new Image()
 
         img.src = src
         img.onload = () => {
+            let canvasWidth = img.width > maxWidth ? maxWidth : img.width,
+                canvasHeight = img.width > maxWidth ? img.height * (maxWidth / img.width) : img.height
+
+            setSize(canvasWidth, canvasHeight)
+
             return cb && cb({ height: img.height, width: img.width })
         }
     }
 
+    /**
+     * Calculates the floor plan size offset to the canvas
+     * @param {Function} cb Callback function
+     */
     function calcOffsets(cb) {
         getImageDim(floor.floor_plan_url, dim => {
             let diff = { h: height - dim.height, w: width - dim.width },
@@ -108,31 +171,42 @@ function mapper(wrapper, data, callbacks) {
         })
     }
 
-    function floorClick() {
-        let t = mapLayer.__transform, evt = d3.event,
-            _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-            _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY
+    /**
+     * Sets the tooltip position
+     * @param {number} x Position on x-axis
+     * @param {number} y Position on y-axis
+     * @param {string} content Tooltip content
+     */
+    function setTooltip(x, y, content) {
+        if (content) tooltip.html(content)
 
-        if ((t && t.z === 1) || !t) {
-            _x -= offset.x
-            _y -= offset.y
-        }
-
-        if (state.sensorPlotting) {
-            return events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale })
-        } else if (state.areaMapping) {
-            let point = {
-                x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-                y: t ? (evt.offsetY - t.y) / t.k : evt.offsetY
-            },
-                drawLayer = areaLayer.select('g.area-draw')
-
-            if (drawLayer.empty())
-                startAreaDraw(point)
-            else
-                addPoint(drawLayer, point)
-        }
+        tooltip.style('left', `${x}px`)
+                .style('top', `${y}px`)
     }
+
+    // function floorClick() {
+    //     let t = mapLayer.__transform, evt = d3.event,
+    //         _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
+    //         _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY
+
+    //     if ((t && t.z === 1) || !t) {
+    //         _x -= offset.x
+    //         _y -= offset.y
+    //     }
+
+    //     if (state.sensorMapping) {
+    //         return events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale })
+    //     } else if (state.areaMapping) {
+    //         let point = {
+    //             x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
+    //             y: t ? (evt.offsetY - t.y) / t.k : evt.offsetY
+    //         },
+    //             drawLayer = areaLayer.select('g.area-draw')
+
+    //         if (drawLayer.empty()) startAreaDraw(point)
+    //         else addPoint(drawLayer, point)
+    //     }
+    // }
 
     /* area mapping functions */
     function startAreaDraw(point) {
@@ -194,12 +268,27 @@ function mapper(wrapper, data, callbacks) {
     function addPoly(points, area) {
         let ag = areaLayer.append('g').attr('class', area ? 'area' : 'area unsaved')
 
-        let canEdit = config.edit && !state.sensorPlotting,
+        let canEdit = config.edit && state.areaMapping,
             poly = ag.append('polygon')//.data(points)
                 .attr('points', area ? toPointsDisp(points, area.scale) : toPolyPoints(points))
-                .style('fill', '#53DBF3').style('opacity', 0.6)
-                .style('cursor', () => { return canEdit ? 'move' : 'default' })
+                .style('fill', '#53DBF3').style('opacity', 0.2)
+                .style('cursor', () => { return canEdit ? 'move' : (state.sensorMapping ? 'crosshair' : 'default') })
                 .on('click', a => canEdit && (polyClick(area), d3.event.stopPropagation()))
+                .on('mouseover', function(a) {
+                    if (state.sensorMapping) return
+
+                    tooltip.transition().duration(200).style('opacity', 0.9)
+                    setTooltip(d3.event.offsetX + tooltipOffsetX, 
+                        d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2),
+                        area.name)
+                })
+                .on('mousemove', function() {
+                    if (state.polyMoved || state.sensorMapping) return
+
+                    setTooltip(d3.event.offsetX + tooltipOffsetX, 
+                        d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2))
+                })
+                .on('mouseout', function() { tooltip.transition().duration(200).style('opacity', 0) })
                 .call(d3.drag()
                     .on('drag', polyDrag)
                     .on('end', polyDragEnd))
@@ -207,8 +296,8 @@ function mapper(wrapper, data, callbacks) {
         if (area) {
             ag.data([area])
 
-            poly.append("svg:title")
-                .text(area.name)
+            // poly.append("svg:title")
+            //     .text(area.name)
         }
 
         if (!canEdit) return
@@ -237,13 +326,13 @@ function mapper(wrapper, data, callbacks) {
     function polyClick(a) { return events.areaClick && events.areaClick.call(_, a)  }
 
     function polyDrag() {
-        if (config.edit && !state.sensorPlotting) {
+        if (config.edit && state.areaMapping) {
             let { dx, dy } = d3.event,
                 poly = d3.select(this),
                 circles = d3.select(this.parentNode).selectAll('circle'), circle, newPoints = [],
                 areaData = d3.select(this.parentNode).data()[0]
             
-            state.polyMoved = dx > 0 || dy > 0
+            state.polyMoved = dx !== 0 || dy !== 0
 
             circles.each(function (cd) {
                 circle = d3.select(this)
@@ -266,7 +355,7 @@ function mapper(wrapper, data, callbacks) {
     }
 
     function polyDragEnd() {
-        if (config.edit && !state.sensorPlotting) {
+        if (config.edit && state.areaMapping) {
             let areaData = d3.select(this.parentNode).data()[0],
                 circles = d3.select(this.parentNode).selectAll('circle'), newPoints = []
 
@@ -334,16 +423,16 @@ function mapper(wrapper, data, callbacks) {
     function sensorClick(s) { return events.sensorClick && events.sensorClick.call(_, s) }
 
     function sensorDrag(s) {
-        if (config.edit && !state.areaMapping) {
+        if (config.edit && state.sensorMapping) {
             s.dragged = true
             d3.select(this)
                 .attr('cx', s.pos_x = d3.event.x)
-                .attr('cy', s.pos_y = d3.event.y);
+                .attr('cy', s.pos_y = d3.event.y)
         }
     }
 
     function sensorDragEnd(s) {
-        if (config.edit && !state.areaMapping && s.dragged) {
+        if (config.edit && state.sensorMapping && s.dragged) {
             s.dragged = false
             s.pos_x -= offset.x
             s.pos_y -= offset.y
@@ -363,14 +452,14 @@ function mapper(wrapper, data, callbacks) {
 
         if (floor.floor_plan) {
 
-            let canClick = config.edit && (state.sensorPlotting || state.areaMapping)
+            let canClick = config.edit && (state.sensorMapping || state.areaMapping)
 
             imgLayer.insert('image', ':first-child')
                     .attr('xlink:href', floor.floor_plan_url)
                     .attr('height', y(0 + yDMax) - y(0))
                     .attr('width', x(0 + xDMax) - x(0))
                     .style('cursor', () => { return canClick ? 'crosshair' : 'default' })
-                    .on('click', () => canClick && (floorClick(), d3.event.stopPropagation()))
+                    // .on('click', () => canClick && (floorClick(), d3.event.stopPropagation()))
         }
     }
 
@@ -384,7 +473,7 @@ function mapper(wrapper, data, callbacks) {
 
         if (sensors.length === 0) return
 
-        let canEdit = config.edit && !state.areaMapping
+        let canEdit = config.edit && state.sensorMapping
 
         sensorLayer.selectAll('.sensor')
             .data(sensors)
@@ -405,6 +494,18 @@ function mapper(wrapper, data, callbacks) {
 
                 return ((s.pos_y / s.scale) * scale) + offset.y
             })
+            .on('mouseover', function(s) {
+                tooltip.transition().duration(200).style('opacity', 0.95)
+
+                setTooltip(d3.event.offsetX + tooltipOffsetX, 
+                    d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2),
+                    `<div>ID: ${s.sensor_id}</div><div>Name: ${s.name ? s.name : '(None)'}</div>`)
+            })
+            .on('mousemove', function() {
+                setTooltip(d3.event.offsetX + tooltipOffsetX, 
+                    d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2))
+            })
+            .on('mouseout', function() { tooltip.transition().duration(200).style('opacity', 0) })
             .on('click', s => canEdit && (sensorClick(s), d3.event.stopPropagation()))
             .call(d3.drag()
                 .on('drag', sensorDrag)
@@ -448,10 +549,10 @@ function mapper(wrapper, data, callbacks) {
             mapLayer.call(zoom.transform, d3.zoomIdentity)
         }
 
-        this.drawFloorPlan()
         calcOffsets(() => {
-            this.drawSensors()
+            this.drawFloorPlan()
             this.drawAreas()
+            this.drawSensors()
         })
     }
 
@@ -469,7 +570,7 @@ function mapper(wrapper, data, callbacks) {
      * @param {Boolean} enable Determines if area mapping is enabled
      */
     this.setAreaMapping = function (enable) {
-        if (enable) state.sensorPlotting = false
+        if (enable) state.sensorMapping = false
         state.areaMapping = enable
         this.redraw(false)
     }
@@ -478,6 +579,7 @@ function mapper(wrapper, data, callbacks) {
      * Clears the unsaved area drawn
      */
     this.clearDrawing = function() {
+        state.drawing = false
         drawPoints.splice(0)
         areaLayer.select('g.area.unsaved').remove()
     }
@@ -488,17 +590,16 @@ function mapper(wrapper, data, callbacks) {
      */
     this.setSensorMapping = function (enable) {
         if (enable) state.areaMapping = false
-        state.sensorPlotting = enable
+        state.sensorMapping = enable
         this.redraw(false)
     }
 
     // render floor plan
     if (floor) {
-        this.drawFloorPlan()
-
         calcOffsets(() => {
-            this.drawSensors()
+            this.drawFloorPlan()
             this.drawAreas()
+            this.drawSensors()
         })
     }
 

@@ -1,54 +1,58 @@
 <template>
     <div class="content">
-        <h1>{{ building ? `${building} Mapping` : 'Mapping' }}</h1>
-        <transition name="fade">
-            <div id="sensor-mapper" v-if="loaded">
-                <div class="row">
-                    <div class="col-12 col-md-3">
-                        <div id="mapper-options">
-                            <div class="input-field">
-                                <label>Floor</label>
-                                <select v-model="floorSel" @change="floorChange">
-                                    <option v-for="f in  floors" :key="f.hid" :value="f.hid">{{ f.ordinal_no }} Floor</option>
-                                </select>
-                            </div>
-                            <template v-if="editMapper">
-                                <!-- <button class="btn btn-primary">Add Sensor</button> -->
-                                <button class="btn btn-primary" @click="toggleEditMode(false)">Close Edit</button>
-                                <div id="switches">
-                                    <switches type-bold="true" v-model="editArea" label="Area Mapping" theme="custom" color="orange" emit-on-mount="false" @input="toggleAreaMap"/>
-                                    <switches type-bold="true" v-model="editSensor" label="Sensor Mapping" theme="custom" color="orange" emit-on-mount="false" @input="toggleSensorMap"/>
+        <template v-if="loaded">
+            <h1>{{ building ? `${building} Mapping` : 'Mapping' }}</h1>
+            <transition name="fade">
+                <div id="sensor-mapper" v-if="loaded">
+                    <div class="row">
+                        <div class="col-12 col-md-3">
+                            <div id="mapper-options">
+                                <div class="input-field">
+                                    <label>Floor</label>
+                                    <!-- <select v-model="floorSel" @change="floorChange"> -->
+                                    <select v-model="floorSel">
+                                        <option v-for="f in  floors" :key="f.hid" :value="f.hid">{{ f.ordinal_no }} Floor</option>
+                                    </select>
                                 </div>
-                                <!-- <span class="checkbox">
-                                    <input type="checkbox" id="cbSensorMap" @change="toggleSensorMap" />
-                                    <label for="cbSensorMap">Sensor Mapping</label>
-                                </span>
-                                <span class="checkbox">
-                                    <input type="checkbox" id="cbAreaMap" @change="toggleAreaMap" />
-                                    <label for="cbAreaMap">Area Mapping</label>
-                                </span> -->
-                            </template>
-                            <button class="btn btn-primary" v-else @click="toggleEditMode(true)">Edit Mode</button>
+                                <template v-if="editMapper">
+                                    <button class="btn btn-primary" @click="toggleEditMode(false)">Close Edit</button>
+                                    <div id="switches">
+                                        <switches type-bold="true" v-model="editArea" label="Area Mapping" theme="custom" color="orange" emit-on-mount="false" @input="toggleAreaMap"/>
+                                        <switches type-bold="true" v-model="editSensor" label="Sensor Mapping" theme="custom" color="orange" emit-on-mount="false" @input="toggleSensorMap"/>
+                                    </div>
+                                </template>
+                                <button class="btn btn-primary" v-else @click="toggleEditMode(true)">Edit Mode</button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div id="floor-map"></div>
                         </div>
                     </div>
-                    <div class="col">
-                        <div id="floor-map"></div>
-                    </div>
                 </div>
-            </div>
-        </transition>
+            </transition>
+        </template>
         <modal :show="showEntry" @close="toggleEntry(false)">
             <template v-slot:header>
                 <h2>{{ editMode ? 'Edit' : 'Add' }} Sensor</h2>
             </template>
             <div id="entry-wrapper">
                 <div class="input-field">
-                    <label>Sensor</label>
+                    <label>Sensor ID</label>
                     <input type="text" v-model="entry.sensor" ref="sensor">
                 </div>
                 <div class="input-field">
                     <label>Name</label>
                     <input type="text" v-model="entry.name" placeholder="(Optional)">
+                </div>
+                <div class="input-field">
+                    <label>Group ID</label>
+                    <input type="text" v-model="entry.group">
+                </div>
+                <div class="input-field">
+                    <label>Area</label>
+                    <select v-model="entry.area">
+                        <option v-for="a in floorAreas" :key="a.hid" :value="a.hid">{{ a.name }}</option>
+                    </select>
                 </div>
             </div>
             <template v-slot:footer>
@@ -65,8 +69,22 @@
             </template>
             <div id="entry-wrapper">
                 <div class="input-field">
+                    <label>Type</label>
+                    <select v-model="areaEntry.type">
+                        <option v-for="t in areaTypes" :key="t.hid" :value="t.hid">{{ t.name }}</option>
+                    </select>
+                </div>
+                <div class="input-field">
                     <label>Name</label>
                     <input type="text" v-model="areaEntry.name" ref="area">
+                </div>
+                <div class="input-field" v-if="areaByDesk">
+                    <label>Desks</label>
+                    <input type="number" v-model="areaEntry.desks">
+                </div>
+                <div class="input-field" v-else>
+                    <label>Seats</label>
+                    <input type="number" v-model="areaEntry.seats">
                 </div>
             </div>
             <template v-slot:footer>
@@ -107,6 +125,27 @@ $color: #FF5A09;
 #floor-map {
     position: relative;
     overflow: hidden;
+
+    .tooltip {
+        position: absolute;
+        padding: 6px 8px;
+        background: #2B2B2B;
+        border-radius: 4px;
+        pointer-events: none;
+        font-size: 12px;
+        opacity: 0;
+
+        &:before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent #2B2B2B transparent transparent;
+        }
+    }
     
     svg {
         pointer-events: initial !important;
@@ -138,6 +177,7 @@ import { getBaseUrl } from '../../helpers'
 import { Loader, Modal } from '../../components'
 import Switches from 'vue-switches'
 import floorMapper from '../../components/FloorMapper.js'
+import { store } from '../../store'
 
 const api = {
     bldg: '/api/locations',
@@ -153,11 +193,11 @@ export default {
     data() {
         return {
             mapper: null,
-            loaded: false, bldg: null, floors: [], floorSel: null,
-            editMapper: false, editArea: false, editSensor: false,
+            loaded: false, bldg: null, areaTypes: [], floors: [], floorAreas: [], 
+            floorSel: null, editMapper: false, editArea: false, editSensor: false,
             showEntry: false, showAreaEntry: false, editMode: false,
-            entry: { id: null, sensor: '', name: '', pos_x: 0, pos_y: 0, scale: 0 },
-            areaEntry: { id: null, name: '', points: '', scale: 0 },
+            entry: { id: null, sensor: '', name: '', group: '', area: null, pos_x: 0, pos_y: 0, scale: 0 },
+            areaEntry: { id: null, type: null, name: '', desks: 0, seats: 0, points: '', scale: 0 },
             state: { saving: false, removing: false }
         }
     },
@@ -169,13 +209,33 @@ export default {
         building() {
             return this.bldg_name ? this.bldg_name : 
                 this.bldg ? this.bldg.name : ''
+        },
+        areaByDesk() {
+            let type = this.areaTypes.find(x => x.hid === this.areaEntry.type)
+
+            return type && type.name === 'Workspace Desk Area'
+        }
+    },
+    watch: {
+        floorSel: function(floor, oldFloor) {
+            this.getFloorData(this.floorSel, () => {
+                this.mapper.setData(this.floor)
+            })
         }
     },
     methods: {
-        async getBldg(id) {
+        async getAreaTypes() {
+            let { data } = await axios.get(`${api.area}/types`)
+
+            this.areaTypes = data
+        },
+        async getBldg(id, cb) {
             let { data } = await axios.get(api.bldg, { params: { id: id } })
 
+            store.setBldg(data)
             this.bldg = data
+
+            return cb && cb()
         },
         async getFloors(bid, cb) {
             let { data } = await axios.get(api.floor, { params: { bid: bid } })
@@ -184,11 +244,14 @@ export default {
                 floor.floor_plan_url = `${this.baseUrl}/plans/${floor.floor_plan}`
             })
 
-            this.floors = data.sort((a, b) => {
+            let sorted = data.sort((a, b) => {
                 if (a.floor_no > b.floor_no) return 1
                 if (a.floor_no < b.floor_no) return -1
                 return 0
             })
+
+            store.setFloors(sorted)
+            this.floors = sorted
 
             if (this.floor_id) {
                 this.floorSel = this.floor_id
@@ -196,12 +259,8 @@ export default {
                 this.floorSel = this.floors[0].hid
             }
             
-            setTimeout(() => { if (cb) cb() }, 0)
-        },
-        floorChange() {
-            this.getFloorData(this.floorSel, () => {
-                this.mapper.setData(this.floor)
-            })
+            // setTimeout(() => { if (cb) cb() }, 0)
+            return cb && cb()
         },
         async getFloorData(fid, cb) {
             let { data } = await axios.get(`${api.floor}/${fid}/data`)
@@ -209,8 +268,10 @@ export default {
 
             floor.sensors = data.sensors
             floor.areas = data.areas
+            this.floorAreas = data.areas
 
-            setTimeout(() => { if (cb) cb() }, 0)
+            // setTimeout(() => { if (cb) cb() }, 0)
+            return cb && cb()
         },
         toggleEditMode(edit) {
             this.editMapper = edit
@@ -227,8 +288,8 @@ export default {
         setupMapper() {
             let _ = this
             _.mapper = new floorMapper('#floor-map', _.floor, {
-                sensorAdd: function(pos) {
-                    _.triggerAdd(pos.x, pos.y, pos.scale)
+                sensorAdd: function(data) {
+                    _.triggerAdd(data.x, data.y, data.scale, data.area)
                 },
                 sensorClick: function(sensor) {
                     _.triggerEdit(sensor.hid)
@@ -259,9 +320,12 @@ export default {
 
             if (show) setTimeout(() => { this.$refs.sensor.focus() }, 0)
         },
-        triggerAdd(x, y, scale) {
+        triggerAdd(x, y, scale, area) {
             this.entry.id = null
             this.entry.sensor = ''
+            this.entry.name = ''
+            this.entry.group = ''
+            this.entry.area = area ? area.hid : null
             this.entry.pos_x = x
             this.entry.pos_y = y
             this.entry.scale = scale
@@ -275,6 +339,8 @@ export default {
                 floor: this.floor.hid,
                 sensor_id: this.entry.sensor,
                 name: this.entry.name,
+                group: this.entry.group,
+                area: this.entry.area,
                 pos_x: this.entry.pos_x,
                 pos_y: this.entry.pos_y,
                 scale: this.entry.scale
@@ -295,6 +361,8 @@ export default {
             this.entry.id = id
             this.entry.sensor = s.sensor_id
             this.entry.name = s.name
+            this.entry.group = s.group_id
+            this.entry.area = s.aid
             this.entry.pos_x = s.pos_x
             this.entry.pos_y = s.pos_y
             this.entry.scale = s.scale
@@ -306,7 +374,9 @@ export default {
             this.toggleSaving(true)
             axios.put(`${api.sensor}/${this.entry.id}`, {
                 sensor_id: this.entry.sensor,
-                name: this.entry.name
+                name: this.entry.name,
+                group: this.entry.group,
+                area: this.entry.area
             }).then(x => {
                 this.toggleSaving(false)
                 let res = x.data
@@ -316,6 +386,8 @@ export default {
                     
                     s.sensor_id = this.entry.sensor
                     s.name = this.entry.name
+                    s.aid = this.entry.area
+                    s.group_id = this.entry.group
 
                     this.mapper.drawSensors()
                     this.toggleEntry(false)
@@ -352,7 +424,10 @@ export default {
         },
         triggerAddArea(points, scale) {
             this.areaEntry.id = null
+            this.areaEntry.type = this.areaTypes[0] ? this.areaTypes[0].hid : null
             this.areaEntry.name = ''
+            this.areaEntry.desks = 0
+            this.areaEntry.seats = 0
             this.areaEntry.points = points
             this.areaEntry.scale = scale
             this.editMode = false
@@ -363,7 +438,10 @@ export default {
             this.toggleSaving(true)
             axios.post(api.area, {
                 floor: this.floor.hid,
+                type: this.areaEntry.type,
                 name: this.areaEntry.name,
+                desks: this.areaByDesk ? this.areaEntry.desks : null,
+                seats: this.areaByDesk ? null : this.areaEntry.seats,
                 points: this.areaEntry.points,
                 scale: this.areaEntry.scale
             }).then(x => {
@@ -381,7 +459,10 @@ export default {
             let a = this.floor.areas.find(a => a.hid === id)
 
             this.areaEntry.id = id
+            this.areaEntry.type = a.tid
             this.areaEntry.name = a.name
+            this.areaEntry.desks = a.desks
+            this.areaEntry.seats = a.seats
             this.areaEntry.points = a.poly_points.map(p => {
                 return [p.x, p.y].join(',')
             }).join(' ')
@@ -393,7 +474,10 @@ export default {
         async upArea() {
             this.toggleSaving(true)
             axios.put(`${api.area}/${this.areaEntry.id}`, {
-                name: this.areaEntry.name
+                type: this.areaEntry.type,
+                name: this.areaEntry.name,
+                desks: this.areaByDesk ? this.areaEntry.desks : null,
+                seats: this.areaByDesk ? null : this.areaEntry.seats
             }).then(x => {
                 this.toggleSaving(false)
                 let res = x.data
@@ -401,7 +485,10 @@ export default {
                 if (res.r) {
                     let a = this.floor.areas.find(a => a.hid === this.areaEntry.id)
                     
+                    a.tid = this.areaEntry.type
                     a.name = this.areaEntry.name
+                    a.desks = this.areaEntry.desks
+                    a.seats = this.areaEntry.seats
 
                     this.mapper.drawAreas()
                     this.toggleAreaEntry(false)
@@ -429,16 +516,45 @@ export default {
         }
     },
     created() {
-        if (!this.bldg_name) this.getBldg(this.bldg_id)
+        this.getAreaTypes()
     },
     mounted() {
         let _ = this
-        _.getFloors(_.bldg_id, function() {
-            _.loaded = true
-            _.getFloorData(_.floor.hid, function() {
-                _.setupMapper()
+        let bldg = store.getBldg(),
+            floors = store.getFloors()
+
+        if (bldg && bldg.hid === _.bldg_id) {
+            _.bldg = bldg
+            
+            if (floors.length > 0) {
+                _.floors = store.getFloors()
+                if (_.floor_id) {
+                    _.floorSel = _.floor_id
+                } else if (_.floors.length > 0) {
+                    _.floorSel = _.floors[0].hid
+                }
+                _.loaded = true
+                _.getFloorData(_.floor.hid, function() {
+                    _.setupMapper()
+                })
+            } else {
+                _.getFloors(_.bldg_id, function() {
+                    _.loaded = true
+                    _.getFloorData(_.floor.hid, function() {
+                        _.setupMapper()
+                    })
+                })
+            }
+        } else {
+            _.getBldg(_.bldg_id, function() {
+                _.getFloors(_.bldg_id, function() {
+                    _.loaded = true
+                    _.getFloorData(_.floor.hid, function() {
+                        _.setupMapper()
+                    })
+                })
             })
-        })
+        }
     }
 }
 </script>

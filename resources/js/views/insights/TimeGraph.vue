@@ -1,13 +1,7 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <div class="graph-range-btns">
-                <span class="graph-range-btn btn--active">Today</span>
-                <span class="graph-range-btn">This Week</span>
-                <span class="graph-range-btn">This Month</span>
-                <span class="graph-range-btn">This Year</span>
-                <span class="graph-range-btn">Pick Date</span>
-            </div>
+            <date-range-toggle @select="rangeSelect" />
             <div class="graph-filters">
                 <span class="graph-filter">
                     Filter By
@@ -37,15 +31,23 @@
             </transition>
         </div>
         <div class="graph-content">
+            <div class="page-back">
+                <div class="back-button" @click="backTo">
+                    <button class="btn btn-primary btn-small">
+                        <caret-left-icon />
+                    </button>
+                    Back
+                </div>
+            </div>
             <!-- graph & legends here -->
-            <h3>Time Graph</h3>
             <div id="time-chart"></div>
             <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
                 @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+            <div class="clearfix"></div>
         </div>
         <div class="graph-footer">
             <div class="left-options">
-                <button class="btn btn-primary btn-small">Live</button>
+                <button class="btn btn-primary btn-small" @click="toLive">Live</button>
             </div>
             <div class="right-options">
                 <checkbox label="Save to report" />
@@ -66,12 +68,12 @@
 <script>
 import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
-import { Checkbox, Modal, TimeSlider } from "../../components"
-import { CaretIcon } from "../../components/icons"
+import { Checkbox, DateRangeToggle, Modal, TimeSlider } from "../../components"
+import { CaretIcon, CaretLeftIcon } from "../../components/icons"
 import { timeGraph } from '../../components/graphs/TimeGraph'
 export default {
     title: 'Time Chart',
-    components: { CaretIcon, Checkbox, Modal, TimeSlider },
+    components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, Modal, TimeSlider },
     data() {
         return {
             user: null,
@@ -86,6 +88,12 @@ export default {
         settings() { return this.user.company ? this.user.company.settings : null }
     },
     methods: {
+        backTo() {
+            this.$router.back()
+        },
+        rangeSelect(range, from, to) {
+            console.log('rangeSelect', range, from, to)
+        },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
@@ -94,13 +102,21 @@ export default {
         timeEndChange(time) { this.timeFilter.end = time },
         viewCostAnalysis() {
             this.$router.push({ name: 'cost-analysis' })
+        },
+        toLive() {
+            this.$router.push({ name: 'live' })
         }
     },
     created() {
         this.user = store.getUser()
     },
     mounted() {
-        timeGraph('#time-chart')
+        timeGraph('#time-chart', `${this.baseUrl}/data/time-chart-data.json`, false, {
+            toPeakChart: (data) => {
+                console.log('toPeakChart', data)
+                this.$router.push({ name: 'peak' })
+            }
+        })
     }
 }
 </script>

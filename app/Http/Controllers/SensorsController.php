@@ -44,6 +44,8 @@ class SensorsController extends Controller
                 $map->floor_id = $fid;
                 $map->sensor_id = $request->sensor_id;
                 $map->name = $request->name;
+                $map->group_id = $request->group;
+                $map->area_id = $request->area ? Hashids::decode($request->area)[0] : null;
                 $map->pos_x = $request->pos_x;
                 $map->pos_y = $request->pos_y;
                 $map->scale = $request->scale;
@@ -63,6 +65,8 @@ class SensorsController extends Controller
 
             $map->sensor_id = $request->sensor_id;
             $map->name = $request->name;
+            $map->group_id = $request->group;
+            $map->area_id = $request->area ? Hashids::decode($request->area)[0] : null;
             $map->save();
 
             return response(['r' => true, 'm' => 'Sensor updated']);

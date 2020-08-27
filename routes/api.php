@@ -43,6 +43,7 @@ Route::put('sensors/coord/{id}', 'SensorsController@updatePos');
 Route::delete('sensors/{id}', 'SensorsController@delete');
 
 Route::get('areas', 'AreasController@get');
+Route::get('areas/types', 'AreasController@types');
 Route::post('areas', 'AreasController@create');
 Route::put('areas/{id}', 'AreasController@update');
 Route::put('areas/coord/{id}', 'AreasController@updatePos');

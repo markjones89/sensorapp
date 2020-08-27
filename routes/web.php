@@ -56,7 +56,6 @@ Route::middleware(['auth'])->group(function(){
     });
 
     Route::get('/{url}', 'AppController@index')
-        // ->where(['url' => 'home|profile|clients|locations|floors|sensors|users|work-settings'])
-        ->where(['url' => 'home|profile|clients|locations|users|sync-places|work-settings|time|peak|cost-analysis|live|heat-map'])
+        ->where(['url' => 'home|profile|clients|locations|occupancy|users|sync-places|work-settings|time|peak|user-peak|cost-analysis|live|heat-map|comfort-map|wfh|compare'])
         ->name('app');
 });

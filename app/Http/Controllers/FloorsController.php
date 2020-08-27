@@ -58,6 +58,9 @@ class FloorsController extends Controller
 
                 $floor->building_id = $bid;
                 $floor->floor_no = $request->floor_no;
+                $floor->size_metre = $request->size_metre;
+                $floor->size_feet = $request->size_feet;
+                $floor->occupancy_limit = $request->occupancy_limit;
                 $floor->save();
 
                 return response(['r' => true, 'm' => 'Floor added', 'data' => $floor]);
@@ -80,6 +83,9 @@ class FloorsController extends Controller
                 return response(['r' => false, 'm' => 'Floor '.$request->floor_no.' already exist']);
             } else {
                 $floor->floor_no = $request->floor_no;
+                $floor->size_metre = $request->size_metre;
+                $floor->size_feet = $request->size_feet;
+                $floor->occupancy_limit = $request->occupancy_limit;
                 $floor->save();
 
                 return response(['r' => true, 'm' => 'Floor updated']);

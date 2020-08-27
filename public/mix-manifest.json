@@ -14,11 +14,16 @@
     "/js/views/config/sync-places.js": "/js/views/config/sync-places.js",
     "/js/views/config/users.js": "/js/views/config/users.js",
     "/js/views/config/work-settings.js": "/js/views/config/work-settings.js",
+    "/js/views/insights/comfort-map.js": "/js/views/insights/comfort-map.js",
+    "/js/views/insights/compare-room.js": "/js/views/insights/compare-room.js",
     "/js/views/insights/cost-analysis.js": "/js/views/insights/cost-analysis.js",
     "/js/views/insights/heat-map.js": "/js/views/insights/heat-map.js",
     "/js/views/insights/live-view.js": "/js/views/insights/live-view.js",
+    "/js/views/insights/occupancy.js": "/js/views/insights/occupancy.js",
     "/js/views/insights/peak-graph.js": "/js/views/insights/peak-graph.js",
     "/js/views/insights/time-graph.js": "/js/views/insights/time-graph.js",
+    "/js/views/insights/user-peak.js": "/js/views/insights/user-peak.js",
+    "/js/views/insights/wfh.js": "/js/views/insights/wfh.js",
     "/js/views/profile.js": "/js/views/profile.js",
     "/vendors~js/views/profile.js": "/vendors~js/views/profile.js"
 }

@@ -88,7 +88,7 @@ export default {
             })
         }
     },
-    created() {
+    async created() {
         axios.interceptors.request.use(function (config) {
             NProgress.start()
             return config
@@ -102,14 +102,13 @@ export default {
         }, function (error) {
             return Promise.reject(error)
         })
+
+        // get user data
+        let res = await axios.get('/profile/authenticated')
+        store.setUser(res.data)
+        this.user = store.getUser()
     },
     mounted() {
-        axios.get('/profile/authenticated').then(x => {
-
-            store.setUser(x.data)
-            this.user = store.getUser()
-        })
-
         addEvent(document, ['mousedown', 'touchend', 'keydown'], this.userOptsHandler)
     },
     destroyed() {

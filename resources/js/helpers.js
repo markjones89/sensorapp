@@ -155,6 +155,8 @@ export function getParam(url, name) {
  * @param {Number} number The number to format
  */
 export function toOrdinal(number) {
+    if (number === 0) return 'Ground'
+
     let s = ["th", "st", "nd", "rd"]
 
     if (Array.isArray(number)) {

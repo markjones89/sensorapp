@@ -14,6 +14,12 @@ class LocationsController extends Controller
         // by company
         if ($request->cid) {
             $cid = Hashids::decode($request->cid)[0];
+
+            // list buildings only
+            if ($request->lob) {
+                return response(Location::with('building_info')
+                    ->where([['company_id', $cid], ['state', '<>', null], ['city', '<>', null]])->get());
+            }
             
             return response(Location::with('building_info')->where('company_id', $cid)->get());
         }

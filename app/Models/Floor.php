@@ -32,8 +32,11 @@ class Floor extends Model
     }
 
     public function getOrdinalNoAttribute() {
-        $s = ["th", "st", "nd", "rd"];
         $no = $this->attributes['floor_no'];
+
+        if ($no == 0) return 'Ground';
+
+        $s = ["th", "st", "nd", "rd"];
         $v = $no % 100;
         $sIdx = ($v - 20) % 10;
         $suffix = '';

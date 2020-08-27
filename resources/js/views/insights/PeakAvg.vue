@@ -1,13 +1,7 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <div class="graph-range-btns">
-                <span class="graph-range-btn btn--active">Today</span>
-                <span class="graph-range-btn">This Week</span>
-                <span class="graph-range-btn">This Month</span>
-                <span class="graph-range-btn">This Year</span>
-                <span class="graph-range-btn">Pick Date</span>
-            </div>
+            <date-range-toggle @select="rangeSelect" />
             <div class="graph-filters">
                 <span class="graph-filter">
                     Select Location
@@ -39,10 +33,11 @@
             <div id="peak-chart"></div>
             <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
                 @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+            <div class="clearfix"></div>
         </div>
         <div class="graph-footer">
             <div class="left-options">
-                <button class="btn btn-primary btn-small">Live</button>
+                <button class="btn btn-primary btn-small" @click="toLive">Live</button>
                 <button class="btn btn-primary btn-small">Insights</button>
             </div>
             <div class="right-options">
@@ -65,12 +60,12 @@
 <script>
 import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
-import { Checkbox, Modal, TimeSlider } from "../../components"
+import { Checkbox, DateRangeToggle, Modal, TimeSlider } from "../../components"
 import { CaretIcon } from "../../components/icons"
 import barChart from '../../components/graphs/HierarchyBar'
 export default {
     title: 'Peak Chart',
-    components: { CaretIcon, Checkbox, Modal, TimeSlider },
+    components: { CaretIcon, Checkbox, DateRangeToggle, Modal, TimeSlider },
     data() {
         return {
             user: null,
@@ -85,6 +80,9 @@ export default {
         settings() { return this.user.company ? this.user.company.settings : null }
     },
     methods: {
+        rangeSelect(range, from, to) {
+            console.log('rangeSelect', range, from, to)
+        },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
@@ -93,13 +91,20 @@ export default {
             fetch(`${this.baseUrl}/data/flare-2.json`)
                 .then(response => response.json())
                 .then(data => {
-                    barChart('#peak-chart', data)
+                    barChart('#peak-chart', data, {
+                        goBack: () => {
+                            this.$router.back()
+                        }
+                    })
                 })
         },
         timeStartChange(time) { this.timeFilter.start = time },
         timeEndChange(time) { this.timeFilter.end = time },
         viewCostAnalysis() {
             this.$router.push({ name: 'cost-analysis' })
+        },
+        toLive() {
+            this.$router.push({ name: 'live' })
         }
     },
     created() {

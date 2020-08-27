@@ -15,6 +15,7 @@
 $height: 15px;
 .checkbox {
     position: relative;
+    display: flex;
     height: $height;
 
     & + .checkbox { margin-top: 12px; }
@@ -84,16 +85,16 @@ export default {
         change() {
             this.checked = !this.checked
 
-            const checked = this.arrayBound ? Array.from(this.value) : this.checked
+            let checked = this.arrayBound ? Array.from(this.value) : this.checked
 
             if (this.arrayBound) {
-                const found = checked.indexOf(this.val)
+                let found = checked.indexOf(this.val)
 
-                if (!this.checked && found) checked.splice(found, 1)
+                if (!this.checked && found >= 0) checked.splice(found, 1)
                 else checked.push(this.val)
             }
             
-            this.$emit('input', checked);
+            this.$emit('input', checked)
         }
     },
     created() {

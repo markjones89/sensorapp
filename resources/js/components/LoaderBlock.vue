@@ -15,6 +15,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    pointer-events: none;
     z-index: 1;
 
     .loader-svg {

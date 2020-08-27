@@ -17,6 +17,9 @@ class CreateFloorsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('building_id');
             $table->integer('floor_no')->unsigned();
+            $table->double('size_metre', 8, 2);
+            $table->double('size_feet', 8, 2);
+            $table->integer('occupancy_limit')->unsigned();
             $table->string('floor_plan')->nullable();
             $table->timestamps();
 

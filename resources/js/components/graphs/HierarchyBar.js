@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 
-export default function hierarchyBarChart(wrapper, data) {
+export default function hierarchyBarChart(wrapper, data, callbacks) {
     const container = d3.select(wrapper)
 
     let root = d3.hierarchy(data)
@@ -148,7 +148,10 @@ export default function hierarchyBarChart(wrapper, data) {
     }
 
     function up(svg, d) {
-        if (!d.parent || !svg.selectAll(".exit").empty()) return;
+        if (!d.parent || !svg.selectAll(".exit").empty()) {
+            if (callbacks && callbacks.goBack) callbacks.goBack.call(this)
+            return
+        }
 
         // Rebind the current node to the background.
         svg.select(".background").datum(d.parent);

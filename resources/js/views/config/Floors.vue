@@ -1,51 +1,54 @@
 <template>
     <div class="content">
-        <h1>{{ building ? `Floors - ${building}` : 'Floors' }}</h1>
-        <transition name="fadeUp" appear>
-            <div id="list-wrapper" v-if="loaded">
-                <div id="floor-list">
-                    <div v-if="floorList.length === 0">No floors defined</div>
-                    <div class="floor" v-for="f in floorList" :key="f.hid" v-else>
-                        <div class="floor-thumb">
-                            <div class="fp-upload-progress" v-if="f.upload_info.uploading">
-                                Uploading
-                                <circle-progress :percent="f.upload_info.progress" />
-                            </div>
-                            <div class="fp-thumb" v-if="f.floor_plan">
-                                <img :src="`${baseUrl}/plans/thumbnail/${f.floor_plan}`">
-                                <div class="fp-thumb-opts">
-                                    <a @click="upFloorPlan(f.hid)">Change</a>
-                                    <a @click="viewFloorPlan(f.hid, f.floor_plan)">Preview</a>
+        <template v-if="loaded">
+            <!-- <h1>{{ building ? `Floors - ${building}` : 'Floors' }}</h1> -->
+            <h1>{{ bldg ? bldg.name : '' }}</h1>
+            <transition name="fadeUp" appear>
+                <div id="list-wrapper" v-if="loaded">
+                    <div id="floor-list">
+                        <div v-if="floorList.length === 0">No floors defined</div>
+                        <div class="floor" v-for="f in floorList" :key="f.hid" v-else>
+                            <div class="floor-thumb">
+                                <div class="fp-upload-progress" v-if="f.upload_info.uploading">
+                                    Uploading
+                                    <circle-progress :percent="f.upload_info.progress" />
+                                </div>
+                                <div class="fp-thumb" v-if="f.floor_plan">
+                                    <img :src="`${baseUrl}/plans/thumbnail/${f.floor_plan}`">
+                                    <div class="fp-thumb-opts">
+                                        <a @click="upFloorPlan(f.hid)">Change</a>
+                                        <a @click="viewFloorPlan(f.hid, f.floor_plan)">Preview</a>
+                                    </div>
+                                </div>
+                                <div v-else class="fp-upload-trigger" @click="upFloorPlan(f.hid)">
+                                    Upload Floor Plan
                                 </div>
                             </div>
-                            <div v-else class="fp-upload-trigger" @click="upFloorPlan(f.hid)">
-                                Upload Floor Plan
-                            </div>
-                        </div>
-                        <div class="floor-info">
-                            {{ `${f.ordinal_no} Floor` }}
-                            <div class="floor-opts">
-                                <template v-if="f.floor_plan">
-                                    <a class="floor-opt" @click="toMapper(f.hid)">Mapper</a>
-                                </template>
-                                <a class="floor-opt" @click="triggerEdit(f.hid)">Edit</a>
-                                <a class="floor-opt" @click="delFloor(f.hid)">Remove</a>
+                            <div class="floor-info">
+                                {{ `${f.ordinal_no} Floor` }}
+                                <div class="floor-opts">
+                                    <template v-if="f.floor_plan">
+                                        <a class="floor-opt" @click="toMapper(f.hid)">Mapper</a>
+                                    </template>
+                                    <a class="floor-opt" @click="triggerEdit(f.hid)">Edit</a>
+                                    <a class="floor-opt" @click="delFloor(f.hid)">Remove</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <input type="file" ref="fpFile" hidden accept="image/*" @change="fpFileChange" />
-                <button class="btn btn-primary" id="add-btn" @click="triggerAdd">Add Floor</button>
-                <div class="fp-preview" v-if="showPlan">
-                    <loader :show="!state.imgLoaded" type="spinner"/>
-                    <img v-if="state.imgLoaded" :src="`${baseUrl}/plans/${floor.floor_plan}`">
-                    <div class="preview-header">
-                        {{ `${building} - ${floor.ordinal_no} Floor` }}
-                        <span class="preview-close" @click="togglePlan(false)">Close</span>
+                    <input type="file" ref="fpFile" hidden accept="image/*" @change="fpFileChange" />
+                    <button class="btn btn-primary" id="add-btn" @click="triggerAdd">Add Floor</button>
+                    <div class="fp-preview" v-if="showPlan">
+                        <loader :show="!state.imgLoaded" type="spinner"/>
+                        <img v-if="state.imgLoaded" :src="`${baseUrl}/plans/${floor.floor_plan}`">
+                        <div class="preview-header">
+                            {{ `${bldg.name} - ${floor.ordinal_no} Floor` }}
+                            <span class="preview-close" @click="togglePlan(false)">Close</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </transition>
+            </transition>
+        </template>
         <modal :show="showEntry" @close="toggleEntry(false)">
             <template v-slot:header>
                 <h2>{{ editMode ? 'Edit' : 'Add' }} Floor</h2>
@@ -54,6 +57,18 @@
                 <div class="input-field">
                     <label>Floor No.</label>
                     <input type="number" v-model="entry.fNo" ref="fNo">
+                </div>
+                <div class="input-field">
+                    <label>Size (m<sup>2</sup>)</label>
+                    <input type="text" v-model="entry.size_metre">
+                </div>
+                <div class="input-field">
+                    <label>Size (ft<sup>2</sup>)</label>
+                    <input type="text" v-model="entry.size_feet">
+                </div>
+                <div class="input-field">
+                    <label>Occupancy Limit</label>
+                    <input type="number" v-model="entry.occupancy_limit">
                 </div>
             </div>
             <template v-slot:footer>
@@ -221,6 +236,7 @@
 }
 </style>
 <script>
+import { store } from '../../store'
 import { CircleProgress, Loader, Modal } from '../../components'
 import { getBaseUrl, preloadImage, toOrdinal }  from '../../helpers'
 
@@ -233,9 +249,10 @@ export default {
     components: { CircleProgress, Loader, Modal },
     data() {
         return {
-            bldgName: null, floors: [], floor: null, listTransition: 'fadeUp',
+            bldg: null, //bldgName: null, 
+            floors: [], floor: null, listTransition: 'fadeUp',
             loaded: false, showEntry: false, editMode: false,
-            entry: { id: null, fNo: 1 },
+            entry: { id: null, fNo: 1, size_metre: 0, size_feet: 0, occupancy_limit: 0 },
             showPlan: false, planUrl: null,
             state: {
                 saving: false, imgLoaded: false
@@ -244,7 +261,6 @@ export default {
     },
     computed: {
         baseUrl() { return getBaseUrl() },
-        building() { return this.bldg_name ? this.bldg_name : this.bldgName },
         floorList() {
             return this.floors.sort((a, b) => {
                 if (a.floor_no > b.floor_no) return 1
@@ -254,20 +270,25 @@ export default {
         }
     },
     methods: {
-        async getBldgName() {
-            let { data } = await axios.get(bldgApi, { params: { id: this.bldg_id } })
+        async getBuilding(id, cb) {
+            let { data } = await axios.get(bldgApi, { params: { id: id } })
 
-            this.bldgName = data.name
+            store.setBldg(data)
+            this.bldg = data
+
+            return cb && cb()
         },
         async getFloors() {
             let { data } = await axios.get(api, { params: { bid: this.bldg_id } })
 
             data.forEach(f => {
+                f.floor_plan_url = `${this.baseUrl}/plans/${f.floor_plan}`
                 f.upload_info = {
                     uploading: false, progress: 0
                 }
             })
 
+            store.setFloors(data)
             this.floors = data
             this.loaded = true
         },
@@ -280,14 +301,21 @@ export default {
         triggerAdd() {
             this.entry.id = null
             this.entry.fNo = 1
+            this.entry.size_metre = 0
+            this.entry.size_feet = 0
+            this.entry.occupancy_limit = 0
             this.editMode = false
 
             this.toggleEntry(true)
         },
         async addFloor() {
             this.toggleSaving(true)
-            axios.post(api, { building: this.bldg_id, floor_no: this.entry.fNo })
-                .then(x => {
+            axios.post(api, { 
+                building: this.bldg_id, floor_no: this.entry.fNo,
+                size_metre: this.entry.size_metre,
+                size_feet: this.entry.size_feet,
+                occupancy_limit: this.entry.occupancy_limit
+            }).then(x => {
                     this.toggleSaving(false)
                     let res = x.data
 
@@ -305,14 +333,21 @@ export default {
 
             this.entry.id = id
             this.entry.fNo = f.floor_no
+            this.entry.size_metre = f.size_metre
+            this.entry.size_feet = f.size_feet
+            this.entry.occupancy_limit = f.occupancy_limit
             this.editMode = true
 
             this.toggleEntry(true)
         },
         async upFloor() {
             this.toggleSaving(true)
-            axios.put(`${api}/${this.entry.id}`, { floor_no: this.entry.fNo })
-                .then(x => {
+            axios.put(`${api}/${this.entry.id}`, {
+                floor_no: this.entry.fNo,
+                size_metre: this.entry.size_metre,
+                size_feet: this.entry.size_feet,
+                occupancy_limit: this.entry.occupancy_limit
+            }).then(x => {
                     this.toggleSaving(false)
                     let res = x.data
 
@@ -320,6 +355,9 @@ export default {
                         let f = this.floors.find(f => f.hid == this.entry.id)
 
                         f.floor_no = this.entry.fNo
+                        f.size_metre = this.entry.size_metre
+                        f.size_feet = this.entry.size_feet
+                        f.occupancy_limit = this.entry.occupancy_limit
                         f.ordinal_no = toOrdinal(f.floor_no)
                         this.toggleEntry(false)
                     }
@@ -394,19 +432,30 @@ export default {
             _.togglePlan(true)
 
             _.state.imgLoaded = false
-            preloadImage(`${_.baseUrl}/plans/${_.floor.floor_plan}`, function() {
-                _.state.imgLoaded = true
-            })
+            preloadImage(_.floor.floor_plan_url, function() { _.state.imgLoaded = true })
         },
         toMapper(id) {
             this.$parent.$router.push({ name: 'mapper', query: { fid: id }, params: { bid: this.bldg_id, bldg_name: this.bldg_name } })
         }
     },
-    created() {
-        if (!this.bldg_name) this.getBldgName()
-    },
     mounted() {
-        this.getFloors()
+        let bldg = store.getBldg(),
+            floors = store.getFloors()
+
+        if (bldg && bldg.hid === this.bldg_id) {
+            this.bldg = bldg
+            
+            if (floors.length > 0) {
+                this.floors = store.getFloors()
+                this.loaded = true
+            } else {
+                this.getFloors()
+            }
+        } else {
+            this.getBuilding(this.bldg_id, () => {
+                this.getFloors()
+            })
+        }
     }
 }
 </script>

@@ -26,9 +26,11 @@ body {
 h1, h2, h3, h4, h5 { margin: 0; }
 h1, h2, h3, h4 { font-weight: 400; }
 
-svg {
-    pointer-events: none;
-}
+svg { pointer-events: none; }
+
+/* margins */
+.ml-12 { margin-left: 12px; }
+.mt-24 { margin-top: 24px; }
 
 [hidden="hidden"] { display: none; }
 
@@ -201,6 +203,10 @@ svg {
     }
 }
 
+.clearfix {
+    clear: both;
+}
+
 /* input styles */
 input:not([type="checkbox"]):not([hidden="hidden"]),
 textarea, select {
@@ -305,25 +311,32 @@ textarea {
     position: relative;
     display: flex;
 
-    .graph-range-btns {
-        flex: 1 auto;
-    }
-
     .graph-filters {
         justify-content: right;
     }
 }
 
-.graph-range-btn {
-    display: inline-block;
-    border-radius: $btnRadius;
-    line-height: $btnHeight;
-    padding: 0 20px;
-    cursor: pointer;
-    
-    &.btn--active {
-        background-color: rgba($color: #fff, $alpha: 0.05);
-        color: $primaryColor;
+.graph-range-btns {
+    flex: 1 auto;
+
+    .graph-range-btn {
+        display: inline-block;
+        border-radius: $btnRadius;
+        line-height: $btnHeight;
+        padding: 0 20px;
+        cursor: pointer;
+        transition: background-color .24s linear, color .24s;
+
+        & + .graph-range-btn { margin-left: 4px; }
+
+        &:hover {
+            background-color: rgba($color: #fff, $alpha: 0.03);
+        }
+        
+        &.btn--active {
+            background-color: rgba($color: #fff, $alpha: 0.05);
+            color: $primaryColor;
+        }
     }
 }
 
@@ -334,6 +347,7 @@ textarea {
     line-height: $btnHeight;
     padding: 0 32px 0 20px;
     cursor: pointer;
+    user-select: none;
     background-color: rgba($color: #fff, $alpha: 0.05);
 
     & + .graph-filter {
@@ -355,6 +369,28 @@ textarea {
             width: 10px;
             height: 6px;
             fill: #fff;
+        }
+    }
+}
+
+.page-back {
+    flex: 1 auto;
+    display: flex;
+    align-items: center;
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        color: rgba($color: #ffffff, $alpha: 0.5);
+
+        .btn {
+            height: 24px;
+            margin-right: 8px;
+
+            svg { 
+                float: left;
+            }
         }
     }
 }
@@ -419,7 +455,7 @@ textarea {
 }
 
 .graph-content {
-    padding: 64px 24px;
+    padding: 24px;
     text-align: center;
 
     .chart-header {
@@ -448,7 +484,7 @@ textarea {
 .graph-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 48px;
+    margin-top: 24px;
     padding-right: 24px;
 }
 

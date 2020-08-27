@@ -1,15 +1,16 @@
 import * as d3 from 'd3'
 
-function circlePacker(wrapper, data) {
+function circlePacker(wrapper, data, callbacks) {
     const container = d3.select(wrapper)
     // const width = 500, height = width
     const width = container.node().getBoundingClientRect().width - 128, height = width
     const pack = data => d3.pack()
         .size([width, height])
-        .padding(3)
+        .padding(10)
         (d3.hierarchy(data)
             .sum(d => d.value)
-            .sort((a, b) => b.value - a.value));
+            .sort((a, b) => b.value - a.value)
+            );
     const root = pack(data);
     let focus = root;
     let view;
@@ -33,19 +34,28 @@ function circlePacker(wrapper, data) {
         .selectAll("circle")
         .data(root.descendants().slice(1))
         .join("circle")
-        .attr("fill", d => d.children ? color(d.depth) : "#EC7F37")
+        // .attr("fill", d => d.children ? color(d.depth) : "#FF5A09")
+        .attr('fill', d => colorByDepth(d.depth))
         // .attr("pointer-events", d => !d.children ? "none" : null)
         .on("mouseover", function () { d3.select(this).attr("stroke", "#000"); })
         .on("mouseout", function () { d3.select(this).attr("stroke", null); })
-        .on("click", d => !focused(d) && (zoom(false, d), d3.event.stopPropagation()));
+        // .on("click", d => !focused(d) && (zoom(false, d), d3.event.stopPropagation()));
+        .on('click', d => {
+            if (focused(d) && !d.children) {
+                d3.event.stopPropagation()
+                return callbacks && callbacks.toTimeChart.call(this, d)
+            } else {
+                return !focused(d) && (zoom(false, d), d3.event.stopPropagation())
+            }
+        })
 
     const label = svg.append("g")
         .style("font", "14px Source Sans Pro, sans-serif")
         .attr("pointer-events", "none")
         .attr("text-anchor", "middle")
-        .attr("fill", "#fff")
         .selectAll("text")
         .data(root.descendants())
+        .attr("fill", d => d.depth === 4 ? "#000" : "#fff")
         .join("text")
         // .attr('x', d => d.x - root.x)
         // .attr('y', d => (d.y - root.y) - (d.r/1.4))
@@ -54,6 +64,12 @@ function circlePacker(wrapper, data) {
         .text(d => d.data.name);
 
     zoomTo([root.x, root.y, root.r * 2]);
+
+    function colorByDepth(depth) {
+        if (depth === 3) return '#FF5A09'
+        else if (depth === 4) return '#FFFFFF'
+        else return color(depth)
+    }
 
     function zoomTo(v) {
         const k = width / v[2];
@@ -71,6 +87,8 @@ function circlePacker(wrapper, data) {
         const focus0 = focus;
 
         focus = d;
+        
+        console.log('zoom', d, d.children)
 
         const transition = svg.transition()
             .duration(1000)

@@ -212,26 +212,6 @@ export default {
             return grouped
         }
     },
-    /* watch: {
-        'entry.continent': function(value, old) {
-            if (value) {
-                let _id = this.refs.continents.find(x => x.name === value).objectId
-                this.getCountries(_id)
-            }
-        },
-        'entry.country': function(value, old) {
-            if (value) {
-                let _id = this.refs.countries.find(x => x.name === value).objectId
-                this.getStates(_id)
-            }
-        },
-        'entry.state': function(value, old) {
-            if (value) {
-                let _id = this.refs.states.find(x => x.Subdivision_Name === value).objectId
-                this.getCities(_id)
-            }
-        }
-    }, */
     methods: {
         async jsonGet() {
             axios.get('/assets/cities')
@@ -405,76 +385,31 @@ export default {
             }
         },
         toFloors(id) {
-            let bldg = this.locations.find(l => l.hid === id)
+            let bldg = this.locations.find(l => l.hid === id),
+                sBldg = store.getBldg()
 
+            if ((sBldg && sBldg.hid !== bldg.hid) ||
+                !sBldg) {
+                store.setBldg(bldg)
+                store.setFloors([])
+            }
             this.$parent.$router.push({ name: 'floors', params: { bid: id, bldg_name: bldg.name } })
         },
         toMapper(id) {
-            let bldg = this.locations.find(l => l.hid === id)
+            let bldg = this.locations.find(l => l.hid === id),
+                sBldg = store.getBldg()
 
+            if ((sBldg && sBldg.hid !== bldg.hid) ||
+                !sBldg) {
+                store.setBldg(bldg)
+                store.setFloors([])
+            }
             this.$parent.$router.push({ name: 'mapper', params: { bid: id, bldg_name: bldg.name } })
-        },
-        /* async getContinents() {
-            let { data } = await axios.get(`${api.world.base}/${api.world.continent}`, {
-                headers: api.world.headers,
-                params: { order: 'name' },
-            })
-
-            this.refs.continents = data.results
-        },
-        async getCountries(continentId) {
-            let where = JSON.stringify({
-                "continent": {
-                    "__type": "Pointer",
-                    "className": api.world.continent,
-                    "objectId": continentId
-                    }
-            })
-            let { data } = await axios.get(`${api.world.base}/${api.world.country}`, {
-                headers: api.world.headers,
-                params: { order: 'name', keys: 'name,emoji,code,currency', where: where }
-            })
-
-            this.refs.countries = data.results
-        },
-        async getStates(countryId) {
-            let where = JSON.stringify({
-                "country": {
-                    "__type": "Pointer",
-                    "className": api.world.country,
-                    "objectId": countryId
-                }
-            })
-            let { data } = await axios.get(`${api.world.base}/${api.world.state}`, { 
-                headers: api.world.headers,
-                params: { order: 'name', excludeKeys: 'country,Country_Code', where: where }
-            })
-
-            console.log('states', data.results)
-            this.refs.states = data.results
-        },
-        async getCities(stateId) {
-            let where = JSON.stringify({
-                "province": {
-                    "__type": "Pointer",
-                    "className": api.world.state,
-                    "objectId": stateId
-                }
-            })
-            let { data } = await axios.get(`${api.world.base}/${api.world.city}`, {
-                headers: api.world.headers,
-                params: { order: 'name', where: where }
-            })
-
-            console.log('cities', data.results)
-            this.refs.cities = data.results
-        } */
+        }
     },
     created() {
         this.user = store.getUser()
         this.jsonGet()
-
-        // this.getContinents()
     },
     mounted() {
         this.getData()

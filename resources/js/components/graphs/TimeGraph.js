@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 
-export function timeGraph(chart, isWidget) {
+export function timeGraph(chart, dataUrl, isWidget, callbacks) {
 
     const container = d3.select(chart)
 
@@ -602,42 +602,35 @@ export function timeGraph(chart, isWidget) {
 
                 that.append('rect')
                     .attr('width', 6)
-                    .attr('height', 10)
-                    .attr('fill', function(d) {
-                        return '#' + tablaIdsInfo[d.id].color;
-                    });
+                    .attr('height', 10).style('cursor', 'pointer')
+                    .attr('fill', function(d) { return '#' + tablaIdsInfo[d.id].color })
+                    .on('click', d => callbacks && (callbacks.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('text')
-                    .text(function(d) {
-                        return tablaIdsInfo[d.id].id;
-                    })
+                    .text(d => tablaIdsInfo[d.id].id)
                     .attr('class', 'j-nombre')
                     .attr('x', 30)
                     .attr('y', 20)
                     .attr('text-anchor', 'start')
-                    .style('font-size', '13')
+                    .style('font-size', '13').style('cursor', 'pointer')
                     // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
                     .style('fill', '#B3B3B3')
-                    .style('fill', function(d) {
-                        return '#' + tablaIdsInfo[d.id].highlightColor;
-                    })
-                    .attr('transform', 'rotate(-45)');
+                    .style('fill', function(d) { return '#' + tablaIdsInfo[d.id].highlightColor })
+                    .attr('transform', 'rotate(-45)')
+                    .on('click', d => callbacks && (callbacks.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('text')
-                    .text(function(d) {
-                        return tablaIdsInfo[d.id].id;
-                    })
+                    .text(d => tablaIdsInfo[d.id].id)
                     .attr('class', 'j-MW')
                     .attr('x', 30)
                     .attr('y', 32)
                     .attr('text-anchor', 'start')
-                    .style('font-size', '12')
+                    .style('font-size', '12').style('cursor', 'pointer')
                     // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
                     .style('fill', '#B3B3B3')
-                    .style('fill', function(d) {
-                        return '#' + tablaIdsInfo[d.id].highlightColor;
-                    })
-                    .attr('transform', 'rotate(-45)');
+                    .style('fill', function(d) { return '#' + tablaIdsInfo[d.id].highlightColor })
+                    .attr('transform', 'rotate(-45)')
+                    .on('click', d => callbacks && (callbacks.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('path')
                     .style('fill', 'none')
@@ -988,8 +981,9 @@ export function timeGraph(chart, isWidget) {
         })
     }
 
-    var baseUrl = "http://energia.ningunaparte.net/data/last24h";
+    // var baseUrl = "http://energia.ningunaparte.net/data/last24h";
 
-    setInterval(getData, 1000 * 30, baseUrl);
-    getData(baseUrl);
+    // setInterval(getData, 1000 * 30, baseUrl);
+    // getData(baseUrl);
+    getData(dataUrl)
 }
