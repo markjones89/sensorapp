@@ -549,6 +549,8 @@ function mapper(wrapper, data, callbacks) {
             mapLayer.call(zoom.transform, d3.zoomIdentity)
         }
 
+        this.clearDrawing()
+
         calcOffsets(() => {
             this.drawFloorPlan()
             this.drawAreas()
@@ -581,6 +583,7 @@ function mapper(wrapper, data, callbacks) {
     this.clearDrawing = function() {
         state.drawing = false
         drawPoints.splice(0)
+        areaLayer.select('g.area-draw').remove()
         areaLayer.select('g.area.unsaved').remove()
     }
 
