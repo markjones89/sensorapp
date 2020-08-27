@@ -1,64 +1,67 @@
 <template>
-    <div class="content" v-if="loaded && building">
-        <div class="graph-header">
-            <div class="page-back">
-                <div class="back-button" @click="backTo">
-                    <button class="btn btn-primary btn-small">
-                        <caret-left-icon />
-                    </button>
-                    Back
+    <div class="content">
+        <template v-if="loaded && building">
+            <div class="graph-header">
+                <div class="page-back">
+                    <div class="back-button" @click="backTo">
+                        <button class="btn btn-primary btn-small">
+                            <caret-left-icon />
+                        </button>
+                        Back
+                    </div>
                 </div>
-            </div>
-            <div class="graph-filters">
-                <span class="graph-filter" @click="showFilter = !showFilter">
-                    {{ bldgFilter ? bldgFilter : 'Select Building' }}
-                    <span class="caret">
-                        <caret-icon />
+                <div class="graph-filters">
+                    <span class="graph-filter" @click="showFilter = !showFilter">
+                        {{ bldgFilter ? bldgFilter : 'Select Building' }}
+                        <span class="caret">
+                            <caret-icon />
+                        </span>
+                        <filter-dropdown :filters="buildingFilters" :show="showFilter" @onSelect="filterSelect" />
                     </span>
-                    <filter-dropdown :filters="buildingFilters" :show="showFilter" @onSelect="filterSelect" />
+                </div>
+                <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
                 </span>
+                <transition name="fadeUp">
+                    <div class="page-opt-panel" v-if="showPageOpts">
+                        <ul>
+                            <li><a @click="toggleEmbed(true)">Embed</a></li>
+                        </ul>
+                    </div>
+                </transition>
             </div>
-            <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </span>
-            <transition name="fadeUp">
-                <div class="page-opt-panel" v-if="showPageOpts">
-                    <ul>
-                        <li><a @click="toggleEmbed(true)">Embed</a></li>
-                    </ul>
+            <div class="graph-content">
+                <div class="chart-header">
+                    <span class="chart-title">{{ building.name }} Occupancy</span>
                 </div>
-            </transition>
-        </div>
-        <div class="graph-content">
-            <div class="chart-header">
-                <span class="chart-title">{{ building.name }} Occupancy</span>
-            </div>
-            <div class="row">
-                <div class="col svg-wrapper">
-                    <building-svg :floors="floors" />
-                </div>
-                <div class="col info-wrapper">
-                    <table>
-                        <thead>
-                            <tr class="info-header">
-                                <th width="100"></th>
-                                <th width="80">Live</th>
-                                <th width="80">Limit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="floor-info" v-for="f in floorsReverse" :key="f.hid">
-                                <td>{{ `${f.ordinal_no} Floor` }}</td>
-                                <td><span class="occ-badge" :class="getLiveColor(f.occupancy_live, f.occupancy_limit)">{{ f.occupancy_live }}</span></td>
-                                <td><span class="occ-badge orange">{{ f.occupancy_limit }}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="row">
+                    <div class="col svg-wrapper">
+                        <building-svg :floors="floors" />
+                    </div>
+                    <div class="col info-wrapper">
+                        <table>
+                            <thead>
+                                <tr class="info-header">
+                                    <th width="100"></th>
+                                    <th width="80">Live</th>
+                                    <th width="80">Limit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="floor-info" v-for="f in floorsReverse" :key="f.hid">
+                                    <td>{{ `${f.ordinal_no} Floor` }}</td>
+                                    <td><span class="occ-badge" :class="getLiveColor(f.occupancy_live, f.occupancy_limit)">{{ f.occupancy_live }}</span></td>
+                                    <td><span class="occ-badge orange">{{ f.occupancy_limit }}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+        </template>
+        <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
 <style lang="scss" scoped>
@@ -115,7 +118,7 @@ $orange: #FF5A09;
 </style>
 <script>
 import { store } from '../../store'
-import { BuildingSvg, FilterDropdown } from '../../components'
+import { BuildingSvg, FilterDropdown, Loader } from '../../components'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
 const api = {
@@ -123,23 +126,9 @@ const api = {
     floor: '/api/floors'
 }
 
-async function getBuildings(company, callback) {
-    let { data } = await axios.get(api.building, { params: { cid: company, lob: true } })
-
-    callback(data)
-}
-
 export default {
     props: ['bldg_id'],
-    components: { BuildingSvg, CaretIcon, CaretLeftIcon, FilterDropdown },
-    beforeRouteEnter (to, from, next) {
-        let //user = store.getUser(),
-            company = store.getUserCompany()
-
-        getBuildings(company.hid, (res) => {
-            next(vm => vm.setBuildings(res))
-        })
-    },
+    components: { BuildingSvg, CaretIcon, CaretLeftIcon, FilterDropdown, Loader },
     data() {
         return {
             buildings: [], building: null, bldgFilter: null, loaded: false, showPageOpts: false, showEmbed: false, showFilter: false,
@@ -153,9 +142,14 @@ export default {
     },
     methods: {
         backTo() { this.$router.back() },
-        setBuildings(data) {
-            this.buildings = data
+        async getBuildings() {
+            let company = store.getUserCompany()
 
+            if (!company) return
+
+            let { data } = await axios.get(api.building, { params: { cid: company.hid, lob: true } })
+
+            this.buildings = data
             if (this.bldg_id) {
                 this.building = data.find(b => b.hid === this.bldg_id)
             } else {
@@ -206,7 +200,7 @@ export default {
         }
     },
     mounted() {
-        // this.loaded = true
+        this.getBuildings()
     }
 }
 </script>

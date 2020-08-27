@@ -242,6 +242,9 @@ export default {
 
             data.forEach(floor => {
                 floor.floor_plan_url = `${this.baseUrl}/plans/${floor.floor_plan}`
+                floor.upload_info = {
+                    uploading: false, progress: 0
+                }
             })
 
             let sorted = data.sort((a, b) => {
@@ -259,7 +262,6 @@ export default {
                 this.floorSel = this.floors[0].hid
             }
             
-            // setTimeout(() => { if (cb) cb() }, 0)
             return cb && cb()
         },
         async getFloorData(fid, cb) {
@@ -534,6 +536,8 @@ export default {
                     _.floorSel = _.floors[0].hid
                 }
                 _.loaded = true
+
+                if (!_.floor) return
                 _.getFloorData(_.floor.hid, function() {
                     _.setupMapper()
                 })

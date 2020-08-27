@@ -289,7 +289,7 @@ export default {
             })
 
             store.setFloors(data)
-            this.floors = data
+            this.floors = store.getFloors()
             this.loaded = true
         },
         toggleEntry(show) {
@@ -323,6 +323,7 @@ export default {
                         res.data.upload_info = {
                             uploading: false, progress: 0
                         }
+                        res.data.floor_plan_url = `${this.baseUrl}/plans/${res.data.floor_plan}`
                         this.floors.push(res.data)
                         this.toggleEntry(false)
                     }
@@ -396,6 +397,7 @@ export default {
                     if (success) {
                         if (res.r) {
                             f.floor_plan = res.floor_plan
+                            f.floor_plan_url = `${_.baseUrl}/plans/${f.floor_plan}`
                         }
                     } else {
                         console.error(res)
