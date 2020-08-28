@@ -137,7 +137,8 @@ export default {
         },
         async renderChart() {
             let baseUrl = getBaseUrl()
-            fetch(`${baseUrl}/data/flare-2.json`)
+            // fetch(`${baseUrl}/data/flare-2.json`)
+            fetch(`${baseUrl}/data/circle-pack.json`)
                 .then(response => response.json())
                 .then(json => {
                     circlePacker('#chart', json, {

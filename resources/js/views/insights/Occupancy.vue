@@ -118,7 +118,8 @@ $orange: #FF5A09;
 </style>
 <script>
 import { store } from '../../store'
-import { BuildingSvg, FilterDropdown, Loader } from '../../components'
+import { FilterDropdown, Loader } from '../../components'
+import { BuildingSvg } from '../../components/svg'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
 const api = {

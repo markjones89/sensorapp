@@ -39,7 +39,7 @@ export default {
     components: { DateRangeToggle },
     data() {
         return {
-            loaded: false, showPageOpts: false
+            loaded: false, showPageOpts: false, showEmbed: false
         }
     },
     computed: {
@@ -48,6 +48,10 @@ export default {
     methods: {
         rangeSelect(range, from, to) {
             console.log('rangeSelect', range, from, to)
+        },
+        toggleEmbed(show) {
+            if (show) this.showPageOpts = false
+            this.showEmbed = show
         },
         async renderTree() {
             fetch(`${this.baseUrl}/data/flare-2.json`)

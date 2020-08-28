@@ -229,7 +229,51 @@
 		{ "country": "Seychelles", "code": "SC", "states": [] },
 		{ "country": "Sierra Leone", "code": "SL", "states": [] },
 		{ "country": "Somalia", "code": "SO", "states": [] },
-		{ "country": "South Africa", "code": "ZA", "states": [] },
+		{
+			"country": "South Africa", "code": "ZA", "states": [
+				{
+					"code":"EC", "province":"Eastern Cape", "cities": [
+						"Aliwal North", "Cradock", "East London", "Graaff-Reinet", "Jeffreys Bay", "King William's Town", "Komani", "Kouga", "Makhanda", "Mdantsane", "Mthatha", "Port Alfred", "Port Elizabeth", "Uitenhage"
+					]
+				},
+				{ "code":"FS", "province":"Free State", "cities": []},
+				{
+					"code":"GT", "province":"Gauteng", "cities": [
+						"Alberton", "Alexandra", "Bedfordview", "Benoni", "Boksburg", "Braamfontein", "Carletonville", "Centurion", "Edenvale", "Ga-Rankuwa", "Germiston", "Heidelberg", "Johannesburg", "Kempton Park", "Krugersdorp", "Mabopane", "Magaliesburg", "Meyerton", "Midrand", "Nigel", "Parkhurst", "Pretoria", "Randburg", "Rosebank", "Sandton", "Soshanguve", "Soweto", "Springs", "Tembisa", "Vanderbijlpark", "Vereeniging"
+					]
+				},
+				{
+					"code":"NL", "province":"Kwazulu-Natal", "cities": [
+						"Babanango", "Balgowan", "Ballito", "Bergville", "Boston", "Bulwer", "Chatsworth", "Chesterville", "Colenso", "Dalton", "Dannhauser", "Dundee", "Elandslaagte", "Empangeni", "Eshowe", "Estcourt", "Folweni", "Franklin", "Glencoe", "Greytown", "Harding", "Harding", "Hattingspruit", "Hibberdene", "Hillcrest", "Hilton", "Himeville", "Hluhluwe", "Howick", "Ifafa Beach", "Illovo Beach", "Inanda", "Ingwavuma", "Isipingo", "Ixopo", "Izinqolweni", "Jozini", "Karridene", "Kelso", "Kingsburgh", "Kloof", "Kokstad", "Kranskop", "KwaDukuza", "KwaMashu", "La Lucia", "La Mercy", "Ladysmith", "Lamontville", "Louwsburg", "Madadeni", "Magabeni", "Mahlabatini", "Mandeni", "Manguzi", "Maphumulo", "Margate", "Mbazwana", "Melmoth", "Merrivale", "Mkuze", "Mooi River", "Mount Edgecombe", "Mtubatuba", "Mtunzini", "New Germany", "New Hanover", "Newcastle", "Nkandla", "Nongoma", "Nquthu", "Osizweni", "Palm Beach", "Park Rynie", "Paulpietersburg", "Pennington", "Phoenix", "Pietermaritzburg", "Pinetown", "Pomeroy", "Pongola", "Port Edward", "Port Shepstone", "Queensburgh", "Ramsgate", "Richards Bay", "Richmond", "Salt Rock", "Scottburgh", "Sezela", "Shelly Beach", "Southbroom", "Tongaat", "Ubombo", "Ulundi", "Umbogintwini", "Umdloti", "Umgababa", "Umhlanga", "Umkomaas", "Umlazi", "Umtentweni", "Umzimkulu", "Umzinto", "Umzumbe", "Underberg", "Uvongo", "Verulam", "Vryheid", "Warner Beach", "Wartburg", "Wasbank", "Wentworth", "Westville", "Winkelspruit", "ekuPhakameni"
+					]
+				},
+				{
+					"code":"LP", "province":"Limpopo", "cities": [
+						"Afguns", "Alldays", "Ba-Phalaborwa", "Bandelierkop", "Bela-Bela", "Bochum", "Bosbokrand", "Dendron", "Duiwelskloof", "Elim", "Ellisras", "Gravelotte", "Haenertsburg", "Hoedspruit", "Klaserie", "Lebowakgomo", "Lephalale", "Letsitele", "Leydsdorp", "Louis Trichardt", "Messina", "Modimolle", "Modjadjiskloof", "Mogwadi", "Mokopane", "Mokopane", "Mookgophong", "Musina", "Naboomspruit", "Nylstroom", "Ofcolaco", "Phalaborwa", "Polokwane", "Roedtan", "Sekgopo", "Senwabarwana", "Seshego", "Thabazimbi", "Thohoyandou", "Tzaneen", "Vaalwater", "Vivo", "Zebedeila", "Zion City Moria"
+					]
+				},
+				{
+					"code":"MP", "province":"Mpumalanga", "cities": [
+						"BushbuckridgeTsonga", "MbombelaSwazi", "Nkomazi", "Thaba ChweuNorthern Sotho", "Umjindi", "Albert LuthuliSwazi", "Dipaleseng", "Govan MbekiZulu", "Lekwa", "Mkhondo", "Msukaligwa", "Pixley Ka Seme", "Dr JS Moroka", "Emakhazeni", "Emalahleni", "Mdala Nature Reserve", "Steve Tshwete", "Thembisile Hani", "Victor Khanye"
+					]
+				},
+				{
+					"code":"NW", "province":"North-West", "cities": [
+						"Amalia", "Babelegi", "Beestekraal", "Bloemhof", "Bray", "Brits", "Broederstroom", "Christiana", "Coligny", "Delareyville", "Derby", "Ga-Rankuwa", "Ganyesa", "Ganyesa", "Groot Marico", "Hartbeesfontein", "Hartbeesfontein/Lethabong", "Hartbeespoort", "Hekpoort", "Jericho", "Klerksdorp", "Kosmos", "Koster", "Kroondal", "Leeudoringstad", "Lehurutshe", "Lichtenburg", "Maanhaarrand", "Mabopane", "Magaliesburg", "Mahikeng", "Makwassie", "Mareetsane", "Mareetsane", "Marikana", "Mathibestad", "Mmabatho", "Mogwase", "Mooinooi", "Morokweng", "Motlhabeng", "Orkney", "Ottosdal", "Ottoshoop", "Pampierstad", "Potchefstroom", "Ramokokastad", "Reivilo", "Rustenburg", "Sannieshof", "Schweizer-Reneke", "Setlagole", "Setlopo", "Skeerpoort", "Stella", "Stilfontein", "Swartruggens", "Taung", "Tlhabane", "Tosca", "Ventersdorp", "Vryburg", "Wolmaransstad", "Zeerust"
+					]
+				},
+				{
+					"code":"NC", "province":"Northern Cape", "cities": [
+						"Aggeneys", "Alexander Bay", "Andriesvale", "Askham", "Augrabies", "Barkly West", "Britstown", "Campbell", "Carolusberg", "Colesberg", "Concordia", "Copperton", "Danielskuil", "De Aar", "Delportshoop", "Douglas", "Garies", "Griquatown", "Groblershoop", "Hanover", "Hartswater", "Hondeklip", "Hopetown", "Hutchinson", "Jan Kempdorp", "Kakamas", "Kamieskroon", "Kanoneiland", "Keimoes", "Kenhardt", "Kimberley", "Kleinzee", "Lime Acres", "Louisvale", "Loxton", "Marydale", "Mier", "Modder River", "Nababeep", "Norvalspont", "Noupoort", "Okiep", "Olifantshoek", "Onseepkans", "Orania", "Pella", "Petrusville", "Philipstown", "Pofadder", "Port Nolloth", "Postmasburg", "Prieska", "Putsonderwater", "Richmond", "Riemvasmaak", "Soebatsfontein", "Springbok", "Steinkopf", "Strydenburg", "Ulco", "Upington", "Vanderkloof", "Victoria West", "Vosburg", "Warrenton", "Windsorton"
+					]
+				},
+				{
+					"code":"WC", "province":"Western Cape", "cities": [
+						"Albertinia", "Arniston", "Ashton", "Atlantis", "Aurora", "Baardskeerdersbos", "Barrydale", "Beaufort West", "Bellville", "Betty's Bay", "Birkenhead", "Bitterfontein", "Blue Downs", "Boggomsbaai", "Bonnievale", "Botrivier", "Brackenfell", "Bredasdorp", "Brenton-on-Sea", "Buffelsbaai", "Caledon", "Calitzdorp", "Cape Town", "Ceres", "Chatsworth", "Citrusdal", "Clanwilliam", "Crossroads", "Dana Baai", "Darling", "De Doorns", "De Kelders", "De Rust", "De Rust", "Denneburg", "Dennehof", "Doringbaai", "Durbanville", "Dwarskersbos", "Dysselsdorp", "Ebenhaeser", "Eendekuil", "Eerste River", "Elands Bay", "Elgin", "Elim", "Elsie's River", "Fish Hoek", "Fisherhaven", "Franschhoek", "Franskraalstrand", "Friemersheim", "Gansbaai", "Genadendal", "George", "Glentana", "Goedverwacht", "Goodwood", "Gordon's Bay", "Gouda", "Gouritsmond", "Graafwater", "Grabouw", "Great Brak River", "Greyton", "Groot-Jongensfontein", "Grotto Bay", "Guguletu", "Haarlem", "Hartenbos", "Hawston", "Heidelberg", "Herbertsdale", "Hermanus", "Herolds Bay", "Hopefield", "Hotagterklip", "Hout Bay", "Infanta", "Jacobsbaai", "Jakkalsfontein", "Kalbaskraal", "Kayamandi", "Keurboomsrivier", "Keurboomstrand", "Khayelitsha", "Klapmuts", "Klawer", "Kleinbaai", "Kleinmond", "Knysna", "Koekenaap", "Koringberg", "Kraaifontein", "Kranshoek", "Kuils River", "Kurland Estate", "Kylemore", "L'Agulhas", "Ladismith", "Laingsburg", "Lamberts Bay", "Langa", "Langebaan", "Langebaanweg", "Languedoc", "Leeu-Gamka", "Little Brak River", "Lutzville", "Macassar", "Malmesbury", "Matjiesfontein", "McGregor", "Melkbosstrand", "Merweville", "Mfuleni", "Milnerton", "Mitchell's Plain", "Montagu", "Montagu", "Moorreesburg", "Mossel Bay", "Murraysburg", "Napier", "Nature's Valley", "Nelspoort", "Noetzie", "Noordhoek", "Nyanga", "Observatory", "Onrusrivier", "Op-die-Berg", "Oudtshoorn", "Paarl", "Pacaltsdorp", "Parow", "Paternoster", "Pearly Beach", "Piketberg", "Plettenberg Bay", "Pniel", "Port Beaufort", "Porterville", "Prince Albert", "Prince Alfred Hamlet", "Pringle Bay", "Rawsonville", "Redelinghuys", "Rheenendal", "Riebeek West", "Riebeek-Kasteel", "Riversdale", "Riviersonderend", "Robertson", "Robertsvlei", "Rooi Els", "Rozendal", "Saldanha", "Saron", "Sedgefield", "Simon's Town", "Slangrivier", "Somerset West", "St Helena Bay", "Stanford", "Stellenbosch", "Stilbaai", "Strand", "Strandfontein", "Struisbaai", "Suiderstrand", "Suurbraak", "Swellendam", "Touws River", "Tulbagh", "Uniondale", "Van Dyksbaai", "Vanrhynsdorp", "Velddrif", "Vermont", "Victoria Bay", "Villiersdorp", "Volmoed", "Vredenburg", "Vredendal", "Wellington", "Wemmershoek", "Wilderness", "Wittedrift", "Wolseley", "Worcester", "Wupperthal", "Yzerfontein", "Zoar"
+					]
+				}
+			]
+		},
 		{ "country": "South Sudan", "code": "SS", "states": [] },
 		{ "country": "Sudan", "code": "SD", "states": [] },
 		{ "country": "Swaziland", "code": "SZ", "states": [] },

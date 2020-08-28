@@ -71,7 +71,7 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, TimeSlider },
     data() {
         return {
-            user: null, showPageOpts: false, buildings: [], showFilter: false,
+            user: null, showPageOpts: false, showEmbed: false, buildings: [], showFilter: false,
             timeFilter: {
                 start: null, end: null
             }
@@ -88,7 +88,11 @@ export default {
         },
         rangeSelect(range, from, to) {},
         timeStartChange(time) { this.timeFilter.start = time },
-        timeEndChange(time) { this.timeFilter.end = time }
+        timeEndChange(time) { this.timeFilter.end = time },
+        toggleEmbed(show) {
+            if (show) this.showPageOpts = false
+            this.showEmbed = show
+        }
     },
     created() {
         this.user = store.getUser()

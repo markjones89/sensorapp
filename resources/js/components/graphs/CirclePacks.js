@@ -55,8 +55,8 @@ function circlePacker(wrapper, data, callbacks) {
         .attr("text-anchor", "middle")
         .selectAll("text")
         .data(root.descendants())
-        .attr("fill", d => d.depth === 4 ? "#000" : "#fff")
         .join("text")
+        .attr("fill", d => d.depth === 3 ? "#000" : "#fff")
         // .attr('x', d => d.x - root.x)
         // .attr('y', d => (d.y - root.y) - (d.r/1.4))
         .style("fill-opacity", d => isRoot(d.parent) ? 1 : 0)
@@ -66,8 +66,8 @@ function circlePacker(wrapper, data, callbacks) {
     zoomTo([root.x, root.y, root.r * 2]);
 
     function colorByDepth(depth) {
-        if (depth === 3) return '#FF5A09'
-        else if (depth === 4) return '#FFFFFF'
+        if (depth === 2) return '#FF5A09'
+        else if (depth === 3) return '#FFFFFF'
         else return color(depth)
     }
 
@@ -87,8 +87,6 @@ function circlePacker(wrapper, data, callbacks) {
         const focus0 = focus;
 
         focus = d;
-        
-        console.log('zoom', d, d.children)
 
         const transition = svg.transition()
             .duration(1000)

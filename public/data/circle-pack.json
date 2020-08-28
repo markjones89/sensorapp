@@ -6,120 +6,386 @@
                 {
                     "name": "Seoul", "children": [
                         {
-                            "name": "Seoul", "children": [
+                            "name": "Building 1", "value": 245456, "floors": [
                                 {
-                                    "name": "Building 1", "value": 245456, "floors": [
-                                        {
-                                            "name": "1st Floor",
-                                            "workspaces_in_use": { "average": 324, "peak": 400 },
-                                            "free_workspaces": { "average": 134, "peak": 58 },
-                                            "meeting_rooms_in_use": { "average": 58, "peak": 65 },
-                                            "free_meeting_rooms": { "average": 15, "peak": 8 },
-                                            "workspaces_used": { "average": 20, "peak": 32 },
-                                            "occupancy_count": { "average": 400, "peak": 458 },
-                                            "work_from_home": { "average": 42, "peak": 58 }
-                                        },
-                                        {
-                                            "name":"2nd Floor",
-                                            "workspaces_in_use": { "average": 300, "peak": 450 },
-                                            "free_workspaces": { "average": 130, "peak": 60 },
-                                            "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                            "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                            "workspaces_used": { "average": 40, "peak": 22 },
-                                            "occupancy_count": { "average": 350, "peak": 400 },
-                                            "work_from_home": { "average": 40, "peak": 50 }
-                                        },
-                                        {
-                                            "name":"2nd Floor",
-                                            "workspaces_in_use": { "average": 200, "peak": 250 },
-                                            "free_workspaces": { "average": 110, "peak": 65 },
-                                            "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                            "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                            "workspaces_used": { "average": 45, "peak": 52 },
-                                            "occupancy_count": { "average": 310, "peak": 350 },
-                                            "work_from_home": { "average": 80, "peak": 150 }
-                                        }
-                                    ]
+                                    "name": "1st Floor",
+                                    "workspaces_in_use": { "average": 324, "peak": 400 },
+                                    "free_workspaces": { "average": 134, "peak": 58 },
+                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
+                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
+                                    "workspaces_used": { "average": 20, "peak": 32 },
+                                    "occupancy_count": { "average": 400, "peak": 458 },
+                                    "work_from_home": { "average": 42, "peak": 58 }
                                 },
                                 {
-                                    "name": "Building 2", "value": 12154, "floors": [
-                                        {
-                                            "name":"1st Floor",
-                                            "workspaces_in_use": { "average": 300, "peak": 450 },
-                                            "free_workspaces": { "average": 130, "peak": 60 },
-                                            "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                            "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                            "workspaces_used": { "average": 40, "peak": 22 },
-                                            "occupancy_count": { "average": 350, "peak": 400 },
-                                            "work_from_home": { "average": 40, "peak": 50 }
-                                        },
-                                        {
-                                            "name":"2nd Floor",
-                                            "workspaces_in_use": { "average": 200, "peak": 250 },
-                                            "free_workspaces": { "average": 110, "peak": 65 },
-                                            "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                            "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                            "workspaces_used": { "average": 45, "peak": 52 },
-                                            "occupancy_count": { "average": 310, "peak": 350 },
-                                            "work_from_home": { "average": 80, "peak": 150 }
-                                        }
-                                    ]
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
                                 },
                                 {
-                                    "name":"Building 3", "value": 52124, "floors": [
-                                        {
-                                            "name":"1st Floor",
-                                            "workspaces_in_use": { "average": 300, "peak": 450 },
-                                            "free_workspaces": { "average": 130, "peak": 60 },
-                                            "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                            "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                            "workspaces_used": { "average": 40, "peak": 22 },
-                                            "occupancy_count": { "average": 350, "peak": 400 },
-                                            "work_from_home": { "average": 40, "peak": 50 }
-                                        },
-                                        {
-                                            "name":"2nd Floor",
-                                            "workspaces_in_use": { "average": 200, "peak": 250 },
-                                            "free_workspaces": { "average": 110, "peak": 65 },
-                                            "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                            "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                            "workspaces_used": { "average": 45, "peak": 52 },
-                                            "occupancy_count": { "average": 310, "peak": 350 },
-                                            "work_from_home": { "average": 80, "peak": 150 }
-                                        }
-                                    ]
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Building 2", "value": 12154, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name":"Building 3", "value": 52124, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    "name": "Jeollanam-do", "children": [
+                    "name": "Mokpo", "children": [
                         {
-                            "name": "Mokpo", "children": [
+                            "name": "Building 1", "value": 21545, "floors": [
                                 {
-                                    "name": "Building 1", "value": 21545, "floors": [
-                                        {
-                                            "name":"1st Floor",
-                                            "workspaces_in_use": { "average": 300, "peak": 450 },
-                                            "free_workspaces": { "average": 130, "peak": 60 },
-                                            "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                            "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                            "workspaces_used": { "average": 40, "peak": 22 },
-                                            "occupancy_count": { "average": 350, "peak": 400 },
-                                            "work_from_home": { "average": 40, "peak": 50 }
-                                        },
-                                        {
-                                            "name":"2nd Floor",
-                                            "workspaces_in_use": { "average": 200, "peak": 250 },
-                                            "free_workspaces": { "average": 110, "peak": 65 },
-                                            "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                            "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                            "workspaces_used": { "average": 45, "peak": 52 },
-                                            "occupancy_count": { "average": 310, "peak": 350 },
-                                            "work_from_home": { "average": 80, "peak": 150 }
-                                        }
-                                    ]
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "United States", "children": [
+                {
+                    "name": "San Diego", "children": [
+                        {
+                            "name": "Building 1", "value": 245456, "floors": [
+                                {
+                                    "name": "1st Floor",
+                                    "workspaces_in_use": { "average": 324, "peak": 400 },
+                                    "free_workspaces": { "average": 134, "peak": 58 },
+                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
+                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
+                                    "workspaces_used": { "average": 20, "peak": 32 },
+                                    "occupancy_count": { "average": 400, "peak": 458 },
+                                    "work_from_home": { "average": 42, "peak": 58 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Building 2", "value": 12154, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name":"Building 3", "value": 52124, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "New York", "children": [
+                        {
+                            "name": "Building 1", "value": 245456, "floors": [
+                                {
+                                    "name": "1st Floor",
+                                    "workspaces_in_use": { "average": 324, "peak": 400 },
+                                    "free_workspaces": { "average": 134, "peak": 58 },
+                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
+                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
+                                    "workspaces_used": { "average": 20, "peak": 32 },
+                                    "occupancy_count": { "average": 400, "peak": 458 },
+                                    "work_from_home": { "average": 42, "peak": 58 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Building 2", "value": 12154, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Philippines", "children": [
+                {
+                    "name": "Manila", "children": [
+                        {
+                            "name": "Building 1", "value": 245456, "floors": [
+                                {
+                                    "name": "1st Floor",
+                                    "workspaces_in_use": { "average": 324, "peak": 400 },
+                                    "free_workspaces": { "average": 134, "peak": 58 },
+                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
+                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
+                                    "workspaces_used": { "average": 20, "peak": 32 },
+                                    "occupancy_count": { "average": 400, "peak": 458 },
+                                    "work_from_home": { "average": 42, "peak": 58 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"3rd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Building 2", "value": 12154, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 200, "peak": 250 },
+                                    "free_workspaces": { "average": 110, "peak": 65 },
+                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
+                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
+                                    "workspaces_used": { "average": 45, "peak": 52 },
+                                    "occupancy_count": { "average": 310, "peak": 350 },
+                                    "work_from_home": { "average": 80, "peak": 150 }
+                                }
+                            ]
+                        },
+                        {
+                            "name":"Building 3", "value": 52124, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Cebu", "children": [
+                        {
+                            "name": "Building 1", "value": 245456, "floors": [
+                                {
+                                    "name": "1st Floor",
+                                    "workspaces_in_use": { "average": 324, "peak": 400 },
+                                    "free_workspaces": { "average": 134, "peak": 58 },
+                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
+                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
+                                    "workspaces_used": { "average": 20, "peak": 32 },
+                                    "occupancy_count": { "average": 400, "peak": 458 },
+                                    "work_from_home": { "average": 42, "peak": 58 }
+                                },
+                                {
+                                    "name":"2nd Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Building 2", "value": 12154, "floors": [
+                                {
+                                    "name":"1st Floor",
+                                    "workspaces_in_use": { "average": 300, "peak": 450 },
+                                    "free_workspaces": { "average": 130, "peak": 60 },
+                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
+                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
+                                    "workspaces_used": { "average": 40, "peak": 22 },
+                                    "occupancy_count": { "average": 350, "peak": 400 },
+                                    "work_from_home": { "average": 40, "peak": 50 }
                                 }
                             ]
                         }

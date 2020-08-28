@@ -27,10 +27,12 @@
     padding: 10px 0;
     min-width: 100%;
     cursor: default;
+    text-align: left;
     white-space: nowrap;
     background-color: rgb(54, 54, 54);
     border-radius: 20px;
     overflow: hidden;
+    z-index: 1;
 
     .filter-buttons {
         line-height: normal;

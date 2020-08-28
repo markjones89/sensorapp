@@ -1,4 +1,3 @@
-export { default as BuildingSvg } from './Building.vue'
 export { default as Checkbox } from './Checkbox.vue'
 export { default as CircleProgress } from './CircleProgress.vue'
 export { default as DatePicker } from './DatePicker.vue'

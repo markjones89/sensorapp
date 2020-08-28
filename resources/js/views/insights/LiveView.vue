@@ -61,7 +61,7 @@ export default {
     components: { CaretIcon, CaretLeftIcon, FilterDropdown },
     data() {
         return {
-            liveWS: null, showPageOpts: false, buildings: [], showFilter: false
+            liveWS: null, showPageOpts: false, showEmbed: false, buildings: [], showFilter: false
         }
     },
     methods: {
@@ -96,6 +96,10 @@ export default {
         filterSelect(value) {},
         toHeatMap() {
             this.$router.push({ name: 'heat-map' })
+        },
+        toggleEmbed(show) {
+            if (show) this.showPageOpts = false
+            this.showEmbed = show
         }
     },
     created() {
