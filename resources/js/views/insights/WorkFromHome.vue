@@ -32,11 +32,11 @@
                 </div>
                 <div id="wfh-content">
                     <div id="house-wrapper">
-                        <house-svg />
+                        <house-svg :style="{ transform: `scale(${homeScale})` }" />
                         <span class="stat">{{ `${wfhStat}%` }}</span>
                     </div>
                     <div id="building-wrapper">
-                        <building-svg :floors="floors" />
+                        <building-svg :floors="floors" :style="{ transform: `scale(${bldgScale})` }" />
                         <span class="stat">{{ `${bldgStat}%` }}</span>
                     </div>
                 </div>
@@ -76,8 +76,8 @@
         padding: 0 0 32px 0;
 
         .house-svg {
-            transform: scale(0.95);
             transform-origin: bottom;
+            transition: transform .4s;
         }
 
         .stat {
@@ -91,12 +91,12 @@
         padding: 0 0 32px 0;
 
         .building-svg {
-            transform: scale(0.4);
             transform-origin: bottom;
+            transition: transform .4s;
         }
 
         .stat {
-            margin-left: 75px;
+            margin-left: 120px;
         }
     }
 }
@@ -111,6 +111,11 @@ const api = {
     building: '/api/locations',
     floor: '/api/floors'
 }
+
+/**
+ * Minimum percent scaling threshold
+ */
+const MIN_SCALE = 25
 
 function randomNum() {
     return Math.floor((Math.random() * 100) + 1)
@@ -134,8 +139,10 @@ export default {
         settings() { return this.user.company ? this.user.company.settings : null },
         buildingFilters() {
             return this.buildings.map(b => { return { value: b.hid, label: b.name } })
-        }
-    },
+        },
+        homeScale() { return (this.wfhStat < MIN_SCALE ? MIN_SCALE : this.wfhStat) / 100 },
+        bldgScale() { return (this.bldgStat < MIN_SCALE ? MIN_SCALE : this.bldgStat) / 100 }
+    }, 
     methods: {
         backTo() {},
         async getBuildings() {
@@ -173,10 +180,10 @@ export default {
 
             return cb && cb()
         },
-        filterSelect(value) {
+        filterSelect(value, label) {
             this.showFilter = false
             this.building = this.buildings.find(b => b.hid === value)
-            this.bldgFilter = this.building.name
+            this.bldgFilter = label
             this.getFloors(this.building.hid, () => {
                 //TODO: update stats
                 this.wfhStat = randomNum()

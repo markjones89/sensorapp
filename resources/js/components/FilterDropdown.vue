@@ -10,7 +10,7 @@
             <template v-else>
                 <div class="filter-wrapper">
                     <label class="filter-item" v-for="f in filters" :key="f.value ? f.value : f" 
-                        @click="onSelect($event, f.value ? f.value : f)" :class="{ 'selected--item': selected === (f.value ? f.value : f) }">
+                        @click="onSelect($event, f.value ? f.value : f, f.label ? f.label : f)" :class="{ 'selected--item': selected === (f.value ? f.value : f) }">
                         {{ f.label ? f.label : f }}
                     </label>
                 </div>
@@ -24,7 +24,7 @@
     top: 100%;
     right: 0;
     margin-top: 10px;
-    padding: 10px 0;
+    padding: 12px 0;
     min-width: 100%;
     cursor: default;
     text-align: left;
@@ -49,7 +49,7 @@
     .filter-wrapper {
         position: relative;
         height: 100%;
-        margin-right: 8px;
+        // margin-right: 8px;
         overflow-y: auto;
         overflow-x: hidden;
 
@@ -112,12 +112,12 @@ export default {
         }
     },
     methods: {
-        onSelect(evt, value) {
+        onSelect(evt, value, label) {
             if (this.multiple) {
                 this.$emit('onSelect', this.selectedItems)
             } else {
                 this.selected = value
-                this.$emit('onSelect', value)
+                this.$emit('onSelect', value, label)
             }
         }
     },

@@ -29,6 +29,7 @@
             <div class="graph-content">
                 <div class="chart-header">
                     <span class="chart-title">{{ `${building.name} User Peak` }}</span>
+                    <span class="chart-subtitle" v-if="areaFilter">{{ `(${areaFilter})` }}</span>
                 </div>
                 <div class="row">
                     <div class="col">
@@ -36,7 +37,7 @@
                     </div>
                     <div class="col-12 col-md-3" id="area-filter">
                         <span class="graph-filter" @click="showAreaFilter = !showAreaFilter">
-                            Select Area
+                            {{ areaFilter ? areaFilter : 'Select Area' }}
                             <span class="caret">
                                 <caret-icon />
                             </span>
@@ -91,9 +92,9 @@ export default {
         return {
             user: null, loaded: false, showPageOpts: false, showEmbed: false,
             buildings: [], building: null,
-            areas: ['Department', 'Informal Meeting Spaces', 'Meeting Rooms', 'Workspace Desk Area'], 
+            areas: ['All Areas', 'Department', 'Informal Meeting Spaces', 'Meeting Rooms', 'Workspace Desk Area'], 
             showFilter: false, showAreaFilter: false,
-            chart: null, bldgFilter: null, areaFilter: null,
+            chart: null, bldgFilter: null, areaFilter: 'All Areas',
             timeFilter: {
                 start: null, end: null
             }
@@ -142,11 +143,11 @@ export default {
                 return { label: `${d.ordinal_no} Floor`, xValue: d.floor_no, yValue: randomNum() }
             }))
         },
-        filterSelect(value) {
+        filterSelect(value, label) {
             //TODO: filter building
             this.showFilter = false
             this.building = this.buildings.find(b => b.hid === value)
-            this.bldgFilter = this.building.name
+            this.bldgFilter = label//this.building.name
             this.getFloors(this.building.hid, (data) => {
                 dummy = data
                 this.chart.update(data.slice(0), true)
@@ -164,8 +165,9 @@ export default {
         renderChart(data) {
             this.chart = new areaChart('#user-peak-chart', data)
         },
-        filterByArea(value) {
+        filterByArea(value, label) {
             this.showAreaFilter = false
+            this.areaFilter = label
             // update chart data
             let data = dummy.slice(0).map(d => {
                 return { label: d.label, xValue: d.xValue, yValue: randomNum() }
