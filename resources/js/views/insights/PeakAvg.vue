@@ -104,7 +104,7 @@ export default {
             this.$router.push({ name: 'cost-analysis' })
         },
         toLive() {
-            this.$router.push({ name: 'live' })
+            this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
         }
     },
     created() {

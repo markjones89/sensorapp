@@ -43,6 +43,7 @@ const router = new VueRouter({
         },
         {
             path: '/live', name: 'live',
+            props: (route) => ({ bldg_id: route.query.bid, floor_id: route.query.fid }),
             component: () => import(/* webpackChunkName: "js/views/insights/live-view" */ './views/insights/LiveView.vue')
         },
         {
@@ -80,13 +81,18 @@ const router = new VueRouter({
             component: () => import(/* webpackChunkName: "js/views/config/work-settings" */ './views/config/WorkSettings.vue')
         },
         {
-            path: '/users', name: 'users',
-            component: () => import(/* webpackChunkName: "js/views/config/users" */ './views/config/Users.vue')
+            path: '/cost-settings', name: 'cost-settings',
+            component: () => import(/* webpackChunkName: "js/views/config/fees" */ './views/config/CostSettings.vue')
         },
         {
-            path: '/sync-places', name: 'sync-places',
-            component: () => import(/* webpackChunkName: "js/views/config/sync-places" */ './views/config/Places.vue')
+            path: '/users', name: 'users',
+            component: () => import(/* webpackChunkName: "js/views/config/users" */ './views/config/Users.vue')
         }
+        // ,
+        // {
+        //     path: '/sync-places', name: 'sync-places',
+        //     component: () => import(/* webpackChunkName: "js/views/config/sync-places" */ './views/config/Places.vue')
+        // }
     ]
 })
 

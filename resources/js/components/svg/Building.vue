@@ -25,7 +25,7 @@
                 <path d="M104.855 22.1477L122.158 32.5294L88.5903 51.9086L70.9414 41.873L104.855 22.1477Z" fill="#597281"/>
             </g>
             <g class="floor" v-for="(f, i) in floors" :key="f.hid" :style="{ transform: `translateY(${i * floorHeight}px)` }" :floor="f.floor_no"
-                :class="getLiveColor(f.occupancy_live, f.occupancy_limit)">
+                :class="getLiveColor(f.occupancy_live, f.occupancy_limit)" :data-hover="clickableFloor" @click="clickableFloor && floorClick(f)">
                 <path d="M341.559 175L243.971 231.5V267.5L341.559 211.5V175Z" fill="#F0A718"/>
                 <path d="M12.457 133L243.969 267.5V231.5L12.457 96.5V133Z" fill="#F0A718"/>
                 <g class="floor-base">
@@ -41,8 +41,17 @@
 $green: #3DCFA3;
 $yellow: #F0A718;
 $orange: #FF5A09;
+$darkenAmount: 10%;
+
+.building-svg {
+    svg { pointer-events: initial; }
+}
 
 .floor {
+    path {
+        transition: fill .24s;
+    }
+
     &.green > path {
         fill: $green;
     }
@@ -52,11 +61,25 @@ $orange: #FF5A09;
     &.orange > path {
         fill: $orange;
     }
+    
+    &[data-hover="true"] {
+        cursor: pointer;
+
+        &.green:hover > path {
+            fill: darken($color: $green, $amount: $darkenAmount);
+        }
+        &.yellow:hover > path {
+            fill: darken($color: $yellow, $amount: $darkenAmount);
+        }
+        &.orange:hover > path {
+            fill: darken($color: $orange, $amount: $darkenAmount);
+        }
+    }
 }
 </style>
 <script>
 export default {
-    props: ['floors'],
+    props: ['floors', 'clickableFloor'],
     data() {
         return {
             floorHeight: 48, roofHeight: 234
@@ -75,6 +98,9 @@ export default {
                 yellow: percent >= 50,
                 orange: percent >= 90
             }
+        },
+        floorClick(floor) {
+            this.$emit('floorClick', floor)
         }
     }
 }

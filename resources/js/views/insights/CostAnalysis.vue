@@ -22,27 +22,43 @@
             </div>
             <date-range-toggle @select="rangeSelect" />
             <div id="cost-tree"></div>
+            <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                <div class="clearfix"></div>
+        </div>
+        <div class="graph-footer">
+            <div class="left-options"></div>
+            <div class="right-options">
+                <checkbox label="Save to report" />
+            </div>
         </div>
     </div>
 </template>
 <style lang="scss" scoped>
 #cost-tree {
-    margin-top: 24px;
+    margin: 24px auto;
+    max-width: 100%;
+    width: 1024px;
 }
 </style>
 <script>
+import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
-import { DateRangeToggle } from '../../components'
+import { Checkbox, DateRangeToggle, TimeSlider } from '../../components'
 import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
 export default {
     title: 'Cost Analysis',
-    components: { DateRangeToggle },
+    components: { Checkbox, DateRangeToggle, TimeSlider },
     data() {
         return {
-            loaded: false, showPageOpts: false, showEmbed: false
+            user: null, loaded: false, showPageOpts: false, showEmbed: false,
+            timeFilter: {
+                start: null, end: null
+            }
         }
     },
     computed: {
+        settings() { return this.user.company ? this.user.company.settings : null },
         baseUrl() { return getBaseUrl() }
     },
     methods: {
@@ -59,10 +75,13 @@ export default {
                 .then(data => {
                     this.loaded = true
                     collapsibleTree('#cost-tree', data)
-                    // console.log('tree', tree)
-                    // document.getElementById('cost-tree').appendChild(tree);
                 })
-        }
+        },
+        timeStartChange(time) { this.timeFilter.start = time },
+        timeEndChange(time) { this.timeFilter.end = time }
+    },
+    created() {
+        this.user = store.getUser()
     },
     mounted() {
         this.renderTree()

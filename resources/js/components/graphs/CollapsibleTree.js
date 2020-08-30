@@ -4,15 +4,20 @@ export function collapsibleTree(wrapper, data) {
     const container = d3.select(wrapper);
     const root = d3.hierarchy(data),
         width = 900,
-        dx = 15,
+        // wrapperRect = container.node().getBoundingClientRect(),
+        // width = wrapperRect.width,
+        dx = 16,
         dy = width / 6,
         margin = { top: 10, right: 120, bottom: 10, left: 40 };
+
     const tree = (d3.tree().nodeSize([dx, dy]));
-    const line = (d3.line().x(d => d.y).y(d => d.x));
+    // const line = (d3.line().x(d => d.y).y(d => d.x));
+    const diagonal = (d3.linkHorizontal().x(d => d.y).y(d => d.x));
 
     const svg = container.append("svg")
         .attr("viewBox", [-margin.left, -margin.top, width, dx])
-        // .attr("width", width).attr('height', 300)
+        // .attr("width", width)
+        // .attr('height', 300)
         .style("font-size", "12px")
         .style("user-select", "none");
 
@@ -107,7 +112,8 @@ export function collapsibleTree(wrapper, data) {
         const linkEnter = link.enter().append("path")
             .attr("d", d => {
                 const o = { x: source.x0, y: source.y0 };
-                return line([o, o])
+                // return line([o, o])
+                return diagonal({source: o, target: o});
             });
 
         // Transition links to their new position.
@@ -118,14 +124,16 @@ export function collapsibleTree(wrapper, data) {
                 let _offset = lg.node().getBBox();
                 const t = { x: d.target.x, y: d.target.y - _offset.width };
 
-                return hasChildren ? line([d.source, t]) : line([d.source, d.target]) 
+                // return hasChildren ? line([d.source, t]) : line([d.source, d.target]) 
+                return hasChildren ? diagonal({source: d.source, target: t}) : diagonal({source: d.source, target: d.target})
             })
 
         // Transition exiting nodes to the parent's new position.
         link.exit().transition(transition).remove()
             .attr("d", d => {
                 const o = { x: source.x, y: source.y };
-                return line([o, o])
+                // return line([o, o])
+                return diagonal({source: o, target: o});
             });
 
         // Stash the old positions for transition.

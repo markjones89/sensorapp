@@ -8,7 +8,7 @@ use Hashids;
 class AreaMap extends Model
 {
     protected $table = 'area_map';
-    protected $hidden = ['pivot', 'id', 'floor_id', 'type_id', 'points'];
+    protected $hidden = ['pivot', 'id', 'floor_id', 'points'];
     protected $appends = ['hid', 'fid', 'tid', 'poly_points'];
 
     public function floor() {

@@ -65,6 +65,7 @@ class AuthController extends Controller
 
         if ($user->isSuperAdmin()) {
             array_push($menus, 
+                ['name' => 'cost-settings', 'icon' => 'accnt-mgr.svg', 'label' => 'Cost Settings'],
                 ['name' => 'clients', 'icon' => 'accnt-mgr.svg', 'label' => 'Clients'],
                 ['name' => 'users', 'icon' => 'accnt-mgr.svg', 'label' => 'Account Manager']);
         }

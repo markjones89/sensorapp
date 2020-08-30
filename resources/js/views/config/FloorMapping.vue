@@ -25,7 +25,7 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div id="floor-map"></div>
+                            <div id="floor-map" class="floor-map"></div>
                         </div>
                     </div>
                 </div>
@@ -120,35 +120,6 @@ $color: #FF5A09;
                 }
             }
         }
-    }
-}
-#floor-map {
-    position: relative;
-    overflow: hidden;
-
-    .tooltip {
-        position: absolute;
-        padding: 6px 8px;
-        background: #2B2B2B;
-        border-radius: 4px;
-        pointer-events: none;
-        font-size: 12px;
-        opacity: 0;
-
-        &:before {
-            content: '';
-            position: absolute;
-            left: -10px;
-            top: 50%;
-            margin-top: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent #2B2B2B transparent transparent;
-        }
-    }
-    
-    svg {
-        pointer-events: initial !important;
     }
 }
 </style>

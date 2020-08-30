@@ -32,12 +32,19 @@ class FloorsController extends Controller
         return response(Floor::all());
     }
 
-    public function getData($id) {
+    public function getData(Request $request, $id) {
         $fid = Hashids::decode($id)[0];
+
+        // sensors only
+        if ($request->so) {
+            return response([
+                'sensors' => SensorMap::with('area')->where('floor_id', $fid)->get()
+            ]);
+        }
 
         return response([
             'areas' => AreaMap::where('floor_id', $fid)->get(),
-            'sensors' => SensorMap::where('floor_id', $fid)->get()
+            'sensors' => SensorMap::with('area')->where('floor_id', $fid)->get()
         ]);
     }
 

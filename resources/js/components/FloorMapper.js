@@ -71,6 +71,9 @@ function mapper(wrapper, data, callbacks) {
             }
         })
 
+    // set wrapper to inline-block
+    container.style('display', 'inline-block')
+
     const mapLayer = svg.selectAll('.map-layer').data([0])
         .enter().append('g').attr('class', 'map-layer')
 
@@ -479,7 +482,7 @@ function mapper(wrapper, data, callbacks) {
             .data(sensors)
             .enter()
             .append('circle')
-            .attr('class', 'sensor')
+            .attr('class', 'sensor').attr('data-id', d => d.hid)
             .attr('r', '5')
             .attr('stroke', 'rgba(61, 207, 163, 0.3)').attr('stroke-width', 5)
             .style('fill', '#3DCFA3')
@@ -494,7 +497,9 @@ function mapper(wrapper, data, callbacks) {
 
                 return ((s.pos_y / s.scale) * scale) + offset.y
             })
-            .on('mouseover', function(s) {
+            .on('mouseover', function() {
+                let s_circle = d3.select(this),
+                    s = sensors.find(x => x.hid === s_circle.attr('data-id'))
                 tooltip.transition().duration(200).style('opacity', 0.95)
 
                 setTooltip(d3.event.offsetX + tooltipOffsetX, 
@@ -510,6 +515,20 @@ function mapper(wrapper, data, callbacks) {
             .call(d3.drag()
                 .on('drag', sensorDrag)
                 .on('end', sensorDragEnd))
+    }
+
+    /**
+     * Sets the sensor color by status
+     * @param {string} id Sensor id
+     * @param {string} status Sensor status
+     */
+    this.setSensorColor = function (id, status) {
+        let fill = status === 'occupied' ? '#FF5A09' : '#3DCFA3',
+            stroke = status === 'occupied' ? 'rgba(255,90,9,0.3)' : 'rgba(61,207,163,0.3)'
+
+        sensorLayer.select(`.sensor[data-id="${id}"]`)
+            .style('fill', fill)
+            .attr('stroke', stroke)
     }
 
     /**

@@ -38,7 +38,7 @@
                 </div>
                 <div class="row">
                     <div class="col svg-wrapper">
-                        <building-svg :floors="floors" />
+                        <building-svg :floors="floors" :clickableFloor="true" @floorClick="floorClick" />
                     </div>
                     <div class="col info-wrapper">
                         <table>
@@ -52,8 +52,8 @@
                             <tbody>
                                 <tr class="floor-info" v-for="f in floorsReverse" :key="f.hid">
                                     <td>{{ `${f.ordinal_no} Floor` }}</td>
-                                    <td><span class="occ-badge" :class="getLiveColor(f.occupancy_live, f.occupancy_limit)">{{ f.occupancy_live }}</span></td>
-                                    <td><span class="occ-badge orange">{{ f.occupancy_limit }}</span></td>
+                                    <td><span class="occ-badge live-badge" :class="getLiveColor(f.occupancy_live, f.occupancy_limit)" @click="toLive(f.hid)">{{ f.occupancy_live }}</span></td>
+                                    <td><span class="occ-badge limit-badge orange">{{ f.occupancy_limit }}</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -68,6 +68,8 @@
 $green: #3DCFA3;
 $yellow: #F0A718;
 $orange: #FF5A09;
+$darkenAmount: 10%;
+
 .svg-wrapper {
     text-align: right;
     
@@ -109,9 +111,32 @@ $orange: #FF5A09;
             padding: 0 16px;
             border-radius: 4px;
 
-            &.green { background-color: $green; }
-            &.yellow { background-color: $yellow; }
-            &.orange { background-color: $orange; }
+            &.live-badge {
+                cursor: pointer;
+                transition: background-color .24s;
+            }
+
+            &.green {
+                background-color: $green;
+
+                &:hover {
+                    background-color: darken($color: $green, $amount: $darkenAmount);
+                }
+            }
+            &.yellow {
+                background-color: $yellow;
+
+                &:hover {
+                    background-color: darken($color: $yellow, $amount: $darkenAmount);
+                }
+            }
+            &.orange {
+                background-color: $orange;
+
+                &:hover {
+                    background-color: darken($color: $orange, $amount: $darkenAmount);
+                }
+            }
         }
     }
 }
@@ -198,6 +223,10 @@ export default {
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
+        },
+        floorClick(floor) { this.toLive(floor.hid) },
+        toLive(fid) {
+            this.$router.push({ name: 'live', query: { bid: this.building.hid, fid: fid } })
         }
     },
     mounted() {

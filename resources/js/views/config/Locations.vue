@@ -18,36 +18,7 @@
                     <label>Name</label>
                     <input type="text" v-model="entry.name" ref="location">
                 </div>
-                <template v-if="entry.is_building">
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Rental per m<sup>2</sup></label>
-                                <input type="text" v-model="entry.info.rental_metre">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Rental per ft<sup>2</sup></label>
-                                <input type="text" v-model="entry.info.rental_foot">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Workspace Furniture Cost</label>
-                                <input type="text" v-model="entry.info.furniture_cost">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Allocated People</label>
-                                <input type="text" v-model="entry.info.people_alloc">
-                            </div>
-                        </div>
-                    </div>
-                </template>
+                <h3 class="section-header" v-if="entry.is_building">Address</h3>
                 <div class="input-field">
                     <label>Continent</label>
                     <select v-model="entry.continent">
@@ -72,6 +43,37 @@
                         <option v-for="c in cities" :key="c">{{ c }}</option>
                     </select>
                 </div>
+                <template v-if="entry.is_building">
+                    <h3 class="section-header">Details</h3>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Rental per m<sup>2</sup></label>
+                                <input type="text" v-model="entry.info.rental_metre" @keyup="metreRentalKeyUp">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Rental per ft<sup>2</sup></label>
+                                <input type="text" v-model="entry.info.rental_foot" @keyup="footRentalKeyUp">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Workspace Furniture Cost</label>
+                                <input type="text" v-model="entry.info.furniture_cost">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-field">
+                                <label>Allocated People</label>
+                                <input type="text" v-model="entry.info.people_alloc">
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
             <template v-slot:footer>
                 <button class="btn btn-primary" @click="addLoc" :disabled="state.saving" v-if="!editMode">{{ state.saving ? 'Adding...' : 'Add'}}</button>
@@ -92,6 +94,12 @@
 #loc-entry {
     position: relative;
     width: 400px;
+
+    .section-header {
+        margin: 32px 0 8px 0;
+        padding: 0 0 8px;
+        border-bottom: 1px solid rgba(255,255,255,.1);
+    }
 }
 </style>
 <script>
@@ -110,18 +118,18 @@ const api = {
         state: 'Continentscountriescities_Subdivisions_States_Provinces',
         city: 'Continentscountriescities_City'
     },
-    locations: '/api/locations'
+    locations: '/api/locations',
+    gcosts: '/api/gcosts'
 }
+
+const METRE_FOOT_FACTOR = 0.092903
 
 export default {
     title: 'Locations',
     components: { LocationItem, Loader, Modal },
     data() {
         return {
-            user: null, locations: [], cityRef: [],
-            // refs: {
-            //     continents: [], countries: [], states: [], cities: []
-            // },
+            user: null, locations: [], cityRef: [], gCostsRef: [], cCostsRef: [],
             entry: {
                 parent: null, id: null, name: '', continent: '', country: '', state: '', city: '', is_building: false,
                 info: {
@@ -212,17 +220,38 @@ export default {
             return grouped
         }
     },
+    watch: {
+        'entry.city': function(value) {
+            if (this.editMode) return
+
+            let gcosts = this.gCostsRef.find(c => c.country === this.entry.country && c.city === value)
+            let ccosts = this.cCostsRef.find(c => c.country === this.entry.country && c.city === value)
+
+            console.log(gcosts, ccosts)
+
+            if (ccosts) {
+                this.entry.info.rental_metre = ccosts.rental_metre
+                this.entry.info.rental_foot = ccosts.rental_foot
+                this.entry.info.furniture_cost = ccosts.furniture_cost
+            } else if (gcosts) {
+                this.entry.info.rental_metre = gcosts.rental_metre
+                this.entry.info.rental_foot = gcosts.rental_foot
+                this.entry.info.furniture_cost = gcosts.furniture_cost
+            }
+        }
+    },
     methods: {
         async jsonGet() {
-            axios.get('/assets/cities')
-                .then(x => {
-                    // console.log(x.data)
-
-                    this.cityRef = x.data
-                })
+            let { data } = await axios.get('/assets/cities')
+            this.cityRef = data
         },
         async jsonPut(json) {
             axios.put('/assets/cities', { data: json })
+        },
+        async getCostsRefs() {
+            let { data } = await axios.get(`${api.locations}/${this.user.company.hid}/costs`)
+            this.gCostsRef = data.global_costs
+            this.cCostsRef = data.cust_costs
         },
         async getData() {
             let { data } = await axios.get(api.locations, { params: { cid: this.compId } })
@@ -235,6 +264,12 @@ export default {
 
             this.locations = data
             this.loaded = true
+        },
+        metreRentalKeyUp() {
+            this.entry.info.rental_foot = (this.entry.info.rental_metre * METRE_FOOT_FACTOR).toFixed(2)
+        },
+        footRentalKeyUp() {
+            this.entry.info.rental_metre = (this.entry.info.rental_foot / METRE_FOOT_FACTOR).toFixed(2)
         },
         toggleEntry(show) {
             this.showEntry = show
@@ -303,16 +338,40 @@ export default {
 
             return data
         },
+        saveCustCosts(country, city, rental_metre, rental_foot, furniture_cost) {
+            let ccosts = this.cCostsRef.find(c => c.country === country && c.city === city)
+
+            if (ccosts) {
+                ccosts.rental_metre = rental_metre
+                ccosts.rental_foot = rental_foot
+                ccosts.furniture_cost = furniture_cost
+            } else {
+                this.cCostsRef.push({
+                    country: country, city: city,
+                    rental_metre: rental_metre,
+                    rental_foot: rental_foot,
+                    furniture_cost: furniture_cost
+                })
+            }
+        },
         async addLoc() {
+            let _entry = this.getEntry(false)
             this.toggleSaving(true)
-            axios.post(api.locations, this.getEntry(false))
+            axios.post(api.locations, _entry)
                 .then(x => {
                     this.toggleSaving(false)
                     let res = x.data
 
                     if (res.r) {
                         res.data.is_building = this.entry.is_building
+
                         this.locations.push(res.data)
+
+                        if (res.saved_to_cust) {
+                            this.saveCustCosts(this.entry.country, this.entry.city,
+                                _entry.building_info.rental_metre, _entry.building_info.rental_foot, _entry.building_info.furniture_cost)
+                        }
+
                         this.toggleEntry(false)
                     }
                 })
@@ -363,6 +422,11 @@ export default {
                         l.city = this.entry.city
 
                         if (this.entry.is_building) l.building_info = _entry.building_info
+                        
+                        if (res.saved_to_cust) {
+                            this.saveCustCosts(this.entry.country, this.entry.city,
+                                _entry.building_info.rental_metre, _entry.building_info.rental_foot, _entry.building_info.furniture_cost)
+                        }
 
                         this.toggleEntry(false)
                     }
@@ -410,6 +474,7 @@ export default {
     created() {
         this.user = store.getUser()
         this.jsonGet()
+        this.getCostsRefs()
     },
     mounted() {
         this.getData()

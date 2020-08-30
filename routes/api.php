@@ -24,7 +24,13 @@ Route::post('clients/logo', 'CompaniesController@setLogo');
 Route::put('clients/{id}', 'CompaniesController@update');
 Route::delete('clients/{id}', 'CompaniesController@delete');
 
+Route::get('gcosts', 'GlobalCostsController@get');
+Route::post('gcosts', 'GlobalCostsController@create');
+Route::put('gcosts/{id}', 'GlobalCostsController@update');
+Route::delete('gcosts/{id}', 'GlobalCostsController@delete');
+
 Route::get('locations', 'LocationsController@get');
+Route::get('locations/{company}/costs', 'LocationsController@getCosts');
 Route::post('locations', 'LocationsController@create');
 Route::put('locations/{id}', 'LocationsController@update');
 Route::delete('locations/{id}', 'LocationsController@delete');
