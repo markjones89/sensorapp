@@ -8,7 +8,7 @@
                 </div>
             </template>
             <template v-else>
-                <div class="filter-wrapper">
+                <div class="filter-wrapper" ref="wrapper">
                     <label class="filter-item" v-for="f in filters" :key="f.value ? f.value : f" 
                         @click="onSelect($event, f.value ? f.value : f, f.label ? f.label : f)" :class="{ 'selected--item': selected === (f.value ? f.value : f) }">
                         {{ f.label ? f.label : f }}
@@ -98,16 +98,27 @@
 import Checkbox from './Checkbox'
 
 export default {
-    props: ['filters', 'chosen', 'multiple', 'show'],
+    props: ['filters', 'chosen', 'multiple', 'maxItems', 'show'],
     components: { Checkbox },
     data() {
         return {
             selectedItems: [], selected: null
         }
     },
+    watch: {
+        show: function(show) {
+            if (show && !this.multiple && this.selected) {
+                setTimeout(() => {
+                    let _selected = this.$refs.wrapper.querySelector('.selected--item')
+                    this.$refs.wrapper.scrollTop = _selected.offsetTop
+                }, 0)
+            }
+        }
+    },
     computed: {
         height() {
-            if (!this.multiple && this.filters.length > 5) return `${5 * 36}px`
+            let max = this.maxItems || 5
+            if (!this.multiple && this.filters.length > max) return `${max * 36}px`
             return 'auto'
         }
     },

@@ -41,6 +41,8 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
 
     // Creates a set of bars for the given data node, at the specified index.
     function bar(svg, down, d, selector) {
+        const barHeight = barStep * (1 - barPadding)
+
         const g = svg.insert("g", selector)
             .attr("class", "enter")
             .attr("transform", `translate(0,${margin.top + barStep * barPadding})`)
@@ -55,15 +57,17 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
 
         bar.append("text")
             .attr("x", margin.left - 6)
-            .attr("y", barStep * (1 - barPadding) / 2)
+            .attr("y", barHeight / 2)
             .attr("dy", ".35em")
             .attr('fill', 'currentColor')
             .text(d => d.data.name);
 
         bar.append("rect")
             .attr("x", x(0))
+            .attr('ry', (barHeight) / 2)
+            .attr('rx', (barHeight) / 2)
             .attr("width", d => x(d.value) - x(0))
-            .attr("height", barStep * (1 - barPadding));
+            .attr("height", barHeight);
 
         return g;
     }

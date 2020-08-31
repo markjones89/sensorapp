@@ -76,7 +76,10 @@ export default {
                 '12:00 am', '1:00 am', '2:00 am', '3:00 am', '4:00 am', '5:00 am', '6:00 am', '7:00 am', '8:00 am', '9:00 am', '10:00 am', '11:00 am', 
                 '12:00 pm', '1:00 pm', '2:00 pm', '3:00 pm', '4:00 pm', '5:00 pm', '6:00 pm', '7:00 pm', '8:00 pm', '9:00 pm', '10:00 pm', '11:00 pm'
             ],
-            start: 8, end: 17, thumb: null, shiftX: 0
+            start: 8, end: 17, thumb: null, shiftX: 0,
+            holdValue: {
+                start: 0, end: 0
+            }
         }
     },
     computed: {
@@ -104,6 +107,8 @@ export default {
             document.addEventListener('mouseup', this.thumbRelease)
 
             this.thumb = thumb
+            this.holdValue.start = this.start
+            this.holdValue.end = this.end
         },
         thumbMove(evt) {
             let newLeft = evt.clientX - this.shiftX - this.$refs.slider.getBoundingClientRect().left + this.step,
@@ -124,17 +129,20 @@ export default {
 
             if (this.thumb == this.$refs.minThumb && this.start !== slot) {
                 this.start = slot
-
-                this.callStartChange()
             }
 
             if (this.thumb == this.$refs.maxThumb && this.end !== slot) {
                 this.end = slot
-
-                this.callEndChange()
             }
         },
         thumbRelease(evt) {
+            //TODO: emit change
+            if (this.thumb === this.$refs.minThumb && this.holdValue.start !== this.start) {
+                this.callStartChange()
+            } else if (this.thumb === this.$refs.maxThumb && this.holdValue.end !== this.end) {
+                this.callEndChange()
+            }
+
             document.removeEventListener('mouseup', this.thumbRelease)
             document.removeEventListener('mousemove', this.thumbMove)
         },
