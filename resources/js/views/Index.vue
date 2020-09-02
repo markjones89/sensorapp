@@ -249,8 +249,8 @@ export default {
         async renderChart() {
             let baseUrl = getBaseUrl()
             let _data = {}
-            let nodes = await axios.get(`${baseUrl}/data/circle-pack.json`)
-            let stats = await axios.get(`${baseUrl}/data/circle-pack-category.json`)
+            let nodes = await axios.get('/data/circle-pack.json')
+            let stats = await axios.get('/data/circle-pack-category.json')
 
             _data.stats = stats.data
             _data.nodes = nodes.data
