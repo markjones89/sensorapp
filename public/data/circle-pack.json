@@ -1,393 +1,252 @@
 {
-    "name": "Netflix",
+    "name": "global",
+    "ID": "",
     "children": [
         {
-            "name": "South Korea", "children": [
+            "name": "USA",
+            "ID": "1",
+            "children": [
                 {
-                    "name": "Seoul", "children": [
+                    "name": "New York",
+                    "ID": "1.1",
+                    "children": [
                         {
-                            "name": "Building 1", "value": 245456, "floors": [
-                                {
-                                    "name": "1st Floor",
-                                    "workspaces_in_use": { "average": 324, "peak": 400 },
-                                    "free_workspaces": { "average": 134, "peak": 58 },
-                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
-                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
-                                    "workspaces_used": { "average": 20, "peak": 32 },
-                                    "occupancy_count": { "average": 400, "peak": 458 },
-                                    "work_from_home": { "average": 42, "peak": 58 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "21st Avenue Building",
+                            "ID": "1.1.2.1",
+                            "value": 52
                         },
                         {
-                            "name": "Building 2", "value": 12154, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "5th Avenue Building",
+                            "ID": "1.1.2.2",
+                            "value": 15
                         },
                         {
-                            "name":"Building 3", "value": 52124, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "3rd Avenue Building",
+                            "ID": "1.1.2.3",
+                            "value": 216
+                        },
+                        {
+                            "name": "10th Avenue Building",
+                            "ID": "1.1.2.4",
+                            "value": 271
                         }
                     ]
                 },
                 {
-                    "name": "Mokpo", "children": [
+                    "name": "Florida",
+                    "ID": "1.2",
+                    "children": [
                         {
-                            "name": "Building 1", "value": 21545, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "Florida Building 1",
+                            "ID": "1.2.2.1",
+                            "value": 178
+                        },
+                        {
+                            "name": "Florida Building 2",
+                            "ID": "1.2.2.2",
+                            "value": 41
+                        },
+                        {
+                            "name": "Florida Building 3",
+                            "ID": "1.2.2.3",
+                            "value": 147
+                        }
+                    ]
+                },
+                {
+                    "name": "New Jersey",
+                    "ID": "1.3",
+                    "children": [
+                        {
+                            "name": "NJ Building 1",
+                            "ID": "1.2.2.1",
+                            "value": 178
+                        },
+                        {
+                            "name": "NJ Building 2",
+                            "ID": "1.2.2.2",
+                            "value": 41
+                        },
+                        {
+                            "name": "NJ Building 3",
+                            "ID": "1.2.2.3",
+                            "value": 147
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "United States", "children": [
+            "name": "Japan",
+            "ID": "4",
+            "children": [
                 {
-                    "name": "San Diego", "children": [
+                    "name": "Tokyo",
+                    "ID": "4.2",
+                    "children": [
                         {
-                            "name": "Building 1", "value": 245456, "floors": [
-                                {
-                                    "name": "1st Floor",
-                                    "workspaces_in_use": { "average": 324, "peak": 400 },
-                                    "free_workspaces": { "average": 134, "peak": 58 },
-                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
-                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
-                                    "workspaces_used": { "average": 20, "peak": 32 },
-                                    "occupancy_count": { "average": 400, "peak": 458 },
-                                    "work_from_home": { "average": 42, "peak": 58 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "Tokyo Building 1",
+                            "ID": "4.2.1",
+                            "value": 696
                         },
                         {
-                            "name": "Building 2", "value": 12154, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
-                        },
-                        {
-                            "name":"Building 3", "value": 52124, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "Tokyo Building 2",
+                            "ID": "4.2.2",
+                            "value": 17
                         }
                     ]
                 },
                 {
-                    "name": "New York", "children": [
+                    "name": "Kyoto",
+                    "ID": "4.1",
+                    "children": [
                         {
-                            "name": "Building 1", "value": 245456, "floors": [
-                                {
-                                    "name": "1st Floor",
-                                    "workspaces_in_use": { "average": 324, "peak": 400 },
-                                    "free_workspaces": { "average": 134, "peak": 58 },
-                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
-                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
-                                    "workspaces_used": { "average": 20, "peak": 32 },
-                                    "occupancy_count": { "average": 400, "peak": 458 },
-                                    "work_from_home": { "average": 42, "peak": 58 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "Kyoto Building 1",
+                            "ID": "4.1.1",
+                            "value": 44
                         },
                         {
-                            "name": "Building 2", "value": 12154, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "Kyoto Building 2",
+                            "ID": "4.1.2",
+                            "value": 17
+                        },
+                        {
+                            "name": "Kyoto Building 3",
+                            "ID": "4.1.3",
+                            "value": 6
+                        }
+                    ]
+                },
+                {
+                    "name": "Osaka",
+                    "ID": "4.3",
+                    "children": [
+                        {
+                            "name": "Osaka Building 1",
+                            "ID": "4.3.1",
+                            "value": 284
+                        },
+                        {
+                            "name": "Osaka Building 2",
+                            "ID": "4.3.2",
+                            "value": 265
+                        },
+                        {
+                            "name": "Osaka Building 3",
+                            "ID": "4.3.3",
+                            "value": 134
+                        },
+                        {
+                            "name": "Osaka Building 4",
+                            "ID": "4.3.4",
+                            "value": 8
                         }
                     ]
                 }
             ]
         },
         {
-            "name": "Philippines", "children": [
+            "name": "Australia",
+            "ID": "3",
+            "children": [
                 {
-                    "name": "Manila", "children": [
+                    "name": "Sydney",
+                    "ID": "3.2",
+                    "children": [
                         {
-                            "name": "Building 1", "value": 245456, "floors": [
-                                {
-                                    "name": "1st Floor",
-                                    "workspaces_in_use": { "average": 324, "peak": 400 },
-                                    "free_workspaces": { "average": 134, "peak": 58 },
-                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
-                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
-                                    "workspaces_used": { "average": 20, "peak": 32 },
-                                    "occupancy_count": { "average": 400, "peak": 458 },
-                                    "work_from_home": { "average": 42, "peak": 58 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"3rd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
+                            "name": "Sydney Building 1",
+                            "ID": "3.2.1",
+                            "value": 1351
                         },
                         {
-                            "name": "Building 2", "value": 12154, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 200, "peak": 250 },
-                                    "free_workspaces": { "average": 110, "peak": 65 },
-                                    "meeting_rooms_in_use": { "average": 55, "peak": 75 },
-                                    "free_meeting_rooms": { "average": 23, "peak": 20 },
-                                    "workspaces_used": { "average": 45, "peak": 52 },
-                                    "occupancy_count": { "average": 310, "peak": 350 },
-                                    "work_from_home": { "average": 80, "peak": 150 }
-                                }
-                            ]
-                        },
-                        {
-                            "name":"Building 3", "value": 52124, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                }
-                            ]
+                            "name": "Sydney Building 2",
+                            "ID": "3.2.2",
+                            "value": 19
                         }
                     ]
                 },
                 {
-                    "name": "Cebu", "children": [
+                    "name": "Melbourne",
+                    "ID": "3.1",
+                    "children": [
                         {
-                            "name": "Building 1", "value": 245456, "floors": [
-                                {
-                                    "name": "1st Floor",
-                                    "workspaces_in_use": { "average": 324, "peak": 400 },
-                                    "free_workspaces": { "average": 134, "peak": 58 },
-                                    "meeting_rooms_in_use": { "average": 58, "peak": 65 },
-                                    "free_meeting_rooms": { "average": 15, "peak": 8 },
-                                    "workspaces_used": { "average": 20, "peak": 32 },
-                                    "occupancy_count": { "average": 400, "peak": 458 },
-                                    "work_from_home": { "average": 42, "peak": 58 }
-                                },
-                                {
-                                    "name":"2nd Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                }
-                            ]
+                            "name": "Melbourne Building 1",
+                            "ID": "3.1.1",
+                            "value": 3285
                         },
                         {
-                            "name": "Building 2", "value": 12154, "floors": [
-                                {
-                                    "name":"1st Floor",
-                                    "workspaces_in_use": { "average": 300, "peak": 450 },
-                                    "free_workspaces": { "average": 130, "peak": 60 },
-                                    "meeting_rooms_in_use": { "average": 50, "peak": 70 },
-                                    "free_meeting_rooms": { "average": 20, "peak": 18 },
-                                    "workspaces_used": { "average": 40, "peak": 22 },
-                                    "occupancy_count": { "average": 350, "peak": 400 },
-                                    "work_from_home": { "average": 40, "peak": 50 }
-                                }
-                            ]
+                            "name": "Melbourne Building 2",
+                            "ID": "3.1.2",
+                            "value": 1200
+                        },
+                        {
+                            "name": "Melbourne Building 3",
+                            "ID": "3.1.3",
+                            "value": 3242
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Philippines",
+            "ID": "2",
+            "children": [
+                {
+                    "name": "Manila",
+                    "ID": "2.4",
+                    "children": [
+                        {
+                            "name": "Manila Building 1",
+                            "ID": "2.4.1",
+                            "value": 282
+                        },
+                        {
+                            "name": "Manila Building 2",
+                            "ID": "2.4.2",
+                            "value": 210
+                        },
+                        {
+                            "name": "Manila Building 3",
+                            "ID": "2.4.3",
+                            "value": 2328
+                        }
+                    ]
+                },
+                {
+                    "name": "Cebu",
+                    "ID": "2.3",
+                    "children": [
+                        {
+                            "name": "Cebu Building 1",
+                            "ID": "2.3.1",
+                            "value": 430
+                        },
+                        {
+                            "name": "Cebu Building 2",
+                            "ID": "2.3.2",
+                            "value": 545
+                        },
+                        {
+                            "name": "Cebu Building 3",
+                            "ID": "2.3.3",
+                            "value": 1992
+                        }
+                    ]
+                },
+                {
+                    "name": "Davao",
+                    "ID": "2.1",
+                    "children": [
+                        {
+                            "name": "Davao Building 1",
+                            "ID": "2.1.1",
+                            "value": 1980
+                        },
+                        {
+                            "name": "Davao Building 2",
+                            "ID": "2.1.2",
+                            "value": 17
                         }
                     ]
                 }

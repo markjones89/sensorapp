@@ -34,7 +34,33 @@
         </div>
         <div class="graph-content">
             <!-- graph & legends here -->
-            <div id="chart"></div>
+            <div class="row">
+                <div class="col">
+                    <div id="chart"></div>
+                </div>
+                <div class="col-md-4" id="stats-wrapper">
+                    <div id="chart-stats">
+                        <span class="chart-stat">
+                            <span>Cost of Unutilised Spaces</span><span class="stat-figure">$23.5M</span>
+                        </span>
+                        <span class="chart-stat">
+                            <span>Peak Workspace Utilisation</span><span class="stat-figure">65%</span>
+                        </span>
+                        <span class="chart-stat">
+                            <span>Average Work space Utilisation</span><span class="stat-figure">52%</span>
+                        </span>
+                        <span class="chart-stat">
+                            <span>Peak Meeting Room Occupancy</span><span class="stat-figure">75%</span>
+                        </span>
+                        <span class="chart-stat">
+                            <span>User to workspace ratio</span><span class="stat-figure">1.5 to 1</span>
+                        </span>
+                        <span class="chart-stat">
+                            <span>Work from home</span><span class="stat-figure">42%</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
             <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
                 @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
             <div class="clearfix"></div>
@@ -54,15 +80,99 @@
     </div>
 </template>
 <style lang="scss">
+// #chart {
+    .tooltip {
+        position: absolute;
+        padding: 6px 8px;
+        font-size: 14px;
+        border-radius: 4px;
+        background-color: #ffffff;
+        color: #000;
+        pointer-events: none;
+
+        &:before {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
+        }
+    }
+// }
 .circle-packs {
     pointer-events: all;
     border-radius: 50%;
+
+    .plotWrapper {
+        .node {
+            cursor: pointer;
+
+            &:hover:not(.node--root) {
+                stroke: #0B1A29;
+                stroke-width: 1.5px;
+            }
+
+            &.node--leaf {
+                fill: #ffffff;
+            }
+        }
+
+        .barWrapperOuter {
+            pointer-events: none;
+        }
+
+        .innerCircleTitle {
+            text-anchor: middle;
+        }
+
+        .innerText {
+            color: #4A4A4A;
+            text-anchor: end;
+
+            &.percent {
+                text-anchor: start;
+            }
+        }
+    }
+
+    .hiddenArcWrapper {
+        .circleText {
+            color: #ffffff;
+            fill: #ffffff;
+            text-anchor: middle;
+        }
+    }
 }
 </style>
 <style lang="scss" scoped>
 #chart {
-    width: 45%;
-    padding: 24px;
+    position: relative;
+}
+
+#stats-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    #chart-stats {
+        padding: 20px;
+        background-color: #393939;
+        border-radius: 10px;
+
+        .chart-stat {
+            display: flex;
+            font-size: 14px;
+            line-height: 40px;
+            justify-content: space-between;
+
+            .stat-figure {
+                font-weight: bold;
+            }
+        }
+    }
 }
 
 #embed-wrapper {
@@ -81,7 +191,7 @@
 <script>
 import { addEvent, getBaseUrl, removeEvent } from "../helpers"
 import { DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "../components"
-import circlePacker from '../components/graphs/CirclePacks.js'
+import { circlePack } from '../components/graphs/CirclePack'
 import { CaretIcon } from "../components/icons"
 import { store } from '../store'
 export default {
@@ -89,7 +199,7 @@ export default {
     components: { CaretIcon, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
     data() {
         return {
-            user: null, filters: [
+            user: null, circlePack: null, filters: [
                 { value: 'CUS', label: 'Cost of Unused Spaces' },
                 { value: 'PU', label: 'Peak Usage' },
                 { value: 'AU', label: 'Average Usage' },
@@ -115,7 +225,8 @@ export default {
         locFilter(loc) {
             this.showLocFilter = false
             this.locationFilter = loc
-            console.log('locFilter', loc)
+
+            this.circlePack.goTo(loc)
         },
         pageOptsHandler(e) {
             let _ = this
@@ -137,17 +248,21 @@ export default {
         },
         async renderChart() {
             let baseUrl = getBaseUrl()
-            // fetch(`${baseUrl}/data/flare-2.json`)
-            fetch(`${baseUrl}/data/circle-pack.json`)
-                .then(response => response.json())
-                .then(json => {
-                    circlePacker('#chart', json, {
-                        toTimeChart: (data) => {
-                            console.log('toTimeChart', data)
-                            this.$router.push({ name: 'time' })
-                        }
-                    })
-                })
+            let _data = {}
+            let nodes = await axios.get(`${baseUrl}/data/circle-pack.json`)
+            let stats = await axios.get(`${baseUrl}/data/circle-pack-category.json`)
+
+            _data.stats = stats.data
+            _data.nodes = nodes.data
+
+            this.circlePack = new circlePack('#chart', _data, {
+                zoomed: (data) => {
+                    console.log('zoomed', data)
+                },
+                moreInfo: (data) => {
+                    this.$router.push({ name: 'time' })
+                }
+            })
         },
         timeStartChange(time) {
             // console.log('from', time)
