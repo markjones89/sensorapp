@@ -43,22 +43,22 @@
                 <div class="col-md-4" id="stats-wrapper">
                     <div id="chart-stats">
                         <span class="chart-stat">
-                            <span>Cost of Unutilised Spaces</span><span class="stat-figure">$23.5M</span>
+                            <span @click="toPeak">Cost of Unutilised Spaces</span><span class="stat-figure" @click="toPeak">$23.5M</span>
                         </span>
                         <span class="chart-stat">
-                            <span>Peak Workspace Utilisation</span><span class="stat-figure">65%</span>
+                            <span @click="toPeak">Peak Workspace Utilisation</span><span class="stat-figure" @click="toPeak">65%</span>
                         </span>
                         <span class="chart-stat">
-                            <span>Average Work space Utilisation</span><span class="stat-figure">52%</span>
+                            <span @click="toPeak">Average Work space Utilisation</span><span class="stat-figure" @click="toPeak">52%</span>
                         </span>
                         <span class="chart-stat">
-                            <span>Peak Meeting Room Occupancy</span><span class="stat-figure">75%</span>
+                            <span @click="toPeak">Peak Meeting Room Occupancy</span><span class="stat-figure" @click="toPeak">75%</span>
                         </span>
                         <span class="chart-stat">
-                            <span>User to workspace ratio</span><span class="stat-figure">1.5 to 1</span>
+                            <span @click="toPeak">User to workspace ratio</span><span class="stat-figure" @click="toPeak">1.5 to 1</span>
                         </span>
                         <span class="chart-stat">
-                            <span>Work from home</span><span class="stat-figure">42%</span>
+                            <span @click="toPeak">Work from home</span><span class="stat-figure" @click="toPeak">42%</span>
                         </span>
                     </div>
                 </div>
@@ -173,6 +173,10 @@
             .stat-figure {
                 font-weight: bold;
             }
+
+            span {
+                cursor: pointer;
+            }
         }
     }
 }
@@ -271,6 +275,9 @@ export default {
         },
         timeEndChange(time) {
             // console.log('to', time)
+        },
+        toPeak() {
+            this.$router.push({ name: 'peak' })
         }
     },
     created() {

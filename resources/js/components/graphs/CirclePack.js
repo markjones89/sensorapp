@@ -4,16 +4,23 @@ export function circlePack(wrapper, packData, callbacks) {
     const _wrapper = d3.select(wrapper)
 
     let diameter,
-        IDbyName = {},
         commaFormat = d3.format(','),
+        moneyFormat = d3.format('$,.2s'),
         root,
         allOccupations = [],
         focus,
         focus0,
         k0,
         scaleFactor,
-        barsDrawn = false,
-        rotationText = [-14, 4, 23, -18, -10.5, -20, 20, 20, 46, -30, -25, -20, 20, 15, -30, -15, -45, 12, -15, -16, 15, 15, 5, 18, 5, 15, 20, -20, -25]; //The rotation of each arc text
+        barsDrawn = false;
+
+    let circleColor = d3.scaleOrdinal()
+        .domain([0, 1, 2])
+        .range(['#393939', '#5A5E63', '#FF5A09']);
+
+    let barColor = d3.scaleOrdinal()
+        .domain([0, 1])
+        .range(['#3DCFA3', '#FF5A09']);
 
     function drawAll(nodes, stats) {
         ////////////////////////////////////////////////////////////// 
@@ -38,22 +45,6 @@ export function circlePack(wrapper, packData, callbacks) {
             .attr("height", height)
             .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-        ////////////////////////////////////////////////////////////// 
-        /////////////////////// Create Scales  /////////////////////// 
-        ////////////////////////////////////////////////////////////// 
-
-        let colorCircle = d3.scaleOrdinal()
-            .domain([0, 1, 2])
-            .range(['#393939', '#5A5E63', '#FF5A09']);
-
-        // let colorBar = d3.scaleOrdinal()
-        //     .domain(["Workspaces in use", "Free workspaces", "Meeting Rooms in Use", "Free Meeting Rooms", "Workspaces used <20%", "Occupancy Count", "Work from home %"])
-        //     .range(["#EFB605", "#E3690B", "#CF003E", "#991C71", "#4F54A8", "#07997E", "#7EB852"]);
-
-        let barColor = d3.scaleOrdinal()
-            .domain([0, 1])
-            .range(['#3DCFA3', '#FF5A09']);
 
         diameter = Math.min(width * 0.95, height * 0.95);
 
@@ -85,14 +76,9 @@ export function circlePack(wrapper, packData, callbacks) {
 
                         //Save current circle data in separate variable	
                         let current = d
-                            // currentId = d.data.ID,
-                            // maxPeak = d3.max(_data.values, v => v.peak),
-                            // maxAvg = d3.max(_data.values, v => v.average),
-                            // maxValue = Math.max(maxPeak, maxAvg)
 
                         //Create a scale for the width of the bars for the current circle
                         let barScale = d3.scaleLinear()
-                            // .domain([0, maxPeak + maxAvg])
                             // .range([0, (current.r]); //don't make the max bar bigger than 0.7 times the radius minus the distance in between
                             .domain([0, 100])
                             .range([0, (current.r * 0.7)]);
@@ -108,7 +94,7 @@ export function circlePack(wrapper, packData, callbacks) {
                             .text(function (d, i) { return d.name; })
                             .style("font-size", function (d) {
                                 //Calculate best font-size
-                                d.fontTitleSize = current.r / 10//this.getComputedTextLength() * 20;				
+                                d.fontTitleSize = current.r / 10
                                 return Math.round(d.fontTitleSize) + "px";
                             })
                             .each(function (d) {
@@ -163,17 +149,26 @@ export function circlePack(wrapper, packData, callbacks) {
 
                         /* Draw the bars */
                         // average bar
-                        let avgBar = barWrapperInner.append("rect")
+                        /* let avgBar = barWrapperInner.append("rect")
                             .attr("class", "innerBar average")
                             .attr("width", d => d.avgWidth)
                             .attr("height", d => {
                                 d.height = d.eachBarHeight * 0.8
                                 return d.height
                             })
-                            .style("fill", barColor(0))
+                            .style("fill", barColor(0)) */
+                        barWrapperInner.append('path')
+                            .attr("class", "innerBar average")
+                            .attr('d', d => {
+                                d.height = d.eachBarHeight * 0.8
+
+                                // return `M0,0 h${d.avgWidth} q5,0 5,5 v${d.height} q0,5 -5,5 h-${d.avgWidth} q-5,0 -5,-5 v-${d.height} q0,-5 5,-5 z`
+                                // return `M0,0 h${d.avgWidth} v${d.height} h-${d.avgWidth} q-5,0 -5,-5 v-${d.height/2} q0,-5 5,-5 z`
+                            })
+                            .style('fill', barColor(0))
 
                         // peak bar
-                        let peakBar = barWrapperInner.append("rect")
+                        /* let peakBar = barWrapperInner.append("rect")
                             .attr("class", "innerBar peak")
                             .attr("width", d => d.peakWidth)
                             .attr("height", d => {
@@ -181,7 +176,11 @@ export function circlePack(wrapper, packData, callbacks) {
                                 return d.height
                             })
                             .style('transform', d => `translateX(${d.avgWidth}px)`)
-                            .style("fill", barColor(1))
+                            .style("fill", barColor(1)) */
+                        barWrapperInner.append('path')
+                            .attr("class", "innerBar peak")
+                            // .attr('d', d => `M0,0 h${d.avgWidth} q5,0 5,5 v${d.height} q0,5 -5,5 h-${d.avgWidth} z`)
+                            .style('fill', barColor(1))
 
                         //Draw the category text next to the bars		
                         barWrapperInner.append("text")
@@ -247,62 +246,6 @@ export function circlePack(wrapper, packData, callbacks) {
         }
 
         ////////////////////////////////////////////////////////////// 
-        ///////////// Function | The legend creation /////////////////
-        ////////////////////////////////////////////////////////////// 
-
-        // let legendSizes = [10, 20, 30];
-
-        function createLegend(scaleFactor) {
-
-            /* d3.select("#legendRowWrapper").style("opacity", 0);
-
-            let width = $("#legendCircles").width(),
-                height = legendSizes[2] * 2 * 1.2;
-
-            let legendCenter = -10,
-                legendBottom = height,
-                legendLineLength = legendSizes[2] * 1.3,
-                textPadding = 5
-
-            //Create SVG for the legend
-            let svg = d3.select("#legendCircles").append("svg")
-                .attr("width", width)
-                .attr("height", height)
-                .append("g")
-                .attr("class", "legendWrapper")
-                .attr("transform", "translate(" + width / 2 + "," + 0 + ")")
-                .style("opacity", 0);
-
-            //Draw the circles
-            svg.selectAll(".legendCircle")
-                .data(legendSizes)
-                .enter().append("circle")
-                .attr('r', function (d) { return d; })
-                .attr('class', "legendCircle")
-                .attr('cx', legendCenter)
-                .attr('cy', function (d) { return legendBottom - d; });
-            //Draw the line connecting the top of the circle to the number
-            svg.selectAll(".legendLine")
-                .data(legendSizes)
-                .enter().append("line")
-                .attr('class', "legendLine")
-                .attr('x1', legendCenter)
-                .attr('y1', function (d) { return legendBottom - 2 * d; })
-                .attr('x2', legendCenter + legendLineLength)
-                .attr('y2', function (d) { return legendBottom - 2 * d; });
-            //Place the value next to the line
-            svg.selectAll(".legendText")
-                .data(legendSizes)
-                .enter().append("text")
-                .attr('class', "legendText")
-                .attr('x', legendCenter + legendLineLength + textPadding)
-                .attr('y', function (d) { return legendBottom - 2 * d; })
-                .attr('dy', '0.3em')
-                .text(function (d) { return commaFormat(Math.round(scaleFactor * d * d / 10) * 10); }); */
-
-        }
-
-        ////////////////////////////////////////////////////////////// 
         ///////////////// Function | Initiates /////////////////////// 
         ////////////////////////////////////////////////////////////// 
 
@@ -319,7 +262,6 @@ export function circlePack(wrapper, packData, callbacks) {
 
         //Call to the zoom function to move everything into place
         function runAfterCompletion() {
-            // createLegend(scaleFactor);
             focus0 = root
             k0 = 1
             d3.select("#loadText").remove()
@@ -345,7 +287,7 @@ export function circlePack(wrapper, packData, callbacks) {
             if (!shouldTooltip) return
 
             d3.select('body').append('div').attr('class', 'cp-tooltip')
-                .text(d.data.name)
+                .text(`${d.data.name} - ${moneyFormat(d.value)}`)
                 .style('left', function() {
                     let _w = this.getBoundingClientRect().width
                     return `${offset.left - ((_w - rect.width) / 2)}px`
@@ -403,7 +345,7 @@ export function circlePack(wrapper, packData, callbacks) {
         let circle = plotWrapper.append("circle")
             .attr("id", "nodeCircle")
             .attr("class", function (d, i) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
-            .style("fill", function (d) { return d.children ? colorCircle(d.depth) : null; })
+            .style("fill", function (d) { return d.children ? circleColor(d.depth) : null; })
             .attr("r", function (d) {
                 if (d.ID === "1.1.1.1") scaleFactor = d.value / (d.r * d.r);
                 return d.r;
@@ -463,7 +405,7 @@ export function circlePack(wrapper, packData, callbacks) {
             .attr("xlink:href", function (d, i) { return "#circleArc_" + i; })
             // .text(function (d) { return d.name.replace(/ and /g, ' & '); });
             .text(d => {
-                return `${d.name} ${d3.format('$,.2s')(d.value)}`
+                return `${d.name} ${moneyFormat(d.value)}`
             })
 
         ////////////////////////////////////////////////////////////// 
@@ -544,7 +486,6 @@ export function circlePack(wrapper, packData, callbacks) {
             //Save the current ID of the clicked on circle
             //If the clicked on circle is a leaf, strip off the last ID number so it becomes its parent ID
 
-            // let currentID = (typeof IDbyName[d.data.name] !== "undefined" ? IDbyName[d.data.name] : d.data.ID.replace(/\.([^\.]*)$/, ""));
             let currentID = d.data.ID
             
             ////////////////////////////////////////////////////////////// 
@@ -609,7 +550,19 @@ export function circlePack(wrapper, packData, callbacks) {
                 //If the circle (i.e. height of one bar) becomes to small do not show the bar chart
                 .filter(function (d) { return Math.round(d.height * k) > 2 & d.ID.lastIndexOf(currentID, 0) === 0; })
                 .style("display", null)
-                .attr("x", function (d) { return d.totalOffset * k; })
+                .attr('d', function (d) {
+                    let isPeak = this.classList.contains('peak'),
+                        w = (isPeak ? d.peakWidth : d.avgWidth) * k,
+                        h = d.height * k,
+                        c = h / 2,  // curve
+                        x = d.totalOffset * k,
+                        y = d.barHeight * k
+                        
+                    return isPeak ? 
+                        `M${x + (d.avgWidth * k)},${y} h${w - c} q${c},0 ${c},${c} v${h - (c*2)} q0,${c} -${c},${c} h-${w - c} z` :
+                        `M${x + c},${y} h${w - c} v${h} h-${w - c} q-${c},0 -${c},-${c} v-${h - (c*2)} q0,-${c} ${c},-${c} z`
+                })
+                /* .attr("x", function (d) { return d.totalOffset * k; })
                 .attr("y", function (d) { return d.barHeight * k; })
                 .attr("width", function (d) {
                     let width = this.classList.contains('peak') ? d.peakWidth : d.avgWidth
@@ -618,8 +571,8 @@ export function circlePack(wrapper, packData, callbacks) {
                 })
                 .attr("height", function (d) { return d.height * k; })
                 .style('transform', function (d) {
-                    return this.classList.contains('peak') ? `translateX(${d.avgWidth * k}px)` : null
-                })
+                    return this.classList.contains('peak') ? `translateX(${(d.avgWidth * k) - ((d.height * k)/2)}px)` : null
+                }) */
 
             //Rescale the axis text
             d3.selectAll(".innerBarWrapper").selectAll(".innerText")
@@ -630,7 +583,6 @@ export function circlePack(wrapper, packData, callbacks) {
                 .style("font-size", function (d) { return Math.round(d.fontSize * k) + 'px' })
                 .attr("dx", function (d) {
                     return (this.classList.contains('category') ? d.dx : d.dx_p) * k
-                    // return d.dx * k;
                 })
                 .attr("x", d => d.totalOffset * k)
                 .attr("y", d => d.barHeight * k)
