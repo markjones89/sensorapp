@@ -1,6 +1,6 @@
 <template>
     <div class="content">
-        <template v-if="loaded">
+        <div class="graph-wrapper" v-if="loaded">
             <div class="graph-header">
                 <div class="page-back">
                     <div class="back-button" @click="backTo">
@@ -39,7 +39,9 @@
                     <span class="chart-subtitle">{{ building.name }}</span>
                 </div>
                 <div id="live-view">
-                    <div id="floor-map" class="floor-map"></div>
+                    <div id="floor-plan">
+                        <div id="floor-map" class="floor-map"></div>
+                    </div>
                     <div id="floor-stats">
                         <div id="desk-stats">
                             Desks
@@ -70,12 +72,22 @@
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
 <style lang="scss" scoped>
 #live-view {
+    flex: 1 auto;
+    display: flex;
+    flex-direction: column;
+
+    #floor-plan {
+        flex: 1 auto;
+        display: flex;
+        justify-content: center;
+    }
+
     #floor-stats {
         display: flex;
         margin-top: 32px;
@@ -161,6 +173,8 @@ export default {
             console.log('Connected to live data websocket.', e)
         },
         wsMessaged(e) {
+            if (!this.floor) return
+            
             let data = JSON.parse(e.data),
                 payload = JSON.parse(data.payload)
 

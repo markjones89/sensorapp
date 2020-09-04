@@ -182,8 +182,10 @@ svg { pointer-events: none; }
             padding: 36px 32px;
             border-radius: 10px;
             background-color: $wrapperBg;
-            min-height: calc(100% - 72px);
-            border: 1px solid rgba(0, 0, 0, 0.06)
+            // min-height: calc(100% - 72px);
+            height: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(0, 0, 0, 0.06);
         }
     }
 
@@ -307,6 +309,12 @@ textarea {
 }
 
 /* graph styles */
+.graph-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 .graph-header {
     position: relative;
     display: flex;
@@ -314,6 +322,44 @@ textarea {
     .graph-filters {
         justify-content: right;
     }
+}
+
+.graph-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 auto;
+    padding: 24px;
+    text-align: center;
+
+    .chart-header {
+        margin-bottom: 32px;
+
+        .chart-title {
+            display: block;
+            font-size: 30px;
+            line-height: 38px;
+        }
+
+        .chart-subtitle {
+            display: block;
+            line-height: 20px;
+            font-size: 14px;
+            color: rgba($color: #ffffff, $alpha: 0.5);
+        }
+    }
+
+    .time-slider {
+        // float: right;
+        margin-top: 16px;
+        align-self: flex-end;
+    }
+}
+
+.graph-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding-right: 24px;
 }
 
 .graph-range-btns {
@@ -452,40 +498,6 @@ textarea {
             background-color: rgba($color: $wrapperBg, $alpha: 0.6);
         }
     }
-}
-
-.graph-content {
-    padding: 24px;
-    text-align: center;
-
-    .chart-header {
-        margin-bottom: 32px;
-
-        .chart-title {
-            display: block;
-            font-size: 30px;
-            line-height: 38px;
-        }
-
-        .chart-subtitle {
-            display: block;
-            line-height: 20px;
-            font-size: 14px;
-            color: rgba($color: #ffffff, $alpha: 0.5);
-        }
-    }
-
-    .time-slider {
-        float: right;
-        margin-top: 16px;
-    }
-}
-
-.graph-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 24px;
-    padding-right: 24px;
 }
 
 .has-modal {
@@ -648,6 +660,9 @@ textarea {
 /* floor mapper */
 .floor-map {
     position: relative;
+    height: 100%;
+    // width: 100%;
+    box-sizing: border-box;
 
     .tooltip {
         position: absolute;

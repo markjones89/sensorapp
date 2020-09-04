@@ -127,6 +127,11 @@ $color: #FF5A09;
 #sensor-mapper {
     display: flex;
     margin-top: 24px;
+    height: calc(100% - 64px);
+
+    .row {
+        height: 100%;
+    }
 
     #mapper-options {
         margin-bottom: 24px;

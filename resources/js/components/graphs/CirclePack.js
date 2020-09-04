@@ -30,7 +30,8 @@ export function circlePack(wrapper, packData, callbacks) {
         /////////////////////// Create SVG  /////////////////////// 
         ////////////////////////////////////////////////////////////// 
 
-        _wrapper.select('svg').remove()
+        _wrapper.style('display', 'inline-block')
+            .select('svg').remove()
 
         let svg = _wrapper.append("svg").attr('class', 'circle-packs')
             .attr("width", width)
@@ -326,26 +327,33 @@ export function circlePack(wrapper, packData, callbacks) {
         }
 
         //Hide the tooltip when the mouse moves away
-        function removeTooltip() {
-            /* // _wrapper.select('.tooltip').remove()
-            d3.select('body .tooltip').remove() */
-        }
+        function removeTooltip() { d3.select('body .cp-tooltip').remove() }
 
         //Show the tooltip on the hovered over slice
         function showTooltip(d) {
-            /* let evt = d3.event,
-                rect = evt.target.getBoundingClientRect(),
-                x = evt.offsetX,
-                y = evt.offsetY
+            let target = d3.event.target,
+                rect = target.getBoundingClientRect(),
+                offset = { 
+                    top: rect.top + window.scrollY, 
+                    left: rect.left + window.scrollX, 
+                },
+                focusChildren = focus.children ? focus.children.map(c => c.data.name) : [],
+                parentChildren = focus.parent && focus.parent.children ? focus.parent.children.map(c => c.data.name) : [],
+                shouldTooltip = d !== focus && d !== focus.parent 
+                    && focusChildren.indexOf(d.data.name) < 0 && parentChildren.indexOf(d.data.name) < 0
 
-            // _wrapper.append('div').attr('class', 'tooltip')
-            d3.select('body').append('div').attr('class', 'tooltip')
+            if (!shouldTooltip) return
+
+            d3.select('body').append('div').attr('class', 'cp-tooltip')
                 .text(d.data.name)
-                .style('left', `${rect.x - 56}px`)
+                .style('left', function() {
+                    let _w = this.getBoundingClientRect().width
+                    return `${offset.left - ((_w - rect.width) / 2)}px`
+                })
                 .style('top', function() {
-                    let thisHeight = this.getBoundingClientRect().height
-                    return `${rect.y - thisHeight - 5}px`
-                }) */
+                    let _h = this.getBoundingClientRect().height
+                    return `${offset.top - _h - 6}px`
+                })
         }
 
         ////////////////////////////////////////////////////////////// 
@@ -355,20 +363,14 @@ export function circlePack(wrapper, packData, callbacks) {
         //Global variables
         let data;//, dataMax, dataById = {};
 
-        // packData.byCategory.forEach(function (d) {
-        //     d.value = +d.value
-        // })
-
         data = d3.nest()
             .key(d => d.ID)
-            // .entries(packData.byCategory)
             .entries(stats)
 
         ////////////////////////////////////////////////////////////// 
         /////////// Read in Occupation Circle data /////////////////// 
         ////////////////////////////////////////////////////////////// 
 
-        // root = pack(packData.tree);
         root = pack(nodes)
         focus = root;
 
@@ -387,7 +389,10 @@ export function circlePack(wrapper, packData, callbacks) {
 
         if (!mobileSize) {
             //Mouseover only on leaf nodes		
-            plotWrapper.filter(function (d) { return typeof d.children === "undefined"; })
+            plotWrapper.filter(function (d) { 
+                return d !== root
+                // return typeof d.children === "undefined"
+            })
                 .on("mouseover", showTooltip)
                 .on("mouseout", removeTooltip);
         }//if
@@ -541,6 +546,7 @@ export function circlePack(wrapper, packData, callbacks) {
 
             // let currentID = (typeof IDbyName[d.data.name] !== "undefined" ? IDbyName[d.data.name] : d.data.ID.replace(/\.([^\.]*)$/, ""));
             let currentID = d.data.ID
+            
             ////////////////////////////////////////////////////////////// 
             /////////////// Change titles on the arcs ////////////////////
             ////////////////////////////////////////////////////////////// 

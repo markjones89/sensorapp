@@ -7,8 +7,11 @@ import * as d3 from 'd3'
  * @param {Object} callbacks Mapper event callbacks
  */
 function mapper(wrapper, data, callbacks) {
-    const container = d3.select(wrapper)
-    const maxWidth = container.node().getBoundingClientRect().width - 16
+    const container = d3.select(wrapper),
+        rect = container.node().getBoundingClientRect(),
+        parentRect = container.node().parentNode.getBoundingClientRect()
+
+    const maxWidth = rect.width || parentRect.width, maxHeight = rect.height || parentRect.height
     let width = 800, height = 487
     let floor = data,
         sensors = floor.sensors || [],
@@ -72,7 +75,7 @@ function mapper(wrapper, data, callbacks) {
         })
 
     // set wrapper to inline-block
-    container.style('display', 'inline-block')
+    // container.style('display', 'inline-block')
 
     const mapLayer = svg.selectAll('.map-layer').data([0])
         .enter().append('g').attr('class', 'map-layer')
@@ -145,8 +148,10 @@ function mapper(wrapper, data, callbacks) {
 
         img.src = src
         img.onload = () => {
-            let canvasWidth = img.width > maxWidth ? maxWidth : img.width,
-                canvasHeight = img.width > maxWidth ? img.height * (maxWidth / img.width) : img.height
+            let diff = { h: maxHeight - img.height, w: maxWidth - img.width },
+                scale = diff.h < diff.w ? (maxHeight / img.height) : (maxWidth / img.width),
+                canvasWidth = Math.min(img.width * scale, img.width),
+                canvasHeight = Math.min(img.height * scale, img.height)
 
             setSize(canvasWidth, canvasHeight)
 

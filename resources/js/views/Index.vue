@@ -36,7 +36,9 @@
             <!-- graph & legends here -->
             <div class="row">
                 <div class="col">
-                    <div id="chart"></div>
+                    <div id="chart-wrapper">
+                        <div id="circle-pack"></div>
+                    </div>
                 </div>
                 <div class="col-md-4" id="stats-wrapper">
                     <div id="chart-stats">
@@ -80,28 +82,26 @@
     </div>
 </template>
 <style lang="scss">
-// #chart {
-    .tooltip {
-        position: absolute;
-        padding: 6px 8px;
-        font-size: 14px;
-        border-radius: 4px;
-        background-color: #ffffff;
-        color: #000;
-        pointer-events: none;
+.cp-tooltip {
+    position: absolute;
+    padding: 6px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    background-color: #2B2B2B;
+    color: #ffffff;
+    pointer-events: none;
 
-        &:before {
-            content: "";
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #ffffff transparent transparent transparent;
-        }
+    &:before {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #2B2B2B transparent transparent transparent;
     }
-// }
+}
 .circle-packs {
     pointer-events: all;
     border-radius: 50%;
@@ -148,8 +148,10 @@
 }
 </style>
 <style lang="scss" scoped>
-#chart {
-    position: relative;
+#chart-wrapper {
+    #circle-pack {
+        position: relative;
+    }
 }
 
 #stats-wrapper {
@@ -255,7 +257,7 @@ export default {
             _data.stats = stats.data
             _data.nodes = nodes.data
 
-            this.circlePack = new circlePack('#chart', _data, {
+            this.circlePack = new circlePack('#circle-pack', _data, {
                 zoomed: (data) => {
                     console.log('zoomed', data)
                 },

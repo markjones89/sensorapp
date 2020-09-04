@@ -42,22 +42,23 @@ $buffer: #393939;
             width: 16px;
             border-radius: 50%;
             top: 50%;
-            transform: translate(0, -50%);
+            transform: translate(-50%, -50%);
             background-color: $primary;
             cursor: pointer;
             transition: all .14s;
 
-            &:active {
-                background-color: darken($color: #FF5A09, $amount: 0);
-            }
-
             .range-label {
                 position: absolute;
                 left: 50%;
-                transform: translateX(-50%);
                 white-space: nowrap;
                 top: 24px;
                 font-size: 14px;
+                pointer-events: none;
+                transform: translateX(-50%);
+            }
+
+            &:active {
+                background-color: darken($color: #FF5A09, $amount: 5%);
             }
         }
     }
@@ -84,7 +85,8 @@ export default {
     },
     computed: {
         width() { return this.$refs.slider.offsetWidth },
-        step() { return parseInt(this.width / MAX_SLOT) },
+        // step() { return parseInt(this.width / MAX_SLOT) },
+        step() { return this.width / MAX_SLOT },
         startValue() { return this.slots[this.start] },
         endValue() { return this.slots[this.end] }
     },
@@ -101,7 +103,7 @@ export default {
 
             let thumb = evt.target
                 
-            this.shiftX = evt.clientX - thumb.getBoundingClientRect().left
+            this.shiftX = evt.clientX - thumb.getBoundingClientRect().left - 16
 
             document.addEventListener('mousemove', this.thumbMove)
             document.addEventListener('mouseup', this.thumbRelease)
@@ -114,7 +116,7 @@ export default {
             let newLeft = evt.clientX - this.shiftX - this.$refs.slider.getBoundingClientRect().left + this.step,
                 steps = parseInt(newLeft / this.step),
                 slot = parseInt(newLeft / this.step) - 1, //value = this.slots[slot]
-                rightEdge = this.width - this.thumb.offsetWidth
+                rightEdge = this.width
 
             newLeft = (this.step * steps) - this.step
 

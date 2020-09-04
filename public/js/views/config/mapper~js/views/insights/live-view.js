@@ -21,8 +21,11 @@ __webpack_require__.r(__webpack_exports__);
 function mapper(wrapper, data, callbacks) {
   var _this2 = this;
 
-  var container = d3__WEBPACK_IMPORTED_MODULE_0__["select"](wrapper);
-  var maxWidth = container.node().getBoundingClientRect().width - 16;
+  var container = d3__WEBPACK_IMPORTED_MODULE_0__["select"](wrapper),
+      rect = container.node().getBoundingClientRect(),
+      parentRect = container.node().parentNode.getBoundingClientRect();
+  var maxWidth = rect.width || parentRect.width,
+      maxHeight = rect.height || parentRect.height;
   var width = 800,
       height = 487;
   var floor = data,
@@ -90,8 +93,8 @@ function mapper(wrapper, data, callbacks) {
       if (drawLayer.empty()) startAreaDraw(point);else addPoint(drawLayer, point);
     }
   }); // set wrapper to inline-block
+  // container.style('display', 'inline-block')
 
-  container.style('display', 'inline-block');
   var mapLayer = svg.selectAll('.map-layer').data([0]).enter().append('g').attr('class', 'map-layer');
   var imgLayer = mapLayer.append('g').attr('class', 'image-layer');
   var areaLayer = mapLayer.append('g').attr('class', 'area-layer');
@@ -145,8 +148,13 @@ function mapper(wrapper, data, callbacks) {
     img.src = src;
 
     img.onload = function () {
-      var canvasWidth = img.width > maxWidth ? maxWidth : img.width,
-          canvasHeight = img.width > maxWidth ? img.height * (maxWidth / img.width) : img.height;
+      var diff = {
+        h: maxHeight - img.height,
+        w: maxWidth - img.width
+      },
+          scale = diff.h < diff.w ? maxHeight / img.height : maxWidth / img.width,
+          canvasWidth = Math.min(img.width * scale, img.width),
+          canvasHeight = Math.min(img.height * scale, img.height);
       setSize(canvasWidth, canvasHeight);
       return cb && cb({
         height: img.height,
