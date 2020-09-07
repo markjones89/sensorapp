@@ -25,6 +25,10 @@ const router = new VueRouter({
             component: () => import(/* webpackChunkName: "js/views/insights/peak-graph" */ './views/insights/PeakAvg.vue')
         },
         {
+            path: '/bar-chart', name: 'bar-chart',
+            component: () => import(/* webpackChunkName: "js/views/insights/bar-chart" */ './views/insights/VerticalBar.vue')
+        },
+        {
             path: '/user-peak', name: 'user-peak',
             component: () => import(/* webpackChunkName: "js/views/insights/user-peak" */ './views/insights/UserPeak.vue')
         },

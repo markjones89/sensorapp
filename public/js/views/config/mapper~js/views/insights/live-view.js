@@ -10,20 +10,25 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers */ "./resources/js/helpers.js");
+
 
 /**
  * Creates a floor plan mapper (areas and sensors)
  * @param {String} wrapper Mapper wrapper ID
  * @param {Object} data Floor plan data
- * @param {Object} callbacks Mapper event callbacks
+ * @param {Object} options Mapper configurations & callback functions
  */
 
-function mapper(wrapper, data, callbacks) {
+function mapper(wrapper, data, options) {
   var _this2 = this;
 
   var container = d3__WEBPACK_IMPORTED_MODULE_0__["select"](wrapper),
       rect = container.node().getBoundingClientRect(),
       parentRect = container.node().parentNode.getBoundingClientRect();
+  var config_defaults = {
+    edit: false
+  };
   var maxWidth = rect.width || parentRect.width,
       maxHeight = rect.height || parentRect.height;
   var width = 800,
@@ -31,10 +36,9 @@ function mapper(wrapper, data, callbacks) {
   var floor = data,
       sensors = floor.sensors || [],
       areas = floor.areas || [],
-      config = {
-    edit: false
-  },
-      offset = {
+      config = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["extend"])(config_defaults, options),
+      //{ edit: false },
+  offset = {
     x: 0,
     y: 0,
     scale: 0
@@ -48,8 +52,7 @@ function mapper(wrapper, data, callbacks) {
     drawing: false,
     polyMoved: false
   },
-      drawPoints = [],
-      events = callbacks; //{ sensorClick: null }
+      drawPoints = []; // events = options.callbacks//{ sensorClick: null }
 
   var xDMax = 50.0,
       yDMax = 33.79,
@@ -57,6 +60,9 @@ function mapper(wrapper, data, callbacks) {
       y = d3__WEBPACK_IMPORTED_MODULE_0__["scaleLinear"]().domain([0, yDMax]).range([0, height]),
       _ = this;
 
+  var sensorColor = d3__WEBPACK_IMPORTED_MODULE_0__["scaleOrdinal"]().domain([0, 1, 2]).range(['#01FE01', '#FF8600', '#ED0003']),
+      sensorStroke = d3__WEBPACK_IMPORTED_MODULE_0__["scaleOrdinal"]().domain([0, 1, 2]).range(['rgba(1,254,1,0.3)', 'rgba(255,134,0,0.3)', 'rgba(237,0,3,0.3)']);
+  console.log('colors', sensorColor(0), sensorStroke(0));
   container.selectAll('svg').remove(); //clean up
 
   container.selectAll('.tooltip').remove();
@@ -78,7 +84,7 @@ function mapper(wrapper, data, callbacks) {
 
     if (state.sensorMapping) {
       var area = elem.tagName === 'polygon' ? d3__WEBPACK_IMPORTED_MODULE_0__["select"](elem.parentNode).data()[0] : null;
-      return events.sensorAdd && events.sensorAdd.call(_, {
+      return config.events && config.events.sensorAdd && config.events.sensorAdd.call(_, {
         x: _x,
         y: _y,
         scale: offset.scale,
@@ -295,7 +301,7 @@ function mapper(wrapper, data, callbacks) {
   }
 
   function polyClick(a) {
-    return events.areaClick && events.areaClick.call(_, a);
+    return config.events && config.events.areaClick && config.events.areaClick.call(_, a);
   }
 
   function polyDrag() {
@@ -341,7 +347,7 @@ function mapper(wrapper, data, callbacks) {
         });
       });
       var polyPoints = toPolyPoints(newPoints);
-      return events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale);
+      return config.events && config.events.areaPtUpdate && config.events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale);
     }
   }
 
@@ -380,7 +386,7 @@ function mapper(wrapper, data, callbacks) {
       });
     });
     var polyPoints = toPolyPoints(newPoints);
-    return events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale);
+    return config.events && config.events.areaPtUpdate && config.events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale);
   }
 
   function endAreaDraw() {
@@ -389,7 +395,7 @@ function mapper(wrapper, data, callbacks) {
     addPoly(drawPoints);
     drawPoints.splice(0);
     state.drawing = false;
-    return events.addArea && events.addArea.call(_, polyPoints, offset.scale);
+    return config.events && config.events.addArea && config.events.addArea.call(_, polyPoints, offset.scale);
   }
   /* end area mapping functions */
 
@@ -397,7 +403,7 @@ function mapper(wrapper, data, callbacks) {
 
 
   function sensorClick(s) {
-    return events.sensorClick && events.sensorClick.call(_, s);
+    return config.events && config.events.sensorClick && config.events.sensorClick.call(_, s);
   }
 
   function sensorDrag(s) {
@@ -413,7 +419,7 @@ function mapper(wrapper, data, callbacks) {
       s.pos_x -= offset.x;
       s.pos_y -= offset.y;
       s.scale = offset.scale;
-      return events.sensorMoved && events.sensorMoved.call(_, s);
+      return config.events && config.events.sensorMoved && config.events.sensorMoved.call(_, s);
     }
   }
   /* end sensor functions */
@@ -447,7 +453,7 @@ function mapper(wrapper, data, callbacks) {
     var canEdit = config.edit && state.sensorMapping;
     sensorLayer.selectAll('.sensor').data(sensors).enter().append('circle').attr('class', 'sensor').attr('data-id', function (d) {
       return d.hid;
-    }).attr('r', '5').attr('stroke', 'rgba(61, 207, 163, 0.3)').attr('stroke-width', 5).style('fill', '#3DCFA3').style('cursor', function () {
+    }).attr('r', '5').attr('stroke-width', 5).attr('stroke', sensorStroke(0)).style('fill', sensorColor(0)).style('cursor', function () {
       return canEdit ? 'move' : 'default';
     }).attr('cx', function (s) {
       var scale = parseFloat(offset.scale.toFixed(12));
@@ -478,9 +484,8 @@ function mapper(wrapper, data, callbacks) {
 
 
   this.setSensorColor = function (id, status) {
-    var fill = status === 'occupied' ? '#FF5A09' : '#3DCFA3',
-        stroke = status === 'occupied' ? 'rgba(255,90,9,0.3)' : 'rgba(61,207,163,0.3)';
-    sensorLayer.select(".sensor[data-id=\"".concat(id, "\"]")).style('fill', fill).attr('stroke', stroke);
+    var range = status === 'occupied' ? 1 : 0;
+    sensorLayer.select(".sensor[data-id=\"".concat(id, "\"]")).style('fill', sensorColor(range)).attr('stroke', sensorStroke(range));
   };
   /**
    * Renders all area polygons

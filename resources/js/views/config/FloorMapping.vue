@@ -266,28 +266,30 @@ export default {
         setupMapper() {
             let _ = this
             _.mapper = new floorMapper('#floor-map', _.floor, {
-                sensorAdd: function(data) {
-                    _.triggerAdd(data.x, data.y, data.scale, data.area)
-                },
-                sensorClick: function(sensor) {
-                    _.triggerEdit(sensor.hid)
-                },
-                sensorMoved: function(sensor) {
-                    axios.put(`${api.sensor}/coord/${sensor.hid}`, {
-                        pos_x: sensor.pos_x, pos_y: sensor.pos_y, scale: sensor.scale
-                    })
-                },
-                addArea: function(points, scale) {
-                    _.triggerAddArea(points, scale)
-                },
-                areaClick: function(area) {
-                    _.triggerEditArea(area.hid)
-                },
-                areaPtUpdate: function(area, points, scale) {
-                    if (!area) return
-                    axios.put(`${api.area}/coord/${area.hid}`, {
-                        points: points, scale: scale
-                    })
+                events: {
+                    sensorAdd: function(data) {
+                        _.triggerAdd(data.x, data.y, data.scale, data.area)
+                    },
+                    sensorClick: function(sensor) {
+                        _.triggerEdit(sensor.hid)
+                    },
+                    sensorMoved: function(sensor) {
+                        axios.put(`${api.sensor}/coord/${sensor.hid}`, {
+                            pos_x: sensor.pos_x, pos_y: sensor.pos_y, scale: sensor.scale
+                        })
+                    },
+                    addArea: function(points, scale) {
+                        _.triggerAddArea(points, scale)
+                    },
+                    areaClick: function(area) {
+                        _.triggerEditArea(area.hid)
+                    },
+                    areaPtUpdate: function(area, points, scale) {
+                        if (!area) return
+                        axios.put(`${api.area}/coord/${area.hid}`, {
+                            points: points, scale: scale
+                        })
+                    }
                 }
             })
         },

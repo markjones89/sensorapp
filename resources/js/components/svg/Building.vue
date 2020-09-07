@@ -26,8 +26,8 @@
             </g>
             <g class="floor" v-for="(f, i) in floors" :key="f.hid" :style="{ transform: `translateY(${i * floorHeight}px)` }" :floor="f.floor_no"
                 :class="getLiveColor(f.occupancy_live, f.occupancy_limit)" :data-hover="clickableFloor" @click="clickableFloor && floorClick(f)">
-                <path d="M341.559 175L243.971 231.5V267.5L341.559 211.5V175Z" fill="#F0A718"/>
-                <path d="M12.457 133L243.969 267.5V231.5L12.457 96.5V133Z" fill="#F0A718"/>
+                <path d="M341.559 175L243.971 231.5V267.5L341.559 211.5V175Z" fill="#FF8600"/>
+                <path d="M12.457 133L243.969 267.5V231.5L12.457 96.5V133Z" fill="#FF8600"/>
                 <g class="floor-base">
                     <path d="M354.709 212.46L243.971 276.481V280.98L354.709 216.959V212.46Z" fill="#5F7C8C"/>
                     <path d="M0 139.442L243.97 280.979V276.481L0 134.943V139.442Z" fill="#5F7C8C"/>
@@ -38,9 +38,9 @@
     </div>
 </template>
 <style lang="scss">
-$green: #3DCFA3;
-$yellow: #F0A718;
-$orange: #FF5A09;
+$green: #01FE01;//#3DCFA3;
+$yellow: #FF8600;//#F0A718;
+$orange: #ED0003;//#FF5A09;
 $darkenAmount: 10%;
 
 .building-svg {

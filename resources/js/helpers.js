@@ -3,8 +3,8 @@
  * @param {Boolean} trailing Determines if a trailing slash ('/') is added to the base url
  */
 export function getBaseUrl(trailing = false) {
-    let baseUrl = process.env.NODE_ENV === 'development' ? 
-        trailing ? '/' : '' : 
+    let baseUrl = process.env.NODE_ENV === 'development' ?
+        trailing ? '/' : '' :
         `${process.env.MIX_APP_BASE_URL}${trailing ? '/' : ''}`
 
     return baseUrl
@@ -17,7 +17,7 @@ export function getBaseUrl(trailing = false) {
  * @param {Function} handler Event handler to attach
  */
 export function addEvent(el, evt, handler) {
-    if(Array.isArray(evt)) {
+    if (Array.isArray(evt)) {
         evt.forEach((e) => el.addEventListener(e, handler))
     } else {
         el.addEventListener(evt, handler)
@@ -31,7 +31,7 @@ export function addEvent(el, evt, handler) {
  * @param {Function} handler Event handler to remove
  */
 export function removeEvent(el, evt, handler) {
-    if(Array.isArray(evt)) {
+    if (Array.isArray(evt)) {
         evt.forEach(e => el.removeEventListener(e, handler))
     } else {
         el.removeEventListener(evt, handler)
@@ -44,7 +44,7 @@ export function removeEvent(el, evt, handler) {
  * @param {String} by Object key to use in grouping
  * @param {String} name Object key to use as group name in the resulting object
  */
-export function groupBy(array, by, name){
+export function groupBy(array, by, name) {
     const result = []
     const memberKey = name || 'members'
     array.forEach(item => {
@@ -178,4 +178,44 @@ export function preloadImage(src, callback) {
 
     img.onload = callback
     img.src = `${src}`
+}
+
+/**
+ * Vanilla JavaScript version of jQuery.extend()
+ * @see {@link https://gomakethings.com/vanilla-javascript-version-of-jquery-extend/}
+ */
+export function extend() {
+    // Variables
+    var extended = {}
+    var deep = false
+    var i = 0
+    var length = arguments.length
+
+    // Check if a deep merge
+    if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
+        deep = arguments[0]
+        i++
+    }
+
+    // Merge the object into the extended object
+    var merge = function (obj) {
+        for (var prop in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                // If deep merge and property is an object, merge properties
+                if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+                    extended[prop] = extendObj(true, extended[prop], obj[prop])
+                } else {
+                    extended[prop] = obj[prop]
+                }
+            }
+        }
+    }
+
+    // Loop through each object and conduct a merge
+    for (; i < length; i++) {
+        var obj = arguments[i]
+        merge(obj)
+    }
+
+    return extended
 }

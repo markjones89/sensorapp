@@ -65,9 +65,9 @@
     </div>
 </template>
 <style lang="scss" scoped>
-$green: #3DCFA3;
-$yellow: #F0A718;
-$orange: #FF5A09;
+$green: #01FE01;//#3DCFA3;
+$yellow: #FF8600;//#F0A718;
+$orange: #ED0003;//#FF5A09;
 $darkenAmount: 10%;
 
 .svg-wrapper {

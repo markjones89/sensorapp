@@ -27,10 +27,10 @@
         <div class="graph-content">
             <!-- graph & legends here -->
             <div class="chart-header">
-                <span class="chart-title">Building Name</span>
-                <span class="chart-subtitle">Click the orange bar for more info or click the blank space to go back</span>
+                <span class="chart-title">Building Name, Ground Floor Peak Performance</span>
+                <!-- <span class="chart-subtitle">Click the orange bar for more info or click the blank space to go back</span> -->
             </div>
-            <div id="peak-chart"></div>
+            <div id="bar-chart" class="bar-chart"></div>
             <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
                 @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
             <div class="clearfix"></div>
@@ -47,9 +47,8 @@
     </div>
 </template>
 <style lang="scss">
-.hierarchy-chart {
+.bar-chart svg {
     pointer-events: initial;
-    transition: height 750ms;
 }
 </style>
 <script>
@@ -57,14 +56,64 @@ import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
 import { Checkbox, DateRangeToggle, Modal, TimeSlider } from "../../components"
 import { CaretIcon } from "../../components/icons"
-import hierarchyBarChart from '../../components/graphs/HierarchyBar'
+import barChart from '../../components/graphs/BarChart'
+
+function randomNum(limit) {
+    return Math.floor((Math.random() * (limit || 100)) + 1)
+}
+
+function randomData (range) {
+    let data = []
+    if (range === 'today') {
+        let hours = []
+
+        for (let i = 0; i < 24; i++) { hours.push(`${("00" + i).substr(-2,2)}:00`) }
+
+        hours.forEach(h => {
+            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
+
+            data.push({ Hour: h, Peak: peak, Average: avg })
+        })
+    } else if (range === 'week') {
+        let days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+        days.forEach(d => {
+            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
+
+            data.push({ Day: d, Peak: peak, Average: avg })
+        })
+    } else if (range === 'month') {
+        let now = new Date(),
+            days = (new Date(now.getFullYear(), now.getMonth() + 1, 0)).getDate(),
+            dates = [],
+            month = now.toString().substr(4,3)
+
+        for (let i = 1; i <= days; i++) {
+            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
+
+            data.push({ Date: `${month} ${i}`, Peak: peak, Average: avg })
+        }
+    } else if (range === 'year') {
+        let months = ['Jan', 'Feb', 'March', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+        months.forEach(m => {
+            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
+
+            data.push({ Month: m, Peak: peak, Average: avg })
+        })
+    }
+
+    return data
+}
+
 export default {
-    title: 'Peak Chart',
+    title: 'Bar Chart',
     components: { CaretIcon, Checkbox, DateRangeToggle, Modal, TimeSlider },
     data() {
         return {
             user: null,
             showPageOpts: false, showEmbed: false,
+            chart: null,
             timeFilter: {
                 start: null, end: null
             }
@@ -76,28 +125,21 @@ export default {
     },
     methods: {
         rangeSelect(range, from, to) {
-            console.log('rangeSelect', range, from, to)
+            // console.log('rangeSelect', range, from, to)
+            this.chart.update(randomData(range))
+        },
+        viewCostAnalysis() {
+            this.$router.push({ name: 'cost-analysis' })
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         },
-        async renderChart() {
-            fetch(`${this.baseUrl}/data/detail-breakdown.json`)
-                .then(response => response.json())
-                .then(data => {
-                    hierarchyBarChart('#peak-chart', data, {
-                        goBack: () => {
-                            this.$router.back()
-                        }
-                    })
-                })
+        renderChart() {
+            this.chart = new barChart('#bar-chart', randomData('today'))
         },
         timeStartChange(time) { this.timeFilter.start = time },
         timeEndChange(time) { this.timeFilter.end = time },
-        viewCostAnalysis() {
-            this.$router.push({ name: 'cost-analysis' })
-        },
         toLive() {
             this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
         }

@@ -3,26 +3,30 @@ import * as d3 from 'd3'
 export default function hierarchyBarChart(wrapper, data, callbacks) {
     const container = d3.select(wrapper)
 
-    let root = d3.hierarchy(data)
-        .sum(d => d.value)
-        .sort((a, b) => b.value - a.value)
-        .eachAfter(d => d.index = d.parent ? d.parent.index = d.parent.index + 1 || 0 : 0),
+    let averaged = average(data)
 
+    let root = d3.hierarchy(averaged)
+            // .sum(d => d.value)
+            // .sort((a, b) => b.value - a.value)
+            .eachAfter(d => d.index = d.parent ? d.parent.index = d.parent.index + 1 || 0 : 0),
         color = d3.scaleOrdinal([true, false], ["#FF5A09", "#953100"]),
         barStep = 30,
         barPadding = 3 / barStep,
         duration = 750,
         // width = container.node().getBoundingClientRect().width - 128,
-        width = 900,
-        margin = { top: 30, right: 30, bottom: 0, left: 100 },
-        minHeight = calcHeight(root),
+        width = 950,
+        margin = { top: 30, right: 30, bottom: 0, left: 200 },
+        minHeight = 5 * barStep + margin.top + margin.bottom,//calcHeight(root),
         height = calcHeight(root),
-        x = d3.scaleLinear().range([margin.left, width - margin.right]),
-
+        x = d3.scaleLinear()
+            .domain([0, 100])
+            .range([margin.left, width - margin.right]),
         xAxis = g => g
             .attr("class", "x-axis")
             .attr("transform", `translate(0,${margin.top})`)
-            .call(d3.axisTop(x).ticks(width / 80, "s"))
+            // .call(d3.axisTop(x).ticks(width / 80, "%"))
+            .call(d3.axisTop(x).ticks(10)
+                .tickFormat(x => `${x}%`))
             .call(g => (g.selection ? g.selection() : g).select(".domain").remove()),
 
         yAxis = g => g
@@ -32,16 +36,30 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
                 .attr("stroke", "currentColor")
                 .attr("y1", margin.top)
                 .attr("y2", height - margin.bottom))
+
+    function average(ds) {
+        if (ds.value) {
+            return ds
+        }
+
+        const children = ds.children.map(average)
+
+        return {
+            ...ds,
+            children,
+            value: Math.floor(children.reduce((total, { value }) => total + value, 0) / children.length)
+        }
+    }
     
     function calcHeight(data) {
-        /* let max = 1;
-        root.each(d => d.children && (max = Math.max(max, d.children.length))); */
         return data.children.length * barStep + margin.top + margin.bottom;
     }
 
     // Creates a set of bars for the given data node, at the specified index.
     function bar(svg, down, d, selector) {
         const barHeight = barStep * (1 - barPadding)
+        const node = d
+        const childrenSum = d.children.reduce((sum, curr) => sum + curr.value, 0)
 
         const g = svg.insert("g", selector)
             .attr("class", "enter")
@@ -66,25 +84,30 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
             .attr("x", x(0))
             .attr('ry', (barHeight) / 2)
             .attr('rx', (barHeight) / 2)
-            .attr("width", d => x(d.value) - x(0))
+            // .attr("width", d => x(d.value) - x(0))
+            .attr('width', d => x(node.value * (d.value / childrenSum)) - x(0))
             .attr("height", barHeight);
 
         return g;
     }
 
-    function stack(i) {
+    function stack(i, sum, pvalue) {
         let value = 0;
         return d => {
-            const t = `translate(${x(value) - x(0)},${barStep * i})`;
+            let scale = (value / sum)
+            // const t = `translate(${x(value) - x(0)},${barStep * i})`;
+            const t = `translate(${x(scale * pvalue) - x(0)},${barStep * i})`
             value += d.value;
             return t;
         };
     }
 
-    function stagger() {
+    function stagger(sum, pvalue) {
         let value = 0;
         return (d, i) => {
-            const t = `translate(${x(value) - x(0)},${barStep * i})`;
+            let scale = (value / sum)
+            // const t = `translate(${x(value) - x(0)},${barStep * i})`;
+            const t = `translate(${x(scale * pvalue) - x(0)},${barStep * i})`
             value += d.value;
             return t;
         };
@@ -98,6 +121,8 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
 
         // Set chart height
         setHeight(d)
+
+        const childrenSum = d.children.reduce((sum, curr) => sum + curr.value, 0)
 
         // Define two sequenced transitions.
         const transition1 = svg.transition().duration(duration);
@@ -127,16 +152,16 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
 
         // Transition entering bars to their new y-position.
         enter.selectAll("g")
-            .attr("transform", stack(d.index))
+            .attr("transform", stack(d.index, childrenSum, d.value))
             .transition(transition1)
-            .attr("transform", stagger());
+            .attr("transform", stagger(childrenSum, d.value));
 
         // Update the x-scale domain.
-        x.domain([0, d3.max(d.children, d => d.value)]);
+        // x.domain([0, d3.max(d.children, d => d.value)]);
 
         // Update the x-axis.
-        svg.selectAll(".x-axis").transition(transition2)
-            .call(xAxis);
+        // svg.selectAll(".x-axis").transition(transition2)
+        //     .call(xAxis);
 
         // Transition entering bars to the new x-scale.
         enter.selectAll("g").transition(transition2)
@@ -163,6 +188,9 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
         // Set chart height
         setHeight(d.parent)
 
+        const node = d
+        const childrenSum = d.children.reduce((sum, curr) => sum + curr.value, 0)
+
         // Define two sequenced transitions.
         const transition1 = svg.transition().duration(duration);
         const transition2 = transition1.transition();
@@ -172,23 +200,25 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
             .attr("class", "exit");
 
         // Update the x-scale domain.
-        x.domain([0, d3.max(d.parent.children, d => d.value)]);
+        // x.domain([0, d3.max(d.parent.children, d => d.value)]);
 
         // Update the x-axis.
-        svg.selectAll(".x-axis").transition(transition1)
-            .call(xAxis);
+        // svg.selectAll(".x-axis").transition(transition1)
+        //     .call(xAxis);
 
         // Transition exiting bars to the new x-scale.
         exit.selectAll("g").transition(transition1)
-            .attr("transform", stagger());
+            .attr("transform", stagger(childrenSum, d.value));
 
         // Transition exiting bars to the parent’s position.
         exit.selectAll("g").transition(transition2)
-            .attr("transform", stack(d.index));
+            .attr("transform", stack(d.index, childrenSum, d.value));
 
         // Transition exiting rects to the new scale and fade to parent color.
         exit.selectAll("rect").transition(transition1)
-            .attr("width", d => x(d.value) - x(0))
+            // .attr("width", d => x(d.value) - x(0))
+            // .attr('width', d => x((d.value / childrenSum) * 100) - x(0))
+            .attr('width', d => x(node.value * (d.value / childrenSum)) - x(0))
             .attr("fill", color(true));
 
         // Transition exiting text to fade out.
@@ -225,7 +255,7 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
         .attr("width", width)
         .attr("height", height);
 
-    x.domain([0, root.value]);
+    // x.domain([0, root.value]);
 
     const rectUp = svg.append("rect")
         .attr("class", "background")

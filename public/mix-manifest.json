@@ -15,6 +15,7 @@
     "/js/views/config/mapper.js": "/js/views/config/mapper.js",
     "/js/views/config/users.js": "/js/views/config/users.js",
     "/js/views/config/work-settings.js": "/js/views/config/work-settings.js",
+    "/js/views/insights/bar-chart.js": "/js/views/insights/bar-chart.js",
     "/js/views/insights/comfort-map.js": "/js/views/insights/comfort-map.js",
     "/js/views/insights/compare-room.js": "/js/views/insights/compare-room.js",
     "/js/views/insights/cost-analysis.js": "/js/views/insights/cost-analysis.js",

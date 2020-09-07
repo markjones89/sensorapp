@@ -1,22 +1,25 @@
 import * as d3 from 'd3'
+import { extend } from '../helpers'
 
 /**
  * Creates a floor plan mapper (areas and sensors)
  * @param {String} wrapper Mapper wrapper ID
  * @param {Object} data Floor plan data
- * @param {Object} callbacks Mapper event callbacks
+ * @param {Object} options Mapper configurations & callback functions
  */
-function mapper(wrapper, data, callbacks) {
+function mapper(wrapper, data, options) {
     const container = d3.select(wrapper),
         rect = container.node().getBoundingClientRect(),
         parentRect = container.node().parentNode.getBoundingClientRect()
+
+    const config_defaults = { edit: false }
 
     const maxWidth = rect.width || parentRect.width, maxHeight = rect.height || parentRect.height
     let width = 800, height = 487
     let floor = data,
         sensors = floor.sensors || [],
         areas = floor.areas || [],
-        config = { edit: false },
+        config = extend(config_defaults, options),//{ edit: false },
         offset = { x: 0, y: 0, scale: 0 },
         tooltipOffsetX = 15,
         state = {
@@ -24,13 +27,22 @@ function mapper(wrapper, data, callbacks) {
             areaMapping: false, showAreas: false,
             drawing: false, polyMoved: false
         },
-        drawPoints = [],
-        events = callbacks//{ sensorClick: null }
+        drawPoints = []
+        // events = options.callbacks//{ sensorClick: null }
 
     let xDMax = 50.0, yDMax = 33.79,
         x = d3.scaleLinear().domain([0, xDMax]).range([0, width]),
         y = d3.scaleLinear().domain([0, yDMax]).range([0, height]),
         _ = this
+
+    const sensorColor = d3.scaleOrdinal()
+            .domain([0, 1, 2])
+            .range(['#01FE01', '#FF8600', '#ED0003']),
+        sensorStroke = d3.scaleOrdinal()
+            .domain([0, 1, 2])
+            .range(['rgba(1,254,1,0.3)', 'rgba(255,134,0,0.3)', 'rgba(237,0,3,0.3)'])
+
+    console.log('colors', sensorColor(0), sensorStroke(0))
 
     container.selectAll('svg').remove() //clean up
     container.selectAll('.tooltip').remove()
@@ -62,7 +74,8 @@ function mapper(wrapper, data, callbacks) {
             if (state.sensorMapping) {
                 let area = elem.tagName === 'polygon' ? d3.select(elem.parentNode).data()[0] : null
 
-                return events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale, area })
+                return config.events && config.events.sensorAdd && 
+                    config.events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale, area })
             } else if (state.areaMapping) {
                 let point = {
                     x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
@@ -331,7 +344,7 @@ function mapper(wrapper, data, callbacks) {
             )
     }
 
-    function polyClick(a) { return events.areaClick && events.areaClick.call(_, a)  }
+    function polyClick(a) { return config.events && config.events.areaClick && config.events.areaClick.call(_, a)  }
 
     function polyDrag() {
         if (config.edit && state.areaMapping) {
@@ -374,7 +387,8 @@ function mapper(wrapper, data, callbacks) {
 
             let polyPoints = toPolyPoints(newPoints)
 
-            return events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
+            return config.events && config.events.areaPtUpdate && 
+                config.events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
         }
     }
 
@@ -411,7 +425,8 @@ function mapper(wrapper, data, callbacks) {
 
         let polyPoints = toPolyPoints(newPoints)
 
-        return events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
+        return config.events && config.events.areaPtUpdate && 
+            config.events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
     }
 
     function endAreaDraw() {
@@ -423,12 +438,13 @@ function mapper(wrapper, data, callbacks) {
         drawPoints.splice(0)
         state.drawing = false
 
-        return events.addArea && events.addArea.call(_, polyPoints, offset.scale)
+        return config.events && config.events.addArea && 
+            config.events.addArea.call(_, polyPoints, offset.scale)
     }
     /* end area mapping functions */
 
     /* sensor functions */
-    function sensorClick(s) { return events.sensorClick && events.sensorClick.call(_, s) }
+    function sensorClick(s) { return config.events && config.events.sensorClick && config.events.sensorClick.call(_, s) }
 
     function sensorDrag(s) {
         if (config.edit && state.sensorMapping) {
@@ -445,7 +461,8 @@ function mapper(wrapper, data, callbacks) {
             s.pos_x -= offset.x
             s.pos_y -= offset.y
             s.scale = offset.scale
-            return events.sensorMoved && events.sensorMoved.call(_, s)
+            return config.events && config.events.sensorMoved && 
+                config.events.sensorMoved.call(_, s)
         }
     }
     /* end sensor functions */
@@ -489,8 +506,9 @@ function mapper(wrapper, data, callbacks) {
             .append('circle')
             .attr('class', 'sensor').attr('data-id', d => d.hid)
             .attr('r', '5')
-            .attr('stroke', 'rgba(61, 207, 163, 0.3)').attr('stroke-width', 5)
-            .style('fill', '#3DCFA3')
+            .attr('stroke-width', 5)
+            .attr('stroke', sensorStroke(0))
+            .style('fill', sensorColor(0))
             .style('cursor', function () { return canEdit ? 'move' : 'default' })
             .attr('cx', s => {
                 let scale = parseFloat(offset.scale.toFixed(12))
@@ -528,12 +546,11 @@ function mapper(wrapper, data, callbacks) {
      * @param {string} status Sensor status
      */
     this.setSensorColor = function (id, status) {
-        let fill = status === 'occupied' ? '#FF5A09' : '#3DCFA3',
-            stroke = status === 'occupied' ? 'rgba(255,90,9,0.3)' : 'rgba(61,207,163,0.3)'
+        let range = status === 'occupied' ? 1 : 0
 
         sensorLayer.select(`.sensor[data-id="${id}"]`)
-            .style('fill', fill)
-            .attr('stroke', stroke)
+            .style('fill', sensorColor(range))
+            .attr('stroke', sensorStroke(range))
     }
 
     /**

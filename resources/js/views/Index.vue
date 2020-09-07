@@ -17,7 +17,7 @@
                     </span>
                     <filter-dropdown :filters="locations" :show="showLocFilter" @onSelect="locFilter" />
                 </span>
-                <a href="javascript:;" class="btn btn-primary ml-12" @click="viewCostAnalysis">Cost Analysis</a>
+                <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">Cost Analysis</a>
             </div>
             <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                 <span class="dot"></span>
@@ -43,7 +43,7 @@
                 <div class="col-md-4" id="stats-wrapper">
                     <div id="chart-stats">
                         <span class="chart-stat">
-                            <span @click="toPeak">Cost of Unutilised Spaces</span><span class="stat-figure" @click="toPeak">$23.5M</span>
+                            <span @click="toCostAnalysis">Cost of Unutilised Spaces</span><span class="stat-figure" @click="toCostAnalysis">$23.5M</span>
                         </span>
                         <span class="chart-stat">
                             <span @click="toPeak">Peak Workspace Utilisation</span><span class="stat-figure" @click="toPeak">65%</span>
@@ -245,7 +245,7 @@ export default {
                 if (e.keyCode === 27) _.showPageOpts = false
             }
         },
-        viewCostAnalysis() {
+        toCostAnalysis() {
             this.$router.push({ name: 'cost-analysis' })
         },
         toggleEmbed(show) {
