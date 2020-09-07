@@ -227,13 +227,7 @@
             ]
         },
         {
-            "name":"Compare Meeting Spaces",
-            "children":[
-                {
-                    "name":"FlareVis",
-                    "value":41
-                }
-            ]
+            "name":"Compare Meeting Spaces", "value":41, "route": "compare-room"
         },
         {
             "name":"Overall User Occupancy",
@@ -724,7 +718,8 @@
                         },
                         {
                             "name":"Ground Floor Users Peak",
-                            "value":65
+                            "value":65,
+                            "route": "user-peak"
                         },
                         {
                             "name":"Ground Floor Meeting Room Efficiency Peak",

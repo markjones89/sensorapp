@@ -87,8 +87,13 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     hierarchyBarChart('#peak-chart', data, {
-                        goBack: () => {
-                            this.$router.back()
+                        events : {
+                            goBack: () => {
+                                this.$router.back()
+                            },
+                            routeTo: (route) => {
+                                this.$router.push({ name: route })
+                            }
                         }
                     })
                 })

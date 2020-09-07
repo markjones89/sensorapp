@@ -1,9 +1,11 @@
 import * as d3 from 'd3'
+import { extend } from '../../helpers'
 
-export default function hierarchyBarChart(wrapper, data, callbacks) {
+export default function hierarchyBarChart(wrapper, data, options) {
     const container = d3.select(wrapper)
-
-    let averaged = average(data)
+    let config = extend({}, options),
+        callbacks = config.events,
+        averaged = average(data)
 
     let root = d3.hierarchy(averaged)
             // .sum(d => d.value)
@@ -15,7 +17,7 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
         duration = 750,
         // width = container.node().getBoundingClientRect().width - 128,
         width = 950,
-        margin = { top: 30, right: 30, bottom: 0, left: 200 },
+        margin = { top: 30, right: 30, bottom: 0, left: 215 },
         minHeight = 5 * barStep + margin.top + margin.bottom,//calcHeight(root),
         height = calcHeight(root),
         x = d3.scaleLinear()
@@ -70,7 +72,8 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
         const bar = g.selectAll("g")
             .data(d.children)
             .join("g")
-            .attr("cursor", d => !d.children ? null : "pointer")
+            // .attr("cursor", d => !d.children ? null : "pointer")
+            .attr('cursor', d => d.children || d.data.route ? 'pointer' : null)
             .on("click", d => down(svg, d));
 
         bar.append("text")
@@ -114,6 +117,10 @@ export default function hierarchyBarChart(wrapper, data, callbacks) {
     }
 
     function down(svg, d) {
+        if (d.data.route) {
+            return callbacks && callbacks.routeTo.call(d, d.data.route)
+        }
+
         if (!d.children || d3.active(svg.node())) return;
 
         // Rebind the current node to the background.
