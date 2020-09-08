@@ -714,7 +714,8 @@
                     "children":[
                         {
                             "name":"Ground Floor Meeting Sizes vs Room Supply",
-                            "value":43
+                            "value":43,
+                            "route": "bar-chart"
                         },
                         {
                             "name":"Ground Floor Users Peak",
@@ -723,19 +724,23 @@
                         },
                         {
                             "name":"Ground Floor Meeting Room Efficiency Peak",
-                            "value":10
+                            "value":10,
+                            "route": "bar-chart"
                         },
                         {
                             "name":"Ground Floor Meeting Room Occupancy Peak",
-                            "value":82
+                            "value":82,
+                            "route": "bar-chart"
                         },
                         {
                             "name":"Ground Floor Workspace Occupancy Peak",
-                            "value":65
+                            "value":65,
+                            "route": "bar-chart"
                         },
                         {
                             "name":"Ground Floor Overall Peak Performance",
-                            "value":63
+                            "value":63,
+                            "route": "bar-chart"
                         }
                     ]
                 },

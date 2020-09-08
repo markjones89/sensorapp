@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 
 export default function barChart(wrapper, data, options) {
     const container = d3.select(wrapper)
-    let margin = { top: 10, right: 30, bottom: 100, left: 50 },
+    let margin = { top: 30, right: 30, bottom: 100, left: 50 },
         width = 950 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom
 
@@ -150,7 +150,6 @@ export default function barChart(wrapper, data, options) {
         // Show the bars
         svg.append("g").attr('class', 'bar-data')
             .selectAll("g")
-            // Enter in data = loop group per group
             .data(data)
             .enter()
             .append("g")
@@ -166,11 +165,45 @@ export default function barChart(wrapper, data, options) {
             .attr('rx', xSubgroups.bandwidth() / 2)
             .attr('ry', xSubgroups.bandwidth() / 2)
             .attr("fill", d => color(d.key))
-            .on('mouseover', function (d) { d3.select(this).attr('fill', lightColor(d.key)) })
-            .on('mouseout', function (d) { d3.select(this).attr('fill', color(d.key)) })
+            .on('mouseover', function (d, i) {
+                let pdata = d3.select(this.parentNode).datum()
+                d3.select(this).attr('fill', lightColor(d.key))
+                d3.select(`.bar-label text[data-label-for="${d.key}:${pdata[xKey]}"]`).style('opacity', 1)
+            })
+            .on('mouseout', function (d, i) {
+                let parentData = d3.select(this.parentNode).datum()
+                d3.select(this).attr('fill', color(d.key))
+                d3.select(`.bar-label text[data-label-for="${d.key}:${parentData[xKey]}"]`).style('opacity', 0)
+            })
             .transition().duration(1000)
             .attr("height", d => height - y(d.value))
             .attr("y", d => y(d.value))
+        
+        // add labels
+        svg.append("g").attr('class', 'bar-labels')
+            .selectAll("g")
+            .data(data)
+            .enter()
+            .append("g")
+            .attr('class', 'bar-label')
+            .attr("transform", d => `translate(${x(d[xKey])},0)`)
+            .selectAll('text')
+            .data(function (d) { return subgroups.map(function (key) { return { key: key, value: d[key] }; }); })
+            .enter().append('text').attr("class","label")
+            .attr("x", function(d) { return xSubgroups(d.key) })
+            .attr("y", function(d) { return y(d.value) - 20; })
+            .attr("dy", ".75em")
+            .attr('data-label-for', function(d) {
+                let pdata = d3.select(this.parentNode).datum()
+                return `${d.key}:${pdata[xKey]}`
+            })
+            .style('fill', '#fff').style('font-size', '13px')
+            .style('opacity', 0)
+            .text(d => `${d.value}%`)
+            .style('transform', function(d) {
+                return `translateX(${((xSubgroups.bandwidth() / 2) - (nodeWidth(this) / 2))}px)`
+            })
+
 
         createLegend(subgroups)
     }

@@ -58,7 +58,7 @@
                             <span @click="toPeak">User to workspace ratio</span><span class="stat-figure" @click="toPeak">1.5 to 1</span>
                         </span>
                         <span class="chart-stat">
-                            <span @click="toPeak">Work from home</span><span class="stat-figure" @click="toPeak">42%</span>
+                            <span @click="toWFH">Work from home</span><span class="stat-figure" @click="toWFH">42%</span>
                         </span>
                     </div>
                 </div>
@@ -276,9 +276,8 @@ export default {
         timeEndChange(time) {
             // console.log('to', time)
         },
-        toPeak() {
-            this.$router.push({ name: 'peak' })
-        }
+        toPeak() { this.$router.push({ name: 'peak' }) },
+        toWFH() { this.$router.push({ name: 'wfh' }) }
     },
     created() {
         this.user = store.getUser()
