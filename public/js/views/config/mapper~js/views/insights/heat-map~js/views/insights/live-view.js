@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["js/views/config/mapper~js/views/insights/live-view"],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["js/views/config/mapper~js/views/insights/heat-map~js/views/insights/live-view"],{
 
 /***/ "./resources/js/components/FloorMapper.js":
 /*!************************************************!*\
@@ -63,6 +63,10 @@ function mapper(wrapper, data, options) {
     return size;
   };
 
+  var blurSize = function blurSize() {
+    return config.heatmap ? 7 : 6;
+  };
+
   var xDMax = 50.0,
       yDMax = 33.79,
       x = d3__WEBPACK_IMPORTED_MODULE_0__["scaleLinear"]().domain([0, xDMax]).range([0, width]),
@@ -71,7 +75,6 @@ function mapper(wrapper, data, options) {
 
   var sensorColor = d3__WEBPACK_IMPORTED_MODULE_0__["scaleOrdinal"]().domain([0, 1, 2]).range(['#01FE01', '#FF8600', '#ED0003']),
       sensorStroke = d3__WEBPACK_IMPORTED_MODULE_0__["scaleOrdinal"]().domain([0, 1, 2]).range(['rgba(1,254,1,0.3)', 'rgba(255,134,0,0.3)', 'rgba(237,0,3,0.3)']);
-  console.log('colors', sensorColor(0), sensorStroke(0));
   container.selectAll('svg').remove(); //clean up
 
   container.selectAll('.tooltip').remove();
@@ -109,6 +112,10 @@ function mapper(wrapper, data, options) {
     }
   }); // set wrapper to inline-block
   // container.style('display', 'inline-block')
+
+  if (config.heatmap || config.comfortmap) {
+    svg.append("defs").append("filter").attr("id", "blur").attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%').style('opacity', 0.5).append("feGaussianBlur").attr("stdDeviation", blurSize());
+  }
 
   var mapLayer = svg.selectAll('.map-layer').data([0]).enter().append('g').attr('class', 'map-layer');
   var imgLayer = mapLayer.append('g').attr('class', 'image-layer');
@@ -442,7 +449,7 @@ function mapper(wrapper, data, options) {
     var canEdit = config.edit && state.sensorMapping;
     sensorLayer.selectAll('.sensor').data(sensors).enter().append('circle').attr('class', 'sensor').attr('data-id', function (d) {
       return d.hid;
-    }).attr('r', sensorSize()).attr('stroke-width', config.heatmap || config.comfortmap ? null : 5).attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0)).style('fill', sensorColor(0)).style('cursor', function () {
+    }).attr('r', sensorSize()).attr('stroke-width', config.heatmap || config.comfortmap ? null : 5).attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0)).style('fill', sensorColor(0)).attr("filter", config.heatmap || config.comfortmap ? "url(#blur)" : null).style('cursor', function () {
       return canEdit ? 'move' : 'default';
     }).attr('cx', function (s) {
       var scale = parseFloat(offset.scale.toFixed(12));

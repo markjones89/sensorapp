@@ -52,10 +52,12 @@ const router = new VueRouter({
         },
         {
             path: '/heat-map', name: 'heat-map',
+            props: (route) => ({ bldg_id: route.query.bid, floor_id: route.query.fid }),
             component: () => import(/* webpackChunkName: "js/views/insights/heat-map" */ './views/insights/HeatMap.vue')
         },
         {
             path: '/comfort-map', name: 'comfort-map',
+            props: (route) => ({ bldg_id: route.query.bid, floor_id: route.query.fid }),
             component: () => import(/* webpackChunkName: "js/views/insights/comfort-map" */ './views/insights/ComfortMap.vue')
         },
         {

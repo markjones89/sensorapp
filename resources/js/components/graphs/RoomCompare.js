@@ -4,7 +4,7 @@ export function roomComparer(wrapper, data) {
     const _wrapper = d3.select(wrapper),
         labelWidth = 340,
         step = 48,
-        barDiv = 20
+        barDiv = 10
 
     const groupData = data.groups.map((g, i) => {
         return {
@@ -17,20 +17,21 @@ export function roomComparer(wrapper, data) {
     let createBars = (wrapper, data, type) => {
         wrapper.selectAll('.bars').remove()
 
-        let peakBars = wrapper.append('div').attr('class', 'bars'),
-            peakCount = data.peak === 0 ? 0 : data.peak < barDiv ? 1 : Math.round(data.peak / barDiv),
-            avgBars = wrapper.append('div').attr('class', 'bars'),
-            avgCount = data.average === 0 ? 0 : data.average < barDiv ? 1 : Math.round(data.average / barDiv)
+        let avgBars = wrapper.append('div').attr('class', 'bars'),
+            abCount = data.average === 0 ? 0 : data.average < barDiv ? 1 : Math.ceil(data.average / barDiv),
+            peakBars = wrapper.append('div').attr('class', 'bars'),
+            // pbCount = data.peak === 0 ? 0 : data.peak < barDiv ? 1 : Math.ceil((data.peak - data.average) / barDiv)
+            pbCount = Math.ceil(data.peak / barDiv) - abCount
 
         // percent label (peak)
         if (data.peak > 0) peakBars.append('span').attr('class', 'percent').text(`${data.peak}%`)
         // bars (peak)
-        for (let i = 1; i <= peakCount; i++) { peakBars.append('span').attr('class', 'bar peak') }
+        for (let i = 1; i <= pbCount; i++) { peakBars.append('span').attr('class', 'bar peak') }
 
         // percent label (average)
         if (data.average > 0 || (data.peak === 0 && data.average === 0)) avgBars.append('span').attr('class', 'percent').text(`${data.average}%`)
         // bars (average)
-        for (let i = 1; i <= avgCount; i++) { avgBars.append('span').attr('class', 'bar average') }
+        for (let i = 1; i <= abCount; i++) { avgBars.append('span').attr('class', 'bar average') }
 
         if (data.average > 0) {
             peakBars.style('transform', `translate(${type === 'left' ? -15 : 0}px, ${-(avgBars.node().getBoundingClientRect().height + 5)}px)`)

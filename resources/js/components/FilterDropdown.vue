@@ -54,17 +54,20 @@
         overflow-x: hidden;
 
         &::-webkit-scrollbar {
-            width: 4px;
+            width: 16px;
         }
         &::-webkit-scrollbar-track {
             background: transparent; 
         }
         &::-webkit-scrollbar-thumb {
             background: rgba(255,255,255,.2);
-            border-radius: 4px;
+            background-clip: padding-box;
+            border: 6px solid transparent;
+            border-radius: 8px;
 
             &:hover {
-                background: rgba(255,255,255,.1);
+                background: rgba(255,255,255,.15);
+                background-clip: padding-box;
             }
         }
     }

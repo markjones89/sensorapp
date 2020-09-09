@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["js/views/config/mapper~js/views/insights/live-view"],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["js/views/config/mapper~js/views/insights/comfort-map~js/views/insights/heat-map~js/views/insights/live-view"],{
 
 /***/ "./resources/js/components/FloorMapper.js":
 /*!************************************************!*\
@@ -23,24 +23,28 @@ __webpack_require__.r(__webpack_exports__);
 function mapper(wrapper, data, options) {
   var _this2 = this;
 
-  var container = d3__WEBPACK_IMPORTED_MODULE_0__["select"](wrapper),
-      rect = container.node().getBoundingClientRect(),
-      parentRect = container.node().parentNode.getBoundingClientRect();
+  var container = d3__WEBPACK_IMPORTED_MODULE_0__["select"](wrapper); //, parentRect = container.node().parentNode.getBoundingClientRect()
+
   var config_defaults = {
     edit: false,
     heatmap: false,
     comfortmap: false
   };
-  var maxWidth = rect.width || parentRect.width,
-      maxHeight = rect.height || parentRect.height || 300;
+
+  var maxWidth = function maxWidth() {
+    return container.node().parentNode.getBoundingClientRect().width || 800;
+  },
+      maxHeight = function maxHeight() {
+    return container.node().parentNode.getBoundingClientRect().height || 300;
+  };
+
   var width = 800,
-      height = 487;
+      height = 300;
   var floor = data,
       sensors = floor.sensors || [],
       areas = floor.areas || [],
       config = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["extend"])(config_defaults, options),
-      //{ edit: false },
-  offset = {
+      offset = {
     x: 0,
     y: 0,
     scale: 0
@@ -55,12 +59,16 @@ function mapper(wrapper, data, options) {
     polyMoved: false
   },
       drawPoints = [],
-      size = 5; // events = options.callbacks//{ sensorClick: null }
+      size = 5;
 
   var sensorSize = function sensorSize() {
     if (config.heatmap) return size * 3;
-    if (config.comfortmap) return size * 5;
+    if (config.comfortmap) return size * 7;
     return size;
+  };
+
+  var blurSize = function blurSize() {
+    return config.heatmap ? 7 : 15;
   };
 
   var xDMax = 50.0,
@@ -71,7 +79,6 @@ function mapper(wrapper, data, options) {
 
   var sensorColor = d3__WEBPACK_IMPORTED_MODULE_0__["scaleOrdinal"]().domain([0, 1, 2]).range(['#01FE01', '#FF8600', '#ED0003']),
       sensorStroke = d3__WEBPACK_IMPORTED_MODULE_0__["scaleOrdinal"]().domain([0, 1, 2]).range(['rgba(1,254,1,0.3)', 'rgba(255,134,0,0.3)', 'rgba(237,0,3,0.3)']);
-  console.log('colors', sensorColor(0), sensorStroke(0));
   container.selectAll('svg').remove(); //clean up
 
   container.selectAll('.tooltip').remove();
@@ -109,6 +116,10 @@ function mapper(wrapper, data, options) {
     }
   }); // set wrapper to inline-block
   // container.style('display', 'inline-block')
+
+  if (config.heatmap || config.comfortmap) {
+    svg.append("defs").append("filter").attr("id", "blur").attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%').append("feGaussianBlur").attr("stdDeviation", blurSize());
+  }
 
   var mapLayer = svg.selectAll('.map-layer').data([0]).enter().append('g').attr('class', 'map-layer');
   var imgLayer = mapLayer.append('g').attr('class', 'image-layer');
@@ -164,12 +175,14 @@ function mapper(wrapper, data, options) {
 
     img.onload = function () {
       var diff = {
-        h: maxHeight - img.height,
-        w: maxWidth - img.width
+        h: maxHeight() - img.height,
+        w: maxWidth() - img.width
       },
-          scale = diff.h < diff.w ? maxHeight / img.height : maxWidth / img.width,
-          canvasWidth = Math.min(img.width * scale, img.width),
-          canvasHeight = Math.min(img.height * scale, img.height);
+          isNegative = diff.h < 0 && diff.w < 0,
+          scale = !isNegative && diff.h < diff.w || isNegative && diff.h > diff.w ? maxHeight() / img.height : maxWidth() / img.width,
+          canvasWidth = Math.min(Math.min(img.width * scale, img.width), maxWidth()),
+          canvasHeight = Math.min(Math.min(img.height * scale, img.height), maxHeight());
+      console.log('getImageDim', img.width, img.height, diff, scale, canvasWidth, canvasHeight, maxWidth(), maxHeight());
       setSize(canvasWidth, canvasHeight);
       return cb && cb({
         height: img.height,
@@ -442,7 +455,7 @@ function mapper(wrapper, data, options) {
     var canEdit = config.edit && state.sensorMapping;
     sensorLayer.selectAll('.sensor').data(sensors).enter().append('circle').attr('class', 'sensor').attr('data-id', function (d) {
       return d.hid;
-    }).attr('r', sensorSize()).attr('stroke-width', config.heatmap || config.comfortmap ? null : 5).attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0)).style('fill', sensorColor(0)).style('cursor', function () {
+    }).attr('r', sensorSize()).attr('stroke-width', config.heatmap || config.comfortmap ? null : 5).attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0)).style('fill', sensorColor(0)).attr("filter", config.heatmap || config.comfortmap ? "url(#blur)" : null).style('cursor', function () {
       return canEdit ? 'move' : 'default';
     }).attr('cx', function (s) {
       var scale = parseFloat(offset.scale.toFixed(12));
@@ -451,6 +464,7 @@ function mapper(wrapper, data, options) {
       var scale = parseFloat(offset.scale.toFixed(12));
       return s.pos_y / s.scale * scale + offset.y;
     }).on('mouseover', function () {
+      if (config.comfortmap) return;
       var s_circle = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this),
           s = sensors.find(function (x) {
         return x.hid === s_circle.attr('data-id');
@@ -458,8 +472,10 @@ function mapper(wrapper, data, options) {
       tooltip.transition().duration(200).style('opacity', 0.95);
       setTooltip(d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetX + tooltipOffsetX, d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetY - tooltip.node().getBoundingClientRect().height / 2, "<div>ID: ".concat(s.sensor_id, "</div><div>Name: ").concat(s.name ? s.name : '(None)', "</div>"));
     }).on('mousemove', function () {
+      if (config.comfortmap) return;
       setTooltip(d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetX + tooltipOffsetX, d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetY - tooltip.node().getBoundingClientRect().height / 2);
     }).on('mouseout', function () {
+      if (config.comfortmap) return;
       tooltip.transition().duration(200).style('opacity', 0);
     }).on('click', function (s) {
       return canEdit && (sensorClick(s), d3__WEBPACK_IMPORTED_MODULE_0__["event"].stopPropagation());

@@ -39,7 +39,7 @@
             <router-view></router-view>
         </div>
         <footer class="app-footer">
-            &copy;{{ (new Date()).getYear() }} All Rights Reserved
+            &copy;{{ new Date().getFullYear() }} All Rights Reserved
             <span id="powered-by">Powered by Intuitive.works</span>
         </footer>
     </div>

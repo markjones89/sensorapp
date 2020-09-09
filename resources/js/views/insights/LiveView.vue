@@ -19,6 +19,7 @@
                         <filter-dropdown :filters="floorFilters" :show="showFilter" @onSelect="filterSelect" />
                     </span>
                     <a href="javascript:;" class="btn btn-primary ml-12" @click="toHeatMap">Heatmap</a>
+                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toComfortMap">Comfort Map</a>
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                     <span class="dot"></span>
@@ -213,7 +214,10 @@ export default {
             })
         },
         toHeatMap() {
-            this.$router.push({ name: 'heat-map' })
+            this.$router.push({ name: 'heat-map', query: { bid: this.bldg_id, fid: this.floor.hid } })
+        },
+        toComfortMap() {
+            this.$router.push({ name: 'comfort-map', query: { bid: this.bldg_id, fid: this.floor.hid } })
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
@@ -277,7 +281,8 @@ export default {
 
             this.stats.rooms_free = this.meetingRoomSensors.filter(s => s.sensor_state === 'available').length
             this.stats.rooms_occupied = Math.abs(this.meetingRoomSensors.length - this.stats.rooms_free)
-        }
+        },
+        windowResize() { this.mapper.redraw() }
     },
     created() {
         this.wsConnect()
@@ -286,10 +291,12 @@ export default {
         if (this.bldg_id) this.getBuilding(this.bldg_id)
 
         addEvent(window, 'beforeunload', this.windowUnload)
+        // addEvent(window, 'resize', this.windowResize)
     },
     destroyed() {
         this.wsClose('Page closed')
         removeEvent(window, 'beforeunload', this.windowUnload)
+        // removeEvent(window, 'resize', this.windowResize)
         clearInterval(this.sci_id)
     }
 }

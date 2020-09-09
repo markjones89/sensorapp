@@ -198,18 +198,19 @@ import { TwoPersonChairSvg } from '../../components/svg'
 import { roomComparer } from '../../components/graphs/RoomCompare'
 
 function randomNum(limit) {
-    return Math.floor(Math.random() * (limit || 100))
+    return Math.floor((Math.random() * (limit || 100)) + 1)
 }
 
 function randomData() {
-    return [
-        { average: randomNum(), peak: randomNum() },
-        { average: randomNum(), peak: randomNum() },
-        { average: randomNum(), peak: randomNum() },
-        { average: randomNum(), peak: randomNum() },
-        { average: randomNum(), peak: randomNum() },
-        { average: randomNum(), peak: randomNum() }
-    ]
+    let data = []
+
+    for (let i = 0; i < 6; i++) {
+        let avg = randomNum(90), peak = avg + randomNum(100 - avg)
+        
+        data.push({ average: avg, peak: peak })
+    }
+
+    return data
 }
 
 export default {
@@ -310,22 +311,8 @@ export default {
                 `% of time that rooms are above ${this.percentFilter} Capacity`,
                 '% of time rooms are at Peak Capacity'
             ],
-            left: [
-                { average: 60, peak: 70 },
-                { average: 20, peak: 0 },
-                { average: 0, peak: 2 },
-                { average: 60, peak: 100 },
-                { average: 0, peak: 20 },
-                { average: 40, peak: 0 }
-            ],
-            right: [
-                { average: 80, peak: 100 },
-                { average: 21, peak: 0 },
-                { average: 0, peak: 15 },
-                { average: 100, peak: 100 },
-                { average: 0, peak: 0 },
-                { average: 40, peak: 0 }
-            ]
+            left: randomData(),
+            right: randomData()
         }
         this.comparer = new roomComparer('#room-compare', data)
     }

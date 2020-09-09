@@ -8,18 +8,17 @@ import { extend } from '../helpers'
  * @param {Object} options Mapper configurations & callback functions
  */
 function mapper(wrapper, data, options) {
-    const container = d3.select(wrapper),
-        rect = container.node().getBoundingClientRect(),
-        parentRect = container.node().parentNode.getBoundingClientRect()
+    const container = d3.select(wrapper)//, parentRect = container.node().parentNode.getBoundingClientRect()
+    const config_defaults = { edit: false, heatmap: false, comfortmap: false }
 
-    const config_defaults = { edit: false }
+    let maxWidth = () => container.node().parentNode.getBoundingClientRect().width || 800, 
+        maxHeight = () => container.node().parentNode.getBoundingClientRect().height || 300
 
-    const maxWidth = rect.width || parentRect.width, maxHeight = rect.height || parentRect.height
-    let width = 800, height = 487
+    let width = 800, height = 300
     let floor = data,
         sensors = floor.sensors || [],
         areas = floor.areas || [],
-        config = extend(config_defaults, options),//{ edit: false },
+        config = extend(config_defaults, options),
         offset = { x: 0, y: 0, scale: 0 },
         tooltipOffsetX = 15,
         state = {
@@ -27,8 +26,16 @@ function mapper(wrapper, data, options) {
             areaMapping: false, showAreas: false,
             drawing: false, polyMoved: false
         },
-        drawPoints = []
-        // events = options.callbacks//{ sensorClick: null }
+        drawPoints = [],
+        size = 5
+    
+    let sensorSize = () => {
+        if (config.heatmap) return size * 3
+        if (config.comfortmap) return size * 7
+        return size
+    }
+
+    let blurSize = () => { return config.heatmap ? 7 : 15 }
 
     let xDMax = 50.0, yDMax = 33.79,
         x = d3.scaleLinear().domain([0, xDMax]).range([0, width]),
@@ -41,8 +48,6 @@ function mapper(wrapper, data, options) {
         sensorStroke = d3.scaleOrdinal()
             .domain([0, 1, 2])
             .range(['rgba(1,254,1,0.3)', 'rgba(255,134,0,0.3)', 'rgba(237,0,3,0.3)'])
-
-    console.log('colors', sensorColor(0), sensorStroke(0))
 
     container.selectAll('svg').remove() //clean up
     container.selectAll('.tooltip').remove()
@@ -89,6 +94,14 @@ function mapper(wrapper, data, options) {
 
     // set wrapper to inline-block
     // container.style('display', 'inline-block')
+    if (config.heatmap || config.comfortmap) {
+        svg.append("defs")
+            .append("filter")
+            .attr("id", "blur").attr('x', '-50%').attr('y', '-50%')
+            .attr('width', '200%').attr('height', '200%')
+            .append("feGaussianBlur")
+            .attr("stdDeviation", blurSize())
+    }
 
     const mapLayer = svg.selectAll('.map-layer').data([0])
         .enter().append('g').attr('class', 'map-layer')
@@ -161,10 +174,13 @@ function mapper(wrapper, data, options) {
 
         img.src = src
         img.onload = () => {
-            let diff = { h: maxHeight - img.height, w: maxWidth - img.width },
-                scale = diff.h < diff.w ? (maxHeight / img.height) : (maxWidth / img.width),
-                canvasWidth = Math.min(img.width * scale, img.width),
-                canvasHeight = Math.min(img.height * scale, img.height)
+            let diff = { h: maxHeight() - img.height, w: maxWidth() - img.width },
+                isNegative = diff.h < 0 && diff.w < 0,
+                scale = (!isNegative && diff.h < diff.w) || (isNegative && diff.h > diff.w) ? (maxHeight() / img.height) : (maxWidth() / img.width),
+                canvasWidth = Math.min(Math.min(img.width * scale, img.width), maxWidth()),
+                canvasHeight = Math.min(Math.min(img.height * scale, img.height), maxHeight())
+
+            console.log('getImageDim', img.width, img.height, diff, scale, canvasWidth, canvasHeight, maxWidth(), maxHeight())
 
             setSize(canvasWidth, canvasHeight)
 
@@ -204,30 +220,6 @@ function mapper(wrapper, data, options) {
         tooltip.style('left', `${x}px`)
                 .style('top', `${y}px`)
     }
-
-    // function floorClick() {
-    //     let t = mapLayer.__transform, evt = d3.event,
-    //         _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-    //         _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY
-
-    //     if ((t && t.z === 1) || !t) {
-    //         _x -= offset.x
-    //         _y -= offset.y
-    //     }
-
-    //     if (state.sensorMapping) {
-    //         return events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale })
-    //     } else if (state.areaMapping) {
-    //         let point = {
-    //             x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-    //             y: t ? (evt.offsetY - t.y) / t.k : evt.offsetY
-    //         },
-    //             drawLayer = areaLayer.select('g.area-draw')
-
-    //         if (drawLayer.empty()) startAreaDraw(point)
-    //         else addPoint(drawLayer, point)
-    //     }
-    // }
 
     /* area mapping functions */
     function startAreaDraw(point) {
@@ -505,10 +497,11 @@ function mapper(wrapper, data, options) {
             .enter()
             .append('circle')
             .attr('class', 'sensor').attr('data-id', d => d.hid)
-            .attr('r', '5')
-            .attr('stroke-width', 5)
-            .attr('stroke', sensorStroke(0))
+            .attr('r', sensorSize())
+            .attr('stroke-width', config.heatmap || config.comfortmap ? null : 5)
+            .attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0))
             .style('fill', sensorColor(0))
+            .attr("filter", config.heatmap || config.comfortmap ? "url(#blur)" : null)
             .style('cursor', function () { return canEdit ? 'move' : 'default' })
             .attr('cx', s => {
                 let scale = parseFloat(offset.scale.toFixed(12))
@@ -521,6 +514,7 @@ function mapper(wrapper, data, options) {
                 return ((s.pos_y / s.scale) * scale) + offset.y
             })
             .on('mouseover', function() {
+                if (config.comfortmap) return
                 let s_circle = d3.select(this),
                     s = sensors.find(x => x.hid === s_circle.attr('data-id'))
                 tooltip.transition().duration(200).style('opacity', 0.95)
@@ -530,10 +524,14 @@ function mapper(wrapper, data, options) {
                     `<div>ID: ${s.sensor_id}</div><div>Name: ${s.name ? s.name : '(None)'}</div>`)
             })
             .on('mousemove', function() {
+                if (config.comfortmap) return
                 setTooltip(d3.event.offsetX + tooltipOffsetX, 
                     d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2))
             })
-            .on('mouseout', function() { tooltip.transition().duration(200).style('opacity', 0) })
+            .on('mouseout', function() { 
+                if (config.comfortmap) return
+                tooltip.transition().duration(200).style('opacity', 0) 
+            })
             .on('click', s => canEdit && (sensorClick(s), d3.event.stopPropagation()))
             .call(d3.drag()
                 .on('drag', sensorDrag)

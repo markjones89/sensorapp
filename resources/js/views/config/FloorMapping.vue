@@ -25,7 +25,9 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div id="floor-map" class="floor-map"></div>
+                            <div class="floor-map">
+                                <div id="floor-map"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
