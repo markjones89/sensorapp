@@ -26,7 +26,9 @@
                         </div>
                         <div class="col">
                             <div class="floor-map">
-                                <div id="floor-map"></div>
+                                <div id="floor-map">
+                                    <loader :show="mapperLoading" type="spinner"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -148,6 +150,14 @@ $color: #FF5A09;
             margin: 5px 5px 20px;
         }
     }
+    .floor-map {
+        display: flex;
+        align-items: flex-start;
+
+        #floor-map {
+            position: relative;
+        }
+    }
 }
 </style>
 <script>
@@ -170,7 +180,7 @@ export default {
     components: { Loader, Modal, Switches },
     data() {
         return {
-            mapper: null,
+            mapper: null, mapperLoading: false,
             loaded: false, bldg: null, areaTypes: [], floors: [], floorAreas: [], 
             floorSel: null, editMapper: false, editArea: false, editSensor: false,
             showEntry: false, showAreaEntry: false, editMode: false,
@@ -269,6 +279,8 @@ export default {
             let _ = this
             _.mapper = new floorMapper('#floor-map', _.floor, {
                 events: {
+                    imgLoad: function() { _.mapperLoading = true },
+                    imgLoaded: function() { _.mapperLoading = false },
                     sensorAdd: function(data) {
                         _.triggerAdd(data.x, data.y, data.scale, data.area)
                     },

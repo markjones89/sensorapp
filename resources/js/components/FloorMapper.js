@@ -12,13 +12,14 @@ function mapper(wrapper, data, options) {
     const config_defaults = { edit: false, heatmap: false, comfortmap: false }
 
     let maxWidth = () => container.node().parentNode.getBoundingClientRect().width || 800, 
-        maxHeight = () => container.node().parentNode.getBoundingClientRect().height || 300
+        maxHeight = () => container.node().parentNode.getBoundingClientRect().height || 400
 
-    let width = 800, height = 300
+    let width = 800, height = 400
     let floor = data,
         sensors = floor.sensors || [],
         areas = floor.areas || [],
         config = extend(config_defaults, options),
+        events = config.events,
         offset = { x: 0, y: 0, scale: 0 },
         tooltipOffsetX = 15,
         state = {
@@ -79,8 +80,7 @@ function mapper(wrapper, data, options) {
             if (state.sensorMapping) {
                 let area = elem.tagName === 'polygon' ? d3.select(elem.parentNode).data()[0] : null
 
-                return config.events && config.events.sensorAdd && 
-                    config.events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale, area })
+                return events && events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale, area })
             } else if (state.areaMapping) {
                 let point = {
                     x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
@@ -172,17 +172,24 @@ function mapper(wrapper, data, options) {
     function getImageDim(src, cb) {
         let img = new Image()
 
+        if (events && events.imgLoad) events.imgLoad.call(this, src)
+
         img.src = src
         img.onload = () => {
-            let diff = { h: maxHeight() - img.height, w: maxWidth() - img.width },
-                isNegative = diff.h < 0 && diff.w < 0,
-                scale = (!isNegative && diff.h < diff.w) || (isNegative && diff.h > diff.w) ? (maxHeight() / img.height) : (maxWidth() / img.width),
-                canvasWidth = Math.min(Math.min(img.width * scale, img.width), maxWidth()),
-                canvasHeight = Math.min(Math.min(img.height * scale, img.height), maxHeight())
+            let //diff = { h: maxHeight() - img.height, w: maxWidth() - img.width },
+                // isNegative = diff.h < 0 && diff.w < 0,
+                // scale = (!isNegative && diff.h < diff.w) || (isNegative && diff.h > diff.w) ? (maxHeight() / img.height) : (maxWidth() / img.width),
+                // scale = (diff.h < diff.w) ? (maxHeight() / img.height) : (maxWidth() / img.width),
+                max_height = maxHeight(), max_width = maxWidth(),
+                scale = img.height > max_height ? (max_height / img.height) : (max_width / img.width),
+                canvasWidth = Math.min(Math.min(img.width * scale, img.width), max_width),
+                canvasHeight = Math.min(Math.min(img.height * scale, img.height), max_height)
 
-            console.log('getImageDim', img.width, img.height, diff, scale, canvasWidth, canvasHeight, maxWidth(), maxHeight())
+            // console.log('getImageDim', img.width, img.height, scale, canvasWidth, canvasHeight, max_width, max_height)
 
             setSize(canvasWidth, canvasHeight)
+
+            if (events && events.imgLoaded) events.imgLoaded.call(this, img)
 
             return cb && cb({ height: img.height, width: img.width })
         }
@@ -336,7 +343,7 @@ function mapper(wrapper, data, options) {
             )
     }
 
-    function polyClick(a) { return config.events && config.events.areaClick && config.events.areaClick.call(_, a)  }
+    function polyClick(a) { return events && events.areaClick && events.areaClick.call(_, a)  }
 
     function polyDrag() {
         if (config.edit && state.areaMapping) {
@@ -379,8 +386,7 @@ function mapper(wrapper, data, options) {
 
             let polyPoints = toPolyPoints(newPoints)
 
-            return config.events && config.events.areaPtUpdate && 
-                config.events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
+            return events && events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
         }
     }
 
@@ -417,8 +423,7 @@ function mapper(wrapper, data, options) {
 
         let polyPoints = toPolyPoints(newPoints)
 
-        return config.events && config.events.areaPtUpdate && 
-            config.events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
+        return events && events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
     }
 
     function endAreaDraw() {
@@ -430,13 +435,12 @@ function mapper(wrapper, data, options) {
         drawPoints.splice(0)
         state.drawing = false
 
-        return config.events && config.events.addArea && 
-            config.events.addArea.call(_, polyPoints, offset.scale)
+        return events && events.addArea && events.addArea.call(_, polyPoints, offset.scale)
     }
     /* end area mapping functions */
 
     /* sensor functions */
-    function sensorClick(s) { return config.events && config.events.sensorClick && config.events.sensorClick.call(_, s) }
+    function sensorClick(s) { return events && events.sensorClick && events.sensorClick.call(_, s) }
 
     function sensorDrag(s) {
         if (config.edit && state.sensorMapping) {
@@ -453,8 +457,7 @@ function mapper(wrapper, data, options) {
             s.pos_x -= offset.x
             s.pos_y -= offset.y
             s.scale = offset.scale
-            return config.events && config.events.sensorMoved && 
-                config.events.sensorMoved.call(_, s)
+            return events && events.sensorMoved && events.sensorMoved.call(_, s)
         }
     }
     /* end sensor functions */
@@ -586,15 +589,19 @@ function mapper(wrapper, data, options) {
         if (fresh) {
             mapLayer.__transform = null
             mapLayer.call(zoom.transform, d3.zoomIdentity)
-        }
 
-        this.clearDrawing()
-
-        calcOffsets(() => {
+            calcOffsets(() => {
+                this.drawFloorPlan()
+                this.drawAreas()
+                this.drawSensors()
+            })
+        } else {
             this.drawFloorPlan()
             this.drawAreas()
             this.drawSensors()
-        })
+        }
+
+        this.clearDrawing()
     }
 
     /**
