@@ -43,7 +43,7 @@
                 <div class="col-md-4" id="stats-wrapper">
                     <div id="chart-stats">
                         <span class="chart-stat">
-                            <span @click="toCostAnalysis">Cost of Unutilised Spaces</span><span class="stat-figure" @click="toCostAnalysis">$23.5M</span>
+                            <span @click="toCostAnalysis">Opportunity Cost</span><span class="stat-figure" @click="toCostAnalysis">$23.5M</span>
                         </span>
                         <span class="chart-stat">
                             <span @click="toPeak">Peak Workspace Utilisation</span><span class="stat-figure" @click="toPeak">65%</span>

@@ -78,6 +78,7 @@ export default {
         return {
             user: null,
             showPageOpts: false, showEmbed: false,
+            timeGraph: null,
             timeFilter: {
                 start: null, end: null
             }
@@ -111,12 +112,18 @@ export default {
         this.user = store.getUser()
     },
     mounted() {
-        timeGraph('#time-chart', `${this.baseUrl}/data/time-chart-data.json`, false, {
-            toPeakChart: (data) => {
-                console.log('toPeakChart', data)
-                this.$router.push({ name: 'peak' })
+        this.timeGraph = new timeGraph('#time-chart', `${this.baseUrl}/data/time-chart-data.json`, {
+            widget: false,
+            events: {
+                toPeakChart: (data) => {
+                    console.log('toPeakChart', data)
+                    this.$router.push({ name: 'peak' })
+                }
             }
         })
+    },
+    destroyed() {
+        this.timeGraph.destroy()
     }
 }
 </script>

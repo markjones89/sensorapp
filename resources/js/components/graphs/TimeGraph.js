@@ -1,28 +1,28 @@
 import * as d3 from 'd3'
+import { extend } from '../../helpers'
 
-export function timeGraph(chart, dataUrl, isWidget, callbacks) {
-
+export function timeGraph(chart, dataUrl, options) {
     const container = d3.select(chart)
+    const default_config = {
+        widget: false
+    }
+    let config = extend(true, default_config, options),
+        events = config.events
 
-    var VEL_INTERFAZ = 600,
-        isOuterRadio = 0,
-        demanda,
-        consumoMaximo,
-        consumoMinimo,
-        consumoMedio,
+    var isOuterRadio = 0,
         // canvasWidth = 960,
-        canvasWidth = container.node().getBoundingClientRect().width - (isWidget ? 0 : 17),
+        canvasWidth = container.node().getBoundingClientRect().width - (config.widget ? 0 : 17),
         // canvasHeight = 600,
         canvasHeight = container.node().getBoundingClientRect().height || 600,
         centerX = canvasWidth * .4,
         centerY = canvasHeight / 2,
         // radio = 250,
-        radio = canvasHeight / 3,
-        radioHours = radio + 12,
-        formulaRadioDesglose = (radio * .75) * 2,
+        radius = canvasHeight / 2.5,
+        radiusHours = radius + 12,
+        formulaRadiusBreakdown = (radius * .75) * 2,
         lastJsonData;
 
-    //SUMA LOS ELEMENTOS DEL ARRAY
+    //ADD THE ELEMENTS OF THE ARRAY
     Array.prototype.sum = function(ignoraNegativos) {
         var sum = 0,
             ln = this.length,
@@ -42,32 +42,28 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
         return sum;
     }
 
-    function grados_a_radianes(grados) {
+    function degrees_to_radians(degrees) { return Math.PI / 180 * degrees }
 
-        return Math.PI / 180 * grados;
-    }
-
-    function rd3(maxi, dato, medida) {
-        // la variable medida es la que marca. 180 es un hemiciclo, 360 es un circulo completo
-        var mx = +maxi,
-            med = (medida) ? medida : 100;
-        return (dato * med) / mx;
-    }
+    // function rd3(maxi, dato, medida) {
+    //     // the measured variable is the one that marks. 180 is a hemicycle, 360 is a full circle
+    //     var mx = +maxi,
+    //         med = (medida) ? medida : 100;
+    //     return (dato * med) / mx;
+    // }
 
     function calcArrayPercents(arr) {
-
         var sum = arr.sum(),
-            parciales = [],
+            partial = [],
             ln = arr.length,
             calc,
             i;
 
         for (i = 0; i < ln; i++) {
             calc = (arr[i] * 100) / sum;
-            parciales.push(calc >= 0 ? calc : 0);
+            partial.push(calc >= 0 ? calc : 0);
         }
 
-        return parciales;
+        return partial;
     }
 
     var en_US = {
@@ -88,147 +84,16 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
         iso = d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ"),
         tooltipDateFormat = ENUS.format("%A %d, %H:%M")
 
-    var tablaIdsOrdenados = ['eol', 'hid', 'sol', 'aut', 'gf', 'nuc', 'car', 'cc'],
-        tablaIdsInfo = {
-            'eol': {
-                'id': 'eol',
-                'nombre': 'Wind',
-                'nombreAbrev': 'Wind',
-                'color': '7EAADD',
-                'highlightColor': 'c6d1dd',
-                'icon': '\\e82b',
-            },
-            'hid': {
-                'id': 'hid',
-                'nombre': 'Hydroelectric',
-                'nombreAbrev': 'Hydroelectric',
-                'color': '33537A',
-                'highlightColor': '446fa4',
-                'icon': '\\e82d'
-            },
-            'sol': {
-                'id': 'sol',
-                'nombre': 'Solar/Solar Thermal',
-                'nombreAbrev': 'Solar/S.Thermal',
-                'color': 'F5A623',
-                'highlightColor': 'f5cc89',
-                'icon': '\\e82c'
-            },
-            'aut': {
-                'id': 'aut',
-                'nombre': 'Special Scheme',
-                'nombreAbrev': 'Special S.',
-                'color': '9B9B9B',
-                'highlightColor': 'bdbdbd',
-                'icon': '\\e800'
-            },
-            'gf': {
-                'id': 'gf',
-                'nombre': 'Gas + Fuel',
-                'nombreAbrev': 'Gas+Fuel',
-                'color': '6F93A4',
-                'highlightColor': '96C6DD',
-                'icon': '\\e806'
-            },
-            'nuc': {
-                'id': 'nuc',
-                'nombre': 'Nuclear',
-                'nombreAbrev': 'Nuclear',
-                'color': 'BD10E0',
-                'highlightColor': 'd712ff',
-                'icon': '\\e807'
-            },
-            'car': {
-                'id': 'car',
-                'nombre': 'Coal',
-                'nombreAbrev': 'Coal',
-                'color': '583636',
-                'highlightColor': '795d5d',
-                'icon': '\\e805'
-            },
-            'cc': {
-                'id': 'cc',
-                'nombre': 'Combined Cycle',
-                'nombreAbrev': 'Combined C.',
-                'color': '3D4163',
-                'highlightColor': '686fa9',
-                'icon': '\\e804'
-            }
-        },
-        tablaIdsConsumos = {
-            'eol': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'hid': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'sol': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'aut': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'gf': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'nuc': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'car': {
-                'med24h': 0,
-                'percent24h': []
-            },
-            'cc': {
-                'med24h': 0,
-                'percent24h': []
-            }
-        },
-        tablaEmisiones = {
-            "icb": 0,
-            "inter": 0,
-            "car": 0.95,
-            "aut": 0.27,
-            "sol": 0,
-            "cc": 0.37,
-            "hid": 0,
-            "gf": 0.7,
-            "nuc": 0,
-            "eol": 0
-        },
-        parametrosUsados = {
-            'dem': true,
-            'icb': true,
-            'inter': true,
-            'car': true,
-            'aut': true,
-            'sol': true,
-            'cc': true,
-            'hid': true,
-            'gf': true,
-            'nuc': true,
-            'eol': true,
-            'ts': true
-        },
-        energiasMostradas = {
-            'icb': true,
-            'inter': true,
-            'car': true,
-            'aut': true,
-            'sol': true,
-            'cc': true,
-            'hid': true,
-            'gf': true,
-            'nuc': true,
-            'eol': true
-        };
+    var dataKeys = ['wfhp', 'cs', 'pwu', 'pmru', 'pmre'],
+        dataKeysInfo = {
+            wfhp: { id: 'wfhp', name: 'Work from home peak', color: '7EAADD', highlightColor: 'c6d1dd' },
+            cs: { id: 'cs', name: 'Cost Saving', color: '33537A', highlightColor: '446fa4' },
+            pwu: { id: 'pwu', name: 'Peak Workspace Utilisation', color: 'F5A623', highlightColor: 'f5cc89' },
+            pmru: { id: 'pmru', name: 'Peak Meeting Room Utilisation', color: '8F31AE', highlightColor: 'b662d2' },
+            pmre: { id: 'pmre', name: 'Peak Meeting Room Efficiency', color: '3D3F56', highlightColor: '6a6d95' }
+        }
 
-    //DIBUJO BASE 
+    //BASE DRAWING
     var svg = container.append('svg')
         .attr('class', 'time-chart')
         .attr('width', canvasWidth)
@@ -248,30 +113,21 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
         .attr('type', 'linear')
         .attr('slope', '1.25')
 
-    //.style("filter", "url(#brightness)")  
-    // background
-    /* svg.append('rect')
-        .attr('id', 'bg')
-        .attr('x', 0).attr('y', 0)
-        .attr('width', canvasWidth).attr('height', canvasHeight)
-        .attr('fill', '#2f2f2f') */
-
-    svg.append('g').attr('id', 'base');
 
     svg.append('circle')
         .attr('id', 'circleBG')
-        .attr('r', radio)
+        .attr('r', radius)
         .attr('cx', centerX)
         .attr('cy', centerY)
-        .attr('fill', '#222222');
+        .attr('fill', 'rgb(57,57,57)');
 
-    // CREO LOS HOST PARA LOS 'RADIOS'
-    svg.append('g').attr('id', 'horas');
+    // CREATE THE HOST FOR THE 'RADIUS'
+    svg.append('g').attr('id', 'hours');
 
     var hostRads = svg.append('g').attr('id', 'hostRads'),
-        groupCircle = svg.append('g').attr('id', 'consumo'),
+        groupCircle = svg.append('g').attr('id', 'circle'),
         consumoCircle = groupCircle.append('circle')
-        .attr('r', radio)
+        .attr('r', radius)
         .attr('cx', centerX)
         .attr('cy', centerY)
         .attr('stroke', '#990000')
@@ -280,188 +136,135 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
         .attr('stroke-width', 2)
         .attr('stroke-opacity', 0);
 
-    var groupConsumo = svg.append('g').attr('id', 'consumo-dot'),
-        consumoDot = groupConsumo.append('circle')
+    var currTimeDot = svg.append('g').attr('id', 'curr-time-dot'),
+        timeDot = currTimeDot.append('circle')
         .attr('r', 5)
         .attr('cx', -9999)
         .attr('cy', -9999)
         .attr('stroke', 'none')
         .attr('fill', '#900')
 
-    var grupoHoras = d3.select("svg #horas")
+    var hoursGroup = d3.select("svg #hours")
         .attr('transform', 'translate(' + centerX + ',' + centerY + ')');
 
-    // PASAR MINUTOS 24*60 
-    var horaRotation = d3.scaleLinear()
+    // SPEND MINUTES 24 * 60
+    var hourRotation = d3.scaleLinear()
         .domain([0, 24 * 60])
         .range([0, 360]);
 
-    var hoy = new Date();
-    var currentHourRotation = horaRotation((60 * hoy.getHours()) + hoy.getMinutes());
+    var currDate = new Date();
+    var currentHourRotation = hourRotation((60 * currDate.getHours()) + currDate.getMinutes());
 
     var circleHour = svg.append('circle')
         .attr('id', 'circleHour')
         .attr('r', 3)
-        .attr('cx', centerX + (radio + 12) * Math.sin(grados_a_radianes(180 + 360 - currentHourRotation)))
-        .attr('cy', centerY + (radio + 12) * Math.cos(grados_a_radianes(180 + 360 - currentHourRotation)))
+        .attr('cx', centerX + (radius + 12) * Math.sin(degrees_to_radians(180 + 360 - currentHourRotation)))
+        .attr('cy', centerY + (radius + 12) * Math.cos(degrees_to_radians(180 + 360 - currentHourRotation)))
         .attr('stroke-width', '2')
         .attr('stroke', '#BCD5D5')
         .attr('fill', '#BCD5D5');
 
     var clockTimer = setInterval(function() {
-
         var date = new Date(),
-            currentHourRotation = horaRotation((60 * date.getHours()) + date.getMinutes()),
-            calc = grados_a_radianes(180 + 360 - currentHourRotation);
+            currentHourRotation = hourRotation((60 * date.getHours()) + date.getMinutes()),
+            calc = degrees_to_radians(180 + 360 - currentHourRotation);
 
         circleHour.transition()
-            .attr('cx', centerX + radioHours * Math.sin(calc))
-            .attr('cy', centerY + radioHours * Math.cos(calc))
+            .attr('cx', centerX + radiusHours * Math.sin(calc))
+            .attr('cy', centerY + radiusHours * Math.cos(calc))
             .attr('r', function() {
                 return ((circleHour.attr('r') != 3) ? 3 : 1);
             });
     }, 1000);
 
-    // DIBUJO LAS 24 HORAS
+    // 24 HOUR DRAWING
     var rotation,
         n,
         lnHoras = 24;
 
     for (n = 0; n < lnHoras; n++) {
         rotation = 180 - (360 / lnHoras) * n;
-        grupoHoras.append('text')
+        hoursGroup.append('text')
             .text(((n > 9) ? n : "0" + n) + ':00')
-            .attr('x', (radio + 33) * Math.sin(grados_a_radianes(rotation)))
-            .attr('y', (radio + 33) * Math.cos(grados_a_radianes(rotation)) + 7)
+            .attr('x', (radius + 33) * Math.sin(degrees_to_radians(rotation)))
+            .attr('y', (radius + 33) * Math.cos(degrees_to_radians(rotation)) + 7)
             .attr('text-anchor', 'middle')
-            .style('font-size', '14')
-            // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
+            .style('font-size', '14').style('font-weight', 'bold')
             .style('fill', '#666')
     }
 
-    // PINTO EL DESGLOSE
-    var desglose = svg.append('g')
-        .attr('id', 'desglose_grupo')
-        .attr('transform', 'translate(' + (centerX + radio + 100) + ',' + (centerY - (radio * .75)) + ')')
+    // PAINT THE BREAKDOWN
+    var breakdown = svg.append('g')
+        .attr('id', 'breakdown_group')
+        .attr('transform', 'translate(' + (centerX + radius + 100) + ',' + (centerY - (radius * .75)) + ')')
         .attr('opacity', 0);
 
-    desglose.append('rect')
-        .attr('y', formulaRadioDesglose + 20)
+    breakdown.append('rect')
+        .attr('y', formulaRadiusBreakdown + 20)
         .attr('width', 165)
         .attr('height', 3)
         .attr('fill', '#3C3C3C');
 
-    var fechaBloque = desglose.append('text')
+    var dateBlock = breakdown.append('text')
             .text("hoy")
-            .attr('y', formulaRadioDesglose + 39)
+            .attr('y', formulaRadiusBreakdown + 39)
             .attr('text-anchor', 'start')
             .style('font-size', '14')
-            // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
             .attr('fill', '#666'),
-        horaBloque = desglose.append('text')
+        hourBlock = breakdown.append('text')
             .text("21:00h")
-            .attr('y', formulaRadioDesglose + 62)
+            .attr('y', formulaRadiusBreakdown + 62)
             .attr('text-anchor', 'start')
             .style('font-size', '27')
-            // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
-            .attr('fill', '#666'),
-        desgloseBloqueRenovable = desglose.append('g'),
-        altoRenovables = desgloseBloqueRenovable.append('rect')
-            .attr('x', -8)
-            .attr('width', 2)
-            .attr('height', 200)
-            .attr('fill', '#669C83'),
-        textoRenovables = desgloseBloqueRenovable.append('text')
-            .text("--")
-            .attr('text-anchor', 'middle')
-            .style('font-size', '13')
-            // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
-            .attr('fill', '#669C83')
-            .attr('x', -100)
-            .attr('y', -12)
-            .attr('transform', 'rotate(-90)')
+            .attr('fill', '#666')
 
-    // PINTO EL TOOLTIP
+    // PAINT THE TOOLTIP
     var tooltipWidth = 120,
-        tooltipHeight = 28,
+        tooltipHeight = 32,
         currentTooltipFormat,
-        tooltip = svg.append('g').attr('id', 'dem-tooltip').attr('opacity', 0),
-        tooltip_shadow = tooltip.append('rect')
-            .attr('width', tooltipWidth + 4)
-            .attr('height', tooltipHeight + 4)
-            .attr('rx', 10)
-            .attr('fill', 'black').attr('fill-opacity', .15),
+        tooltip = svg.append('g').attr('id', 'data-tooltip').attr('opacity', 0),
+        // tooltip_shadow = tooltip.append('rect')
+        //     .attr('width', tooltipWidth + 4)
+        //     .attr('height', tooltipHeight + 4)
+        //     .attr('rx', 5)
+        //     .attr('fill', 'black').attr('fill-opacity', .15),
         tooltip_rect = tooltip.append('rect')
             .attr('width', tooltipWidth)
             .attr('height', tooltipHeight)
-            .attr('rx', 10),
-        tooltip_fecha = tooltip.append('text')
+            .attr('rx', 5),
+        tooltip_date = tooltip.append('text')
             .attr('id', 'fecha')
             .attr('x', 5)
             .attr('y', 11)
             .attr('text-anchor', 'start')
             .style('font-size', '11')
-            // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
-            .style('fill', 'black')
+            .style('fill', 'white')
             .style('fill-opacity', .75),
-        tooltip_mw = tooltip.append('text')
+        tooltip_val = tooltip.append('text')
             .text('')
             .attr('x', 15)
             .attr('y', 24)
             .style('font-size', '13')
-            // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
             .style('fill', 'white');
 
     function setTooltip(name) {
-        if (name == 'fmt_0_0') {
-            tooltip_shadow.attr('x', -(tooltipWidth + 2))
-                .attr('y', -(tooltipHeight + 2))
+        let //shadowX = name == 'fmt_0_0' || name == 'fmt_0_1' ? -(tooltipWidth + 2) : -2, 
+            //shadowY = name == 'fmt_0_0' || name == 'fmt_1_0' ? -(tooltipHeight + 2) : -2,
+            rectX = name == 'fmt_0_0' || name == 'fmt_0_1' ? -tooltipWidth : 0, 
+            rectY = name == 'fmt_0_0' || name == 'fmt_1_0' ? -tooltipHeight : 0,
+            dateX = name == 'fmt_0_0' || name == 'fmt_0_1' ? -6 : 6,
+            dateY = name == 'fmt_0_0' || name == 'fmt_1_0' ? -18 : 13, 
+            dateTextAnchor = name == 'fmt_0_0' || name == 'fmt_0_1' ? 'end' : 'start',
+            valX = name == 'fmt_0_0' || name == 'fmt_0_1' ? -6 : 6,
+            valY = name == 'fmt_0_0' || name == 'fmt_1_0' ? -6 : 26, 
+            valTextAnchor = name == 'fmt_0_0' || name == 'fmt_0_1' ? 'end' : 'start';
 
-            tooltip_rect.attr('x', -tooltipWidth)
-                .attr('y', -tooltipHeight)
-
-            tooltip_fecha.attr('x', -4).attr('y', -16)
-                .attr('text-anchor', 'end')
-
-            tooltip_mw.attr('x', -4).attr('y', -4)
-                .attr('text-anchor', 'end')
-        }
-
-        if (name == 'fmt_1_0') {
-            tooltip_shadow.attr('x', -2).attr('y', -(tooltipHeight + 2))
-
-            tooltip_rect.attr('x', 0).attr('y', -tooltipHeight)
-
-            tooltip_fecha.attr('x', 5).attr('y', -16)
-                .attr('text-anchor', 'start')
-
-            tooltip_mw.attr('x', 5).attr('y', -4)
-                .attr('text-anchor', 'start')
-        }
-
-        if (name == 'fmt_1_1') {
-            tooltip_shadow.attr('x', -2).attr('y', -2)
-
-            tooltip_rect.attr('x', 0).attr('y', 0)
-
-            tooltip_fecha.attr('x', 5).attr('y', 11)
-                .attr('text-anchor', 'start')
-
-            tooltip_mw.attr('x', 5).attr('y', 24)
-                .attr('text-anchor', 'start')
-        }
-
-        if (name == 'fmt_0_1') {
-            tooltip_shadow.attr('x', -(tooltipWidth + 2)).attr('y', -2)
-
-            tooltip_rect.attr('x', -tooltipWidth).attr('y', 0)
-
-            tooltip_fecha.attr('x', -4).attr('y', 11)
-                .attr('text-anchor', 'end')
-
-            tooltip_mw.attr('x', -4).attr('y', 24)
-                .attr('text-anchor', 'end')
-        }
+        // tooltip_shadow.attr('x', shadowX).attr('y', shadowY)
+        tooltip_rect.attr('x', rectX).attr('y', rectY)
+        tooltip_date.attr('x', dateX).attr('y', dateY)
+            .attr('text-anchor', dateTextAnchor)
+        tooltip_val.attr('x', valX).attr('y', valY)
+            .attr('text-anchor', valTextAnchor)
     }
 
     function mousemove(d, i) {
@@ -485,12 +288,12 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
             currentTooltipFormat = tooltipFmtName;
         }
 
-        if (isOuterRadio != +(sqrt <= radio)) {
+        if (isOuterRadio != +(sqrt <= radius)) {
 
-            isOuterRadio = +(sqrt <= radio);
+            isOuterRadio = +(sqrt <= radius);
 
             groupCircle.transition().duration(100).style('opacity', isOuterRadio);
-            groupConsumo.transition().duration(100).style('opacity', isOuterRadio);
+            currTimeDot.transition().duration(100).style('opacity', isOuterRadio);
             tooltip.transition().duration(100).style('opacity', isOuterRadio);
 
             if (!isOuterRadio) {
@@ -503,24 +306,18 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
 
     svg.on('mousemove', mousemove)
 
-    function demFn(d) { return +d.dem }
+    var //sizes = d3.scaleLinear().range([10, 24]),
+        opacityScale = d3.scaleLinear().range([.4, 1]),
+        colorDemand = d3.scaleLinear().range(['#996A00', '#990000'])
+            .domain([0, 100]);
 
-    function idFn(d) { return d.id }
-
-    var sizes = d3.scaleLinear()
-        .range([10, 24]),
-        opacityScale = d3.scaleLinear()
-        .range([.4, 1]),
-        colorDemand = d3.scaleLinear()
-        .range(['#996A00', '#990000']);
-
-    // ESTA ESCALA ME PERMITE ESTABLECER EL MÁXIMO Y MÍNIMO CONSUMO EN FUNCIÓN DE LA DEMANDA
-    // Y VARIAR EL MÁXIMO PORCENTAJE DE RADIO
-    var scaleRadius = d3.scaleLinear()
-        .range([0, radio]);
+    // THIS SCALE ALLOWS ME TO ESTABLISH THE MAXIMUM AND MINIMUM CONSUMPTION DEPENDING ON DEMAND
+    // AND VARY THE MAXIMUM RADIO PERCENTAGE
+    var scaleRadius = d3.scaleLinear().range([0, radius])
+        .domain([0, 100]);
 
     var dispatch = d3.dispatch("mouseenter");
-    dispatch.on("mouseenter", debounce(pintaDesglose, 125))
+    dispatch.on("mouseenter", debounce(drawBreakdown, 125))
 
     //http://davidwalsh.name/javascript-debounce-function
     // Returns a function, that, as long as it continues to be invoked, will not
@@ -547,96 +344,82 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
         };
     };
 
-    function pintaDesglose(datos) {
-        // CALCULAMOS LA SUMA DE LAS DIFERENTES ENERGÍAS PROVEEDORAS
-        var generadoras = [datos.eol, datos.hid, datos.sol, datos.aut, datos.gf, datos.nuc, datos.car, datos.cc],
-            porcentajesDemanda = calcArrayPercents(generadoras),
-            demandaHora = generadoras.sum(true);
+    function drawBreakdown(data) {
+        // WE CALCULATE THE SUM OF THE DIFFERENT SUPPLYING ENERGIES
+        var generators = dataKeys.map(key => data[key]),
+            demandPercentages = calcArrayPercents(generators),
+            demandTime = generators.sum(true);
 
-        var acumuladoInner = 0,
-            grosorGeneradora = 0,
-            ln = porcentajesDemanda.length,
-            tsDate = iso(datos.ts),
-            h = tsDate.getHours(),
-            m = tsDate.getMinutes(),
-            ecoPercent = rd3(demandaHora, [datos.eol, datos.hid, datos.sol].sum(true)),
+        var accumulatorInner = 0,
+            generatorThickness = 0,
+            tsDate = iso(data.ts),
             path,
             i;
 
-        desglose.attr('opacity', 1)
+        breakdown.attr('opacity', 1)
 
-        textoRenovables.text("Renewable " + d3.format(",.2f")(ecoPercent) + "% ")
-            .transition()
-            .attr('x', -(formulaRadioDesglose / 100 * ecoPercent) / 2)
+        dateBlock.text(ENUS.format("%A %d")(tsDate))
 
-        altoRenovables
-            .transition()
-            .attr('height', (formulaRadioDesglose / 100 * ecoPercent))
-
-        fechaBloque
-            .text(ENUS.format("%A %d")(tsDate))
-
-        horaBloque
-            .text(ENUS.format("%H:%M")(tsDate) + "h")
+        hourBlock.text(ENUS.format("%H:%M")(tsDate) + "h")
 
         var scaleDesglose = d3.scaleLinear()
-            .range([0, formulaRadioDesglose]),
+            .range([0, formulaRadiusBreakdown]),
             tabla = [];
 
-        for (i = 0; i < tablaIdsOrdenados.length; i++) {
+        for (i = 0; i < dataKeys.length; i++) {
             tabla[i] = {
-                id: tablaIdsOrdenados[i],
-                datos: datos[tablaIdsOrdenados[i]]
+                id: dataKeys[i],
+                data: data[dataKeys[i]]
             };
         }
 
-        var bloques = desglose.selectAll('.j-bloque')
+        var blocks = breakdown.selectAll('.j-block')
             .data(tabla, function(d, i) { return d.id })
 
-        bloques.enter()
+        blocks.enter()
             .append('g')
             .attr('id', function(d, i) { return "des_" + d.id })
-            .attr('class', 'j-bloque')
+            .attr('class', 'j-block')
             .each(function() {
                 var that = d3.select(this);
 
                 that.append('rect')
                     .attr('width', 6)
                     .attr('height', 10).style('cursor', 'pointer')
-                    .attr('fill', function(d) { return '#' + tablaIdsInfo[d.id].color })
-                    .on('click', d => callbacks && (callbacks.toPeakChart.call(this, d), d3.event.stopPropagation()));
+                    .attr('fill', function(d) { return '#' + dataKeysInfo[d.id].color })
+                    .on('click', d => events && (events.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('text')
-                    .text(d => tablaIdsInfo[d.id].id)
-                    .attr('class', 'j-nombre')
+                    .text(d => dataKeysInfo[d.id].id)
+                    .attr('class', 'j-name')
                     .attr('x', 30)
                     .attr('y', 20)
                     .attr('text-anchor', 'start')
                     .style('font-size', '13').style('cursor', 'pointer')
                     // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
                     .style('fill', '#B3B3B3')
-                    .style('fill', function(d) { return '#' + tablaIdsInfo[d.id].highlightColor })
+                    .style('fill', function(d) { return '#' + dataKeysInfo[d.id].highlightColor })
                     .attr('transform', 'rotate(-45)')
-                    .on('click', d => callbacks && (callbacks.toPeakChart.call(this, d), d3.event.stopPropagation()));
+                    .on('click', d => events && (events.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('text')
-                    .text(d => tablaIdsInfo[d.id].id)
-                    .attr('class', 'j-MW')
+                    .text(d => dataKeysInfo[d.id].id)
+                    .attr('class', 'j-data')
                     .attr('x', 30)
                     .attr('y', 32)
                     .attr('text-anchor', 'start')
                     .style('font-size', '12').style('cursor', 'pointer')
                     // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
                     .style('fill', '#B3B3B3')
-                    .style('fill', function(d) { return '#' + tablaIdsInfo[d.id].highlightColor })
+                    .style('fill', function(d) { return '#' + dataKeysInfo[d.id].highlightColor })
                     .attr('transform', 'rotate(-45)')
-                    .on('click', d => callbacks && (callbacks.toPeakChart.call(this, d), d3.event.stopPropagation()));
+                    .on('click', d => events && (events.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('path')
                     .style('fill', 'none')
                     .style('stroke-width', '1')
                     .style('stroke', function(d) {
-                        return '#' + tablaIdsInfo[d.id].color;
+                        return '#' + dataKeysInfo[d.id].color;
                     })
             }).attr('transform', function(d, i) {
                 return 'translate(0,' + (50 * i) + ')'
@@ -648,34 +431,37 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
             minPercentStep = 8;
 
         // UPDATE
-        bloques.each(function(d, i) {
-            if (porcentajesDemanda[i - 1] < minPercentStep) {
+        blocks.each(function(d, i) {
+            if (demandPercentages[i - 1] < minPercentStep) {
                 colisionCounter++;
             }
 
             safeStepCalc = safeStep * colisionCounter;
-            grosorGeneradora = porcentajesDemanda[i] / 100 * formulaRadioDesglose;
+            generatorThickness = demandPercentages[i] / 100 * formulaRadiusBreakdown;
 
             var that = d3.select(this)
                 .transition()
-                .attr('transform', 'translate(0,' + acumuladoInner + ')')
+                .attr('transform', 'translate(0,' + accumulatorInner + ')')
                 .each(function() {
                     var that = d3.select(this);
                     that.select('rect')
                         .transition()
-                        .attr('height', grosorGeneradora);
+                        .attr('height', generatorThickness);
 
-                    that.select('.j-nombre')
+                    that.select('.j-name')
                         .text(function(d) {
-                            return tablaIdsInfo[d.id].nombreAbrev + " ";
+                            // return tablaIdsInfo[d.id].nombreAbrev + " ";
+                            return dataKeysInfo[d.id].name + " "
                         })
                         .transition()
                         .attr('transform', 'translate(' + safeStepCalc + ',' + 0 + ') ' + 'rotate(-45 0 0) ');
 
-                    that.select('.j-MW')
-                        .text(function(d) {
-                            return d3.format(",.2f")(porcentajesDemanda[i]) + "% " + d3.format(",")(d.datos) + "MW ";
-                        })
+                    that.select('.j-data')
+                        // .text(function(d) {
+                        //     return d3.format(",.2f")(demandPercentages[i]) + "% " + d3.format(",")(d.data) + "MW ";
+                        // })
+                        // .text(d => `${d3.format(',')(d.data)}%`)
+                        .text(d => `${d.data}%`)
                         .transition()
                         .attr('transform', 'translate(' + safeStepCalc + ',' + 0 + ') ' + 'rotate(-45 0 0) ');
 
@@ -684,90 +470,55 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
                         .attr('d', 'M6,1 H' + Math.floor(31 + safeStepCalc) + " l3,-3")
 
                 })
-            acumuladoInner += grosorGeneradora;
+            accumulatorInner += generatorThickness;
         })
     }
 
     function getData(path) {
-
         d3.json(path).then(function(data) {
 
-            // LIMPIO LOS DATOS DEL JSON NO UTILIZADOS
-            var datosJson = data.map(function(obj) {
-                // REMAPEO EL OBJETO PARA ELIMINAR ALGUNOS DATOS NO UTILIZADOS DEL JSON
-                var tmpObj = {},
-                    key;
+            let jsonData = data.map(d => {
+                // total percentages
+                let toAvg = []
+                // d.tp = 0
 
-                for (key in obj) {
-                    if (parametrosUsados[key]) {
-                        tmpObj[key] = obj[key];
+                for (var key in d) {
+                    if (dataKeys.indexOf(key) >= 0) {
+                        // d.tp += d[key]
+                        toAvg.push(d[key])
                     }
                 }
+                d.combined = d3.mean(toAvg)
 
-                return tmpObj;
-            });
-
-            datosJson.reverse();
-
-            var maxDemand = d3.max(datosJson, demFn),
-                minDemand = d3.min(datosJson, demFn),
-                generadoras = [];
-
-            //RESET
-            for (var key in tablaIdsConsumos) {
-                tablaIdsConsumos[key].percent24h = [];
-                tablaIdsConsumos[key].med24h = 0;
-            }
-
-            datosJson.forEach(function(value) {
-                var generadoras = [],
-                    porcentajesDemanda,
-                    key,
-                    i = 0;
-
-                //RESET
-                for (key in tablaIdsConsumos) {
-                    generadoras.push(value[key]);
-                }
-
-                porcentajesDemanda = calcArrayPercents(generadoras);
-
-                for (key in tablaIdsConsumos) {
-                    tablaIdsConsumos[key].percent24h.push(porcentajesDemanda[i]);
-                    i++;
-                }
+                return d
             })
 
-            for (var key in tablaIdsConsumos) {
-                tablaIdsConsumos[key].med24h = d3.mean(tablaIdsConsumos[key].percent24h);
-            }
+            // console.log('getData', jsonData)
 
-            // console.log('min', minDemand, 'max', maxDemand, 'length', datosJson.length);
+            jsonData.reverse();
 
-            // ACTUALIZO DOMAINS SCALES
-            sizes.domain([minDemand, maxDemand])
-            opacityScale.domain([0, datosJson.length])
-            colorDemand.domain([minDemand, maxDemand])
+            // UPDATE DOMAINS SCALES
+            // sizes.domain([minTotal, maxTotal])
+            opacityScale.domain([0, jsonData.length])
+            // colorDemand.domain([minTotal, maxTotal])
 
-            // ESTA ESCALA ME PERMITE ESTABLECER EL MÁXIMO Y MÍNIMO CONSUMO EN FUNCIÓN DE LA DEMANDA
-            // Y VARIAR EL MÁXIMO PORCENTAJE DE RADIO
-            scaleRadius.domain([0, maxDemand])
+            // THIS SCALE ALLOWS ME TO ESTABLISH THE MAXIMUM AND MINIMUM CONSUMPTION DEPENDING ON DEMAND
+            // AND VARY THE MAXIMUM RADIO PERCENTAGE
+            // scaleRadius.domain([0, maxTotal])
 
             var now = new Date(),
-                currentHourDate = iso(datosJson[datosJson.length - 1].ts),
-                currentHourDateRotation = horaRotation((currentHourDate.getHours() * 60) + (currentHourDate.getMinutes())),
-                arcoPorcion = (360 / datosJson.length) / 1.05;
+                currentHourDate = iso(jsonData[jsonData.length - 1].ts),
+                currentHourDateRotation = hourRotation((currentHourDate.getHours() * 60) + (currentHourDate.getMinutes())),
+                arcoPorcion = (360 / jsonData.length) / 1.05;
 
-            // LANZO EL ÚLTIMO DATO DISPONIBLE
+            // RELEASE THE LAST AVAILABLE DATA
             if (!isOuterRadio) {
-                dispatch.call('mouseenter', this, datosJson[datosJson.length - 1]);
+                dispatch.call('mouseenter', this, jsonData[jsonData.length - 1]);
             }
 
-            // SELECCIONO LOS RADIOS QUE ALBERGAN CADA UNA DE LAS FRANJAS DE TIEMPO
+            // SELECT THE RADIUS THAT HOUSE EACH OF THE TIME SLOTS
             var rads = svg.select('#hostRads').selectAll('.rad')
-                .data(datosJson, function(d) {
-                    return d.ts;
-                });
+                .data(jsonData, d => d.ts)
 
             // ENTER
             rads.enter().append('g')
@@ -786,72 +537,73 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
                     var tsDate = iso(d.ts),
                         h = tsDate.getHours(),
                         m = tsDate.getMinutes(),
-                        angle = horaRotation((h * 60) + m),
+                        angle = hourRotation((h * 60) + m),
                         offset = 180,
-                        a = grados_a_radianes(offset - angle),
-                        consumoRadio = scaleRadius(d.dem),
+                        a = degrees_to_radians(offset - angle),
+                        // consumoRadio = scaleRadius(d.dem),
+                        _scaleRad = scaleRadius(d.combined),
                         sinA = Math.sin(a),
                         cosA = Math.cos(a);
 
-                    consumoDot
-                        .attr('cx', centerX + (consumoRadio * sinA))
-                        .attr('cy', centerY + (consumoRadio * cosA))
+                    timeDot
+                        .attr('cx', centerX + (_scaleRad * sinA))
+                        .attr('cy', centerY + (_scaleRad * cosA))
                         .transition()
                         .duration(150)
-                        .attr('fill', colorDemand(d.dem))
+                        // .attr('fill', colorDemand(d.dem))
+                        .attr('fill', colorDemand(d.combined))
 
                     tooltip
-                        .attr('transform', 'translate(' + (centerX + (consumoRadio * sinA)) + ',' + (centerY + (consumoRadio * cosA)) + ')')
+                        .attr('transform', 'translate(' + (centerX + (_scaleRad * sinA)) + ',' + (centerY + (_scaleRad * cosA)) + ')')
 
-                    tooltip_fecha
+                    tooltip_date
                         .text(function() {
                             var tsDate = iso(d.ts);
                             return tooltipDateFormat(tsDate);
                         });
 
-                    tooltip_mw
-                        .text(function() {
-                            return d3.format(",")(d.dem) + "MW";
-                        });
+                    tooltip_val//.text(function() { return d3.format(",")(d.dem) + "MW" })
+                        .text(`Combined: ${d3.format(",")(d.combined)}%`)
 
                     tooltip_rect
                         .attr('fill-opacity', 1)
                         .transition()
                         .duration(150)
-                        .attr('fill', colorDemand(d.dem));
+                        //.attr('fill', colorDemand(d.dem))
+                        .attr('fill', colorDemand(d.combined))
 
                     consumoCircle
                         .attr('stroke-opacity', .9)
                         .transition()
-                        .attr('r', scaleRadius(d.dem))
-                        .attr('stroke', colorDemand(d.dem))
+                        // .attr('r', scaleRadius(d.dem))
+                        // .attr('stroke', colorDemand(d.dem))
+                        .attr('r', scaleRadius(d.combined))
+                        .attr('stroke', colorDemand(d.combined))
                 })
                 .each(function(d) {
-                    //CREO LOS 'HUECOS'
+                    //CREATE THE 'HOLES'
                     var group = d3.select(this),
                         ln = 8,
                         n = 0;
 
                     group.selectAll('path')
-                        .data(tablaIdsOrdenados)
+                        .data(dataKeys)
                         .enter().append('path')
-                        .on('click', function() {
-                            var that = d3.select(this);
-                            // console.log("click", iso(d.ts), that.datum(), d[that.datum()])
-                        })
+                        // .on('click', function() {
+                        //     var that = d3.select(this);
+                        //     // console.log("click", iso(d.ts), that.datum(), d[that.datum()])
+                        // })
                         .on('mouseover', function() {
-                            var that = d3.select(this);
-                            that
-                                .attr('fill', '#' + tablaIdsInfo[that.datum()].highlightColor);
+                            let that = d3.select(this)
+                            that.attr('fill', '#' + dataKeysInfo[that.datum()].highlightColor);
                         })
                         .on('mouseout', function() {
-                            var that = d3.select(this);
-                            that
-                                .attr('fill', '#' + tablaIdsInfo[that.datum()].color);
+                            let that = d3.select(this)
+                            that.attr('fill', '#' + dataKeysInfo[that.datum()].color);
                         })
                         .attr('fill', function(d, n) {
                             var that = d3.select(this)
-                            return '#' + tablaIdsInfo[that.datum()].color;
+                            return '#' + dataKeysInfo[that.datum()].color;
                         })
                     n++;
                 })
@@ -863,49 +615,48 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
                 // console.log ('rad',i, this.id);
                 var paths = d3.select(this).selectAll('path')
 
-                // CALCULAMOS LA SUMA DE LAS DIFERENTES ENERGÍAS PROVEEDORAS
-                var generadoras = [d.eol, d.hid, d.sol, d.aut, d.gf, d.nuc, d.car, d.cc],
-                    porcentajesDemanda = calcArrayPercents(generadoras),
-                    demandaHora = generadoras.sum(true),
-                    acumuladoInner = 0,
-                    grosorGeneradora = 0,
-                    ln = porcentajesDemanda.length,
+                // CALCULATE THE SUM OF THE DIFFERENT SUPPLYING ENERGIES
+                var generators = dataKeys.map(key => d[key]),
+                    percentDemand = calcArrayPercents(generators),
+                    timeDemand = generators.sum(true),
+                    accumulatedInner = 0,
+                    generatorThickness = 0,
+                    ln = percentDemand.length,
                     n = 0,
                     arc = d3.arc(),
                     tsDate = iso(d.ts),
                     h = tsDate.getHours(),
                     m = tsDate.getMinutes(),
-                    angle = horaRotation((h * 60) + m),
+                    angle = hourRotation((h * 60) + m),
                     path;
 
                 paths.each(function() {
 
-                    grosorGeneradora = porcentajesDemanda[n] / 100 * scaleRadius(d.dem);
+                    // generatorThickness = percentDemand[n] / 100 * scaleRadius(d.dem);
+                    generatorThickness = percentDemand[n] / 100 * scaleRadius(d.combined);
 
                     d3.select(this).attr('d', arc.startAngle(function() {
-                            return grados_a_radianes(angle);
+                            return degrees_to_radians(angle);
                         }).endAngle(function() {
-                            return grados_a_radianes(angle + arcoPorcion);
+                            return degrees_to_radians(angle + arcoPorcion);
                         }).outerRadius(function() {
-                            return grosorGeneradora + acumuladoInner;
+                            return generatorThickness + accumulatedInner;
                         }).innerRadius(function() {
-                            return acumuladoInner;
+                            return accumulatedInner;
                         }))
                         //.attr('shape-rendering','optimizeSpeed' )
 
-                    acumuladoInner += grosorGeneradora;
+                    accumulatedInner += generatorThickness;
 
                     n++;
                 })
             })
 
             .transition().duration(500).delay(function(d, i) {
-                    return (datosJson.length - i) * 25
+                    return (jsonData.length - i) * 25
                 })
-                .attr('opacity', function(d, i) {
-                    return opacityScale(i);
-                })
-                .attr('transform', 'translate(' + centerX + ',' + centerY + ')');
+                .attr('opacity', (d, i) => opacityScale(i))
+                .attr('transform', 'translate(' + centerX + ',' + centerY + ')')
 
             //EXIT
             rads.exit().remove()
@@ -913,71 +664,10 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
                 //     console.log('Bye! exit ', this);
                 // });
 
-            lastJsonData = datosJson[datosJson.length - 1]
+            lastJsonData = jsonData[jsonData.length - 1]
 
             // initialize legends
-            if (lastJsonData) pintaDesglose(lastJsonData)
-
-            /* var dLast = lastJsonData = datosJson[datosJson.length - 1],
-                generadoras = [dLast.eol, dLast.hid, dLast.sol, dLast.aut, dLast.gf, dLast.nuc, dLast.car, dLast.cc],
-                porcentajesDemanda = calcArrayPercents(generadoras),
-                demandaHora = generadoras.sum(true),
-                id;
-
-            //ACTUALIZO HTML
-            var energias = d3.select('#j-energias').selectAll(".energia")
-                .data(tablaIdsOrdenados);
-
-            energias.each(function(d, i) {
-                var datos = tablaIdsInfo[d],
-                    that = d3.select(this),
-                    id = d;
-
-                that.select('.energia__titulo')
-                    .text(datos.nombre) //.text(that.datum().nombre)
-                    .style('color', datos.highlightColor);
-                that.selectAll('.energia__subtitulo')
-                    .data(['Current Contribution', 'Average 24h', 'Emissions CO<sub>2</sub>'])
-                    .each(function(d) {
-                        d3.select(this)
-                            .html(function() {
-                                return d;
-                            })
-                    });
-
-                that.select('.j-porcentaje-' + id)
-                    .text(function() {
-                        return ENUS.format(",.2f")(rd3(demandaHora, +dLast[id])) + "%";
-                    });
-                that.select('.j-valor-' + id).transition()
-                    .text(function() {
-                        return ENUS.format(",.")(dLast[id]) + "MW";
-                    });
-                that.select('.j-porcentaje-media-' + id)
-                    .text(function() {
-                        return ENUS.format(",.2f")(tablaIdsConsumos[id].med24h) + "%";
-                    });
-                that.select('.j-aportacion-media-' + id)
-                    .text(function() {
-                        return ENUS.format(",.2f")(d3.mean(datosJson, function(d) {
-                            return d[id];
-                        })) + "MW";
-                    });
-                that.select('.j-co2-' + id)
-                    .text(function() {
-                        return ENUS.format(",.2f")(+dLast[id] * tablaEmisiones[id]) + 'T/h';
-                    });
-
-                try {
-                    document.styleSheets[0].addRule('#id_' + id + ':before', 'content: "' + datos.icon + '"; color:' + datos.highlightColor + ';');
-                } catch (err) {
-                    console.log(err)
-                }
-
-                that.style('opacity', .5)
-                    .transition().delay(i * 100)
-                    .style('opacity', 1)
-            }); */
+            if (lastJsonData) drawBreakdown(lastJsonData)
         })
     }
 
@@ -986,4 +676,8 @@ export function timeGraph(chart, dataUrl, isWidget, callbacks) {
     // setInterval(getData, 1000 * 30, baseUrl);
     // getData(baseUrl);
     getData(dataUrl)
+
+    this.destroy = function() {
+        clearInterval(clockTimer)
+    }
 }

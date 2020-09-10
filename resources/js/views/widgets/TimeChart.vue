@@ -9,7 +9,7 @@ import { timeGraph } from '../../components/graphs/TimeGraph'
 export default {
     data() {
         return {
-            width: 900, height: 450
+            width: 900, height: 450, timeGraph: null
         }
     },
     created() {
@@ -22,7 +22,10 @@ export default {
         this.$refs.chart.style.width = `${this.width}px`
         this.$refs.chart.style.height = `${this.height}px`
 
-        timeGraph('#time-chart', `${getBaseUrl()}/data/time-chart-data.json`, true)
+        this.timeGraph = new timeGraph('#time-chart', `${getBaseUrl()}/data/time-chart-data.json`, { widget: true })
+    },
+    destroyed() {
+        this.timeGraph.destroy()
     }
 }
 </script>
