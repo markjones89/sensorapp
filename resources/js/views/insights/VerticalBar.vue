@@ -25,6 +25,14 @@
             </transition>
         </div>
         <div class="graph-content">
+            <div class="page-back">
+                <div class="back-button" @click="backTo">
+                    <button class="btn btn-primary btn-small">
+                        <caret-left-icon />
+                    </button>
+                    Back
+                </div>
+            </div>
             <!-- graph & legends here -->
             <div class="chart-header">
                 <span class="chart-title">Building Name, Ground Floor Peak Performance</span>
@@ -55,7 +63,7 @@
 import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
 import { Checkbox, DateRangeToggle, Modal, TimeSlider } from "../../components"
-import { CaretIcon } from "../../components/icons"
+import { CaretIcon, CaretLeftIcon } from "../../components/icons"
 import barChart from '../../components/graphs/BarChart'
 
 function randomNum(limit) {
@@ -108,7 +116,7 @@ function randomData (range) {
 
 export default {
     title: 'Bar Chart',
-    components: { CaretIcon, Checkbox, DateRangeToggle, Modal, TimeSlider },
+    components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, Modal, TimeSlider },
     data() {
         return {
             user: null,
@@ -124,6 +132,7 @@ export default {
         settings() { return this.user.company ? this.user.company.settings : null }
     },
     methods: {
+        backTo() { this.$router.back() },
         rangeSelect(range, from, to) {
             // console.log('rangeSelect', range, from, to)
             this.chart.update(randomData(range))

@@ -322,6 +322,10 @@ textarea {
     position: relative;
     display: flex;
 
+    .page-back {
+        flex: 1 auto;
+    }
+
     .graph-filters {
         justify-content: right;
     }
@@ -423,7 +427,7 @@ textarea {
 }
 
 .page-back {
-    flex: 1 auto;
+    // flex: 1 auto;
     display: flex;
     align-items: center;
 

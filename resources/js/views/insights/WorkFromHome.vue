@@ -27,6 +27,14 @@
                 </transition>
             </div>
             <div class="graph-content">
+                <div class="page-back">
+                    <div class="back-button" @click="backTo">
+                        <button class="btn btn-primary btn-small">
+                            <caret-left-icon />
+                        </button>
+                        Back
+                    </div>
+                </div>
                 <div class="chart-header">
                     <span class="chart-title">{{ `Work From Home - ${building.name}` }}</span>
                 </div>
@@ -144,7 +152,7 @@ export default {
         bldgScale() { return (this.bldgStat < MIN_SCALE ? MIN_SCALE : this.bldgStat) / 100 }
     }, 
     methods: {
-        backTo() {},
+        backTo() { this.$router.back() },
         async getBuildings() {
             let company = this.user.company
 

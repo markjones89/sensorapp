@@ -26,6 +26,14 @@
             </transition>
         </div>
         <div class="graph-content">
+            <div class="page-back">
+                <div class="back-button" @click="backTo">
+                    <button class="btn btn-primary btn-small">
+                        <caret-left-icon />
+                    </button>
+                    Back
+                </div>
+            </div>
             <div class="chart-header">
                 <span class="chart-title">Compare Room Size Performance</span>
             </div>

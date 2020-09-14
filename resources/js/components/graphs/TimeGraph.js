@@ -178,9 +178,7 @@ export function timeGraph(chart, dataUrl, options) {
     }, 1000);
 
     // 24 HOUR DRAWING
-    var rotation,
-        n,
-        lnHoras = 24;
+    var rotation, n, lnHoras = 24;
 
     for (n = 0; n < lnHoras; n++) {
         rotation = 180 - (360 / lnHoras) * n;
@@ -345,15 +343,12 @@ export function timeGraph(chart, dataUrl, options) {
     };
 
     function drawBreakdown(data) {
-        // WE CALCULATE THE SUM OF THE DIFFERENT SUPPLYING ENERGIES
-        var generators = dataKeys.map(key => data[key]),
-            demandPercentages = calcArrayPercents(generators),
-            demandTime = generators.sum(true);
+        var tick_data = dataKeys.map(key => data[key]),
+            dataPercentages = calcArrayPercents(tick_data)
 
         var accumulatorInner = 0,
-            generatorThickness = 0,
+            pathThickness = 0,
             tsDate = iso(data.ts),
-            path,
             i;
 
         breakdown.attr('opacity', 1)
@@ -362,19 +357,17 @@ export function timeGraph(chart, dataUrl, options) {
 
         hourBlock.text(ENUS.format("%H:%M")(tsDate) + "h")
 
-        var scaleDesglose = d3.scaleLinear()
-            .range([0, formulaRadiusBreakdown]),
-            tabla = [];
+        var dataTbl = [];
 
         for (i = 0; i < dataKeys.length; i++) {
-            tabla[i] = {
+            dataTbl[i] = {
                 id: dataKeys[i],
                 data: data[dataKeys[i]]
-            };
+            }
         }
 
         var blocks = breakdown.selectAll('.j-block')
-            .data(tabla, function(d, i) { return d.id })
+            .data(dataTbl, function(d, i) { return d.id })
 
         blocks.enter()
             .append('g')
@@ -386,7 +379,7 @@ export function timeGraph(chart, dataUrl, options) {
                 that.append('rect')
                     .attr('width', 6)
                     .attr('height', 10).style('cursor', 'pointer')
-                    .attr('fill', function(d) { return '#' + dataKeysInfo[d.id].color })
+                    .attr('fill', d => `#${dataKeysInfo[d.id].color}`)
                     .on('click', d => events && (events.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('text')
@@ -398,7 +391,7 @@ export function timeGraph(chart, dataUrl, options) {
                     .style('font-size', '13').style('cursor', 'pointer')
                     // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
                     .style('fill', '#B3B3B3')
-                    .style('fill', function(d) { return '#' + dataKeysInfo[d.id].highlightColor })
+                    .style('fill', d => `#${dataKeysInfo[d.id].highlightColor}`)
                     .attr('transform', 'rotate(-45)')
                     .on('click', d => events && (events.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
@@ -411,19 +404,15 @@ export function timeGraph(chart, dataUrl, options) {
                     .style('font-size', '12').style('cursor', 'pointer')
                     // .style('font-family', 'Roboto Slab, Helvetica Neue, Helvetica, sans-serif')
                     .style('fill', '#B3B3B3')
-                    .style('fill', function(d) { return '#' + dataKeysInfo[d.id].highlightColor })
+                    .style('fill', d => `#${dataKeysInfo[d.id].highlightColor}`)
                     .attr('transform', 'rotate(-45)')
                     .on('click', d => events && (events.toPeakChart.call(this, d), d3.event.stopPropagation()));
 
                 that.append('path')
                     .style('fill', 'none')
                     .style('stroke-width', '1')
-                    .style('stroke', function(d) {
-                        return '#' + dataKeysInfo[d.id].color;
-                    })
-            }).attr('transform', function(d, i) {
-                return 'translate(0,' + (50 * i) + ')'
-            })
+                    .style('stroke', d => `#${dataKeysInfo[d.id].color}`)
+            }).attr('transform', (d, i) => `translate(0,${(50 * i)})`)
         
         var safeStep = 33,
             safeStepCalc = 0,
@@ -432,45 +421,41 @@ export function timeGraph(chart, dataUrl, options) {
 
         // UPDATE
         blocks.each(function(d, i) {
-            if (demandPercentages[i - 1] < minPercentStep) {
+            if (dataPercentages[i - 1] < minPercentStep) {
                 colisionCounter++;
             }
 
             safeStepCalc = safeStep * colisionCounter;
-            generatorThickness = demandPercentages[i] / 100 * formulaRadiusBreakdown;
+            pathThickness = dataPercentages[i] / 100 * formulaRadiusBreakdown;
 
             var that = d3.select(this)
                 .transition()
-                .attr('transform', 'translate(0,' + accumulatorInner + ')')
+                .attr('transform', `translate(0,${accumulatorInner})`)
                 .each(function() {
                     var that = d3.select(this);
                     that.select('rect')
                         .transition()
-                        .attr('height', generatorThickness);
+                        .attr('height', pathThickness);
 
                     that.select('.j-name')
-                        .text(function(d) {
-                            // return tablaIdsInfo[d.id].nombreAbrev + " ";
-                            return dataKeysInfo[d.id].name + " "
-                        })
+                        .text(d => dataKeysInfo[d.id].name)
                         .transition()
-                        .attr('transform', 'translate(' + safeStepCalc + ',' + 0 + ') ' + 'rotate(-45 0 0) ');
+                        .attr('transform', `translate(${safeStepCalc},0) rotate(-45 0 0)`);
 
                     that.select('.j-data')
                         // .text(function(d) {
                         //     return d3.format(",.2f")(demandPercentages[i]) + "% " + d3.format(",")(d.data) + "MW ";
                         // })
-                        // .text(d => `${d3.format(',')(d.data)}%`)
                         .text(d => `${d.data}%`)
                         .transition()
-                        .attr('transform', 'translate(' + safeStepCalc + ',' + 0 + ') ' + 'rotate(-45 0 0) ');
+                        .attr('transform', `translate(${safeStepCalc},0) rotate(-45 0 0)`)
 
                     that.select('path')
                         .transition()
-                        .attr('d', 'M6,1 H' + Math.floor(31 + safeStepCalc) + " l3,-3")
+                        .attr('d', `M6,1 H${Math.floor(31 + safeStepCalc)} l3,-3`)
 
                 })
-            accumulatorInner += generatorThickness;
+            accumulatorInner += pathThickness;
         })
     }
 
@@ -502,10 +487,6 @@ export function timeGraph(chart, dataUrl, options) {
             opacityScale.domain([0, jsonData.length])
             // colorDemand.domain([minTotal, maxTotal])
 
-            // THIS SCALE ALLOWS ME TO ESTABLISH THE MAXIMUM AND MINIMUM CONSUMPTION DEPENDING ON DEMAND
-            // AND VARY THE MAXIMUM RADIO PERCENTAGE
-            // scaleRadius.domain([0, maxTotal])
-
             var now = new Date(),
                 currentHourDate = iso(jsonData[jsonData.length - 1].ts),
                 currentHourDateRotation = hourRotation((currentHourDate.getHours() * 60) + (currentHourDate.getMinutes())),
@@ -524,15 +505,12 @@ export function timeGraph(chart, dataUrl, options) {
             rads.enter().append('g')
                 .attr('class', 'rad')
                 .attr('id', function(d) {
-                    var ts = iso(d.ts)
-                    return ['id-', ts.getHours(), ':', ts.getMinutes(), '-dia-', ts.getDate()].join("");
+                    let ts = iso(d.ts)
+                    return `id-${ts.getHours()}:${ts.getMinutes()}-dia-${ts.getDate()}`
                 })
                 .on('mouseenter', function(d) {
 
                     dispatch.call('mouseenter', this, d);
-
-                    /*var that = d3.select(this)
-                        that.style("filter", "url(#brightness)")  */
 
                     var tsDate = iso(d.ts),
                         h = tsDate.getHours(),
@@ -554,13 +532,12 @@ export function timeGraph(chart, dataUrl, options) {
                         .attr('fill', colorDemand(d.combined))
 
                     tooltip
-                        .attr('transform', 'translate(' + (centerX + (_scaleRad * sinA)) + ',' + (centerY + (_scaleRad * cosA)) + ')')
+                        .attr('transform', `translate(${(centerX + (_scaleRad * sinA))},${(centerY + (_scaleRad * cosA))})`)
 
-                    tooltip_date
-                        .text(function() {
-                            var tsDate = iso(d.ts);
-                            return tooltipDateFormat(tsDate);
-                        });
+                    tooltip_date.text(function() {
+                        var tsDate = iso(d.ts)
+                        return tooltipDateFormat(tsDate)
+                    })
 
                     tooltip_val//.text(function() { return d3.format(",")(d.dem) + "MW" })
                         .text(`Combined: ${d3.format(",")(d.combined)}%`)
@@ -583,70 +560,59 @@ export function timeGraph(chart, dataUrl, options) {
                 .each(function(d) {
                     //CREATE THE 'HOLES'
                     var group = d3.select(this),
-                        ln = 8,
+                        // ln = 8,
                         n = 0;
 
                     group.selectAll('path')
                         .data(dataKeys)
                         .enter().append('path')
-                        // .on('click', function() {
-                        //     var that = d3.select(this);
-                        //     // console.log("click", iso(d.ts), that.datum(), d[that.datum()])
-                        // })
                         .on('mouseover', function() {
                             let that = d3.select(this)
-                            that.attr('fill', '#' + dataKeysInfo[that.datum()].highlightColor);
+                            that.attr('fill', `#${dataKeysInfo[that.datum()].highlightColor}`)
                         })
                         .on('mouseout', function() {
                             let that = d3.select(this)
-                            that.attr('fill', '#' + dataKeysInfo[that.datum()].color);
+                            that.attr('fill', `#${dataKeysInfo[that.datum()].color}`)
                         })
                         .attr('fill', function(d, n) {
                             var that = d3.select(this)
-                            return '#' + dataKeysInfo[that.datum()].color;
+                            return `#${dataKeysInfo[that.datum()].color}`
                         })
                     n++;
                 })
                 .attr('opacity', 0)
-                .attr('transform', 'translate(' + centerX + ',' + centerY + ')')
+                .attr('transform', `translate(${centerX},${centerY})`)
 
             // UPDATE
             .each(function(d, i) {
-                // console.log ('rad',i, this.id);
                 var paths = d3.select(this).selectAll('path')
 
-                // CALCULATE THE SUM OF THE DIFFERENT SUPPLYING ENERGIES
-                var generators = dataKeys.map(key => d[key]),
-                    percentDemand = calcArrayPercents(generators),
-                    timeDemand = generators.sum(true),
+                var tick_data = dataKeys.map(key => d[key]),
+                    dataPercents = calcArrayPercents(tick_data),
                     accumulatedInner = 0,
-                    generatorThickness = 0,
-                    ln = percentDemand.length,
+                    pathThickness = 0,
                     n = 0,
                     arc = d3.arc(),
                     tsDate = iso(d.ts),
                     h = tsDate.getHours(),
                     m = tsDate.getMinutes(),
-                    angle = hourRotation((h * 60) + m),
-                    path;
+                    angle = hourRotation((h * 60) + m)//, path;
 
                 paths.each(function() {
-
-                    // generatorThickness = percentDemand[n] / 100 * scaleRadius(d.dem);
-                    generatorThickness = percentDemand[n] / 100 * scaleRadius(d.combined);
+                    pathThickness = dataPercents[n] / 100 * scaleRadius(d.combined);
 
                     d3.select(this).attr('d', arc.startAngle(function() {
                             return degrees_to_radians(angle);
                         }).endAngle(function() {
                             return degrees_to_radians(angle + arcoPorcion);
                         }).outerRadius(function() {
-                            return generatorThickness + accumulatedInner;
+                            return pathThickness + accumulatedInner;
                         }).innerRadius(function() {
                             return accumulatedInner;
                         }))
                         //.attr('shape-rendering','optimizeSpeed' )
 
-                    accumulatedInner += generatorThickness;
+                    accumulatedInner += pathThickness;
 
                     n++;
                 })
@@ -656,13 +622,10 @@ export function timeGraph(chart, dataUrl, options) {
                     return (jsonData.length - i) * 25
                 })
                 .attr('opacity', (d, i) => opacityScale(i))
-                .attr('transform', 'translate(' + centerX + ',' + centerY + ')')
+                .attr('transform', `translate(${centerX},${centerY})`)
 
             //EXIT
             rads.exit().remove()
-                // .each(function() {
-                //     console.log('Bye! exit ', this);
-                // });
 
             lastJsonData = jsonData[jsonData.length - 1]
 
@@ -671,13 +634,15 @@ export function timeGraph(chart, dataUrl, options) {
         })
     }
 
-    // var baseUrl = "http://energia.ningunaparte.net/data/last24h";
+    // var dataUrl = "http://energia.ningunaparte.net/data/last24h";
 
-    // setInterval(getData, 1000 * 30, baseUrl);
-    // getData(baseUrl);
     getData(dataUrl)
+
+    // auto refresh data
+    // let gdi = setInterval(getData, config.refreshInterval || 10 * 60 * 1000, dataUrl)
 
     this.destroy = function() {
         clearInterval(clockTimer)
+        // clearInterval(gdi)
     }
 }

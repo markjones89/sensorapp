@@ -27,5 +27,6 @@
     "/js/views/insights/user-peak.js": "/js/views/insights/user-peak.js",
     "/js/views/insights/wfh.js": "/js/views/insights/wfh.js",
     "/js/views/profile.js": "/js/views/profile.js",
+    "/vendors~js/views/insights/time-graph.js": "/vendors~js/views/insights/time-graph.js",
     "/vendors~js/views/profile.js": "/vendors~js/views/profile.js"
 }

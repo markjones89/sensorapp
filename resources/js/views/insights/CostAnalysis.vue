@@ -1,8 +1,15 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <div class="graph-range-btns"></div>
-            <div class="graph-filters"></div>
+            <div class="page-back">
+                <div class="back-button" @click="backTo">
+                    <button class="btn btn-primary btn-small">
+                        <caret-left-icon />
+                    </button>
+                    Back
+                </div>
+            </div>
+            <!-- <div class="graph-filters"></div> -->
             <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                 <span class="dot"></span>
                 <span class="dot"></span>
@@ -44,11 +51,12 @@
 <script>
 import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
+import { CaretLeftIcon } from '../../components/icons'
 import { Checkbox, DateRangeToggle, TimeSlider } from '../../components'
 import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
 export default {
     title: 'Cost Analysis',
-    components: { Checkbox, DateRangeToggle, TimeSlider },
+    components: { CaretLeftIcon, Checkbox, DateRangeToggle, TimeSlider },
     data() {
         return {
             user: null, loaded: false, showPageOpts: false, showEmbed: false,
@@ -62,6 +70,7 @@ export default {
         baseUrl() { return getBaseUrl() }
     },
     methods: {
+        backTo() { this.$router.back() },
         rangeSelect(range, from, to) {
             console.log('rangeSelect', range, from, to)
         },
