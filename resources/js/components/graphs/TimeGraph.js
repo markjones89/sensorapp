@@ -501,6 +501,9 @@ export function timeGraph(chart, dataUrl, options) {
             var rads = svg.select('#hostRads').selectAll('.rad')
                 .data(jsonData, d => d.ts)
 
+            // rads with zero data (combined)
+            var radsZero = 0
+
             // ENTER
             rads.enter().append('g')
                 .attr('class', 'rad')
@@ -619,7 +622,12 @@ export function timeGraph(chart, dataUrl, options) {
             })
 
             .transition().duration(500).delay(function(d, i) {
-                    return (jsonData.length - i) * 25
+                    // let delay = Math.abs(jsonData.length - i - radsZero) * (d.combined === 0 ? 0 : 25)
+                    let delay = Math.abs((i + 1) - radsZero) * (d.combined === 0 ? 0 : 25)
+
+                    if (d.combined === 0) radsZero++
+
+                    return delay
                 })
                 .attr('opacity', (d, i) => opacityScale(i))
                 .attr('transform', `translate(${centerX},${centerY})`)

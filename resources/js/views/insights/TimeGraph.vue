@@ -116,8 +116,16 @@ export default {
             console.log('rangeSelect', range, from, to)
             this.showHeatMap = range != 'today'
 
-            if (this.showHeatMap && !this.heatMap) this.renderHeatMap()
-            else if (!this.showHeatMap && !this.timeGraph) this.renderTimeChart()
+            setTimeout(() => {
+                if (this.showHeatMap && !this.heatMap) {
+                    this.renderHeatMap()
+                    this.timeGraph = null
+                }
+                else if (!this.showHeatMap && !this.timeGraph) {
+                    this.renderTimeChart()
+                    this.heatMap = null
+                }
+            }, 10)
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
