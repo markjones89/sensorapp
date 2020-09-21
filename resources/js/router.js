@@ -94,11 +94,6 @@ const router = new VueRouter({
             path: '/users', name: 'users',
             component: () => import(/* webpackChunkName: "js/views/config/users" */ './views/config/Users.vue')
         }
-        // ,
-        // {
-        //     path: '/sync-places', name: 'sync-places',
-        //     component: () => import(/* webpackChunkName: "js/views/config/sync-places" */ './views/config/Places.vue')
-        // }
     ]
 })
 

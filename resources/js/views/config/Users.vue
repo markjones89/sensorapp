@@ -210,12 +210,14 @@ export default {
                 this.toggleSaving(false)
                 let res = x.data
 
-                console.log(res)
+                // console.log(res)
 
                 if (res.r) {
                     this.users.push(res.data)
                     this.toggleEntry(false)
                 }
+
+                this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
             })
         }
     },

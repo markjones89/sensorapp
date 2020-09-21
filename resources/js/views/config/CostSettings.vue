@@ -205,6 +205,8 @@ export default {
                         this.costs.push(res.data)
                         this.toggleEntry(false)
                     }
+
+                    this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
                 })
         },
         triggerEdit(id) {
@@ -233,24 +235,35 @@ export default {
                         c.furniture_cost = this.entry.furniture_cost
                         this.toggleEntry(false)
                     }
+
+                    this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
                 })
         },
         async delSetting(id) {
-            let idx = this.costs.findIndex(c => c.hid === id),
-                c = this.costs[idx]
+            let _ = this,
+                idx = _.costs.findIndex(c => c.hid === id),
+                c = _.costs[idx]
 
-            if (confirm(`Remove cost settings for ${c.country} ${c.city}?`)) {
-                this.toggleSaving(true)
-                axios.delete(`${api}/${id}`)
-                    .then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
+            _.$duDialog(null, `Remove cost settings for ${c.country} ${c.city}?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.toggleSaving(true)
+                        axios.delete(`${api}/${id}`)
+                            .then(x => {
+                                _.toggleSaving(false)
+                                let res = x.data
 
-                        if (res.r) {
-                            this.costs.splice(idx, 1)
-                        }
-                    })
-            }
+                                if (res.r) {
+                                    _.costs.splice(idx, 1)
+                                }
+
+                                _.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
+                            })
+                    }
+                }
+            })
         }
     },
     created() {

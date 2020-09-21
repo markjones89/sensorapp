@@ -365,20 +365,27 @@ export default {
                 })
         },
         async delFloor(id) {
-            let idx = this.floors.findIndex(f => f.hid === id)
+            let _ = this,
+                idx = _.floors.findIndex(f => f.hid === id)
 
-            if (confirm(`Remove Floor ${this.floors[idx].floor_no}?`)) {
-                this.toggleSaving(true)
-                axios.delete(`${api}/${id}`)
-                    .then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
+            _.$duDialog(null, `Remove <strong>${_.floors[idx].ordinal_no} Floor</strong>?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.toggleSaving(true)
+                        axios.delete(`${api}/${id}`)
+                            .then(x => {
+                                _.toggleSaving(false)
+                                let res = x.data
 
-                        if (res.r) {
-                            this.floors.splice(idx, 1)
-                        }
-                    })
-            }
+                                if (res.r) {
+                                    _.floors.splice(idx, 1)
+                                }
+                            })
+                    }
+                }
+            })
         },
         upFloorPlan(id) {
             this.entry.id = id

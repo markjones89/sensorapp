@@ -49,6 +49,8 @@
 
     .logo-holder {
         position: relative;
+        display: flex;
+        align-items: center;
         height: 48px;
         width: 150px;
         padding: 10px;
@@ -79,8 +81,8 @@
         }
 
         img {
-            height: 100%;
-            width: auto;
+            height: auto;
+            width: 100%;
         }
 
         .logo-opt {
@@ -185,6 +187,8 @@ export default {
             }).then(x => {
                 this.toggleSaving(false)
                 let res = x.data
+
+                this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
             })
         },
         async upSettings() {
@@ -196,6 +200,8 @@ export default {
             }).then(x => {
                 this.toggleSaving(false)
                 let res = x.data
+
+                this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
             })
         },
         upLogo() { this.$refs.logoFile.click() },

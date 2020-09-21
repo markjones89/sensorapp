@@ -433,20 +433,27 @@ export default {
                 })
         },
         async delLoc(id) {
-            let idx = this.locations.findIndex(l => l.hid === id)
+            let _ = this,
+                idx = _.locations.findIndex(l => l.hid === id)
 
-            if (confirm(`Remove ${this.locations[idx].name} from locations?`)) {
-                this.toggleSaving(true)
-                axios.delete(`${api.locations}/${id}`)
-                    .then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
+            _.$duDialog(null, `Remove <strong>${_.locations[idx].name}</strong> from locations?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.toggleSaving(true)
+                        axios.delete(`${api.locations}/${id}`)
+                            .then(x => {
+                                _.toggleSaving(false)
+                                let res = x.data
 
-                        if (res.r) {
-                            this.locations.splice(idx, 1)
-                        }
-                    })
-            }
+                                if (res.r) {
+                                    _.locations.splice(idx, 1)
+                                }
+                            })
+                    }
+                }
+            })
         },
         toFloors(id) {
             let bldg = this.locations.find(l => l.hid === id),

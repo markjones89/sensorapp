@@ -389,23 +389,30 @@ export default {
             })
         },
         async delSensor() {
-            let _id = this.entry.id,
-                _idx = this.floor.sensors.findIndex(s => s.hid === _id),
-                _sensor = this.floor.sensors[_idx]
+            let _ = this,
+                _id = _.entry.id,
+                _idx = _.floor.sensors.findIndex(s => s.hid === _id),
+                _sensor = _.floor.sensors[_idx]
 
-            if (confirm(`Remove sensor ${_sensor.sensor_id}?`)) {
-                this.state.removing = true
-                axios.delete(`${api.sensor}/${_id}`).then(x => {
-                    this.state.removing = false
-                    let res = x.data
+            _.$duDialog(null, `Remove sensor <strong>${_sensor.sensor_id}</strong>?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.state.removing = true
+                        axios.delete(`${api.sensor}/${_id}`).then(x => {
+                            _.state.removing = false
+                            let res = x.data
 
-                    if (res.r) {
-                        this.floor.sensors.splice(_idx, 1)
-                        this.mapper.drawSensors()
-                        this.toggleEntry(false)
+                            if (res.r) {
+                                _.floor.sensors.splice(_idx, 1)
+                                _.mapper.drawSensors()
+                                _.toggleEntry(false)
+                            }
+                        })
                     }
-                })
-            }
+                }
+            })
         },
         /* area */
         toggleAreaEntry(show) {
@@ -490,23 +497,30 @@ export default {
             })
         },
         async delArea() {
-            let _id = this.areaEntry.id,
-                _idx = this.floor.areas.findIndex(s => s.hid === _id),
-                _area = this.floor.areas[_idx]
+            let _ = this,
+                _id = _.areaEntry.id,
+                _idx = _.floor.areas.findIndex(s => s.hid === _id),
+                _area = _.floor.areas[_idx]
 
-            if (confirm(`Remove area: ${_area.name}?`)) {
-                this.state.removing = true
-                axios.delete(`${api.area}/${_id}`).then(x => {
-                    this.state.removing = false
-                    let res = x.data
+            _.$duDialog(null, `Remove <strong>${_area.name}</strong>? area`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.state.removing = true
+                        axios.delete(`${api.area}/${_id}`).then(x => {
+                            _.state.removing = false
+                            let res = x.data
 
-                    if (res.r) {
-                        this.floor.areas.splice(_idx, 1)
-                        this.mapper.drawAreas()
-                        this.toggleAreaEntry(false)
+                            if (res.r) {
+                                _.floor.areas.splice(_idx, 1)
+                                _.mapper.drawAreas()
+                                _.toggleAreaEntry(false)
+                            }
+                        })
                     }
-                })
-            }
+                }
+            })
         }
     },
     created() {

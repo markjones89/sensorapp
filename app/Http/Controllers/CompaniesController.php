@@ -37,7 +37,7 @@ class CompaniesController extends Controller
             $ws->work_days = 'Mon,Tue,Wed,Thu,Fri,Sat,Sun';
             $ws->save(); */
 
-            return response(['r' => true, 'm' => 'Company added', 'data' => $comp]);
+            return response(['r' => true, 'm' => 'Client company added', 'data' => $comp]);
         }
     }
 
@@ -51,7 +51,7 @@ class CompaniesController extends Controller
             $comp->name = $request->name;
             $comp->save();
 
-            return response(['r' => true, 'm' => 'Company updated']);
+            return response(['r' => true, 'm' => 'Client company updated']);
         }
     }
 
@@ -106,9 +106,9 @@ class CompaniesController extends Controller
         if ($comp) {
             $comp->delete();
 
-            return response(['r' => true, 'm' => 'Company removed']);
+            return response(['r' => true, 'm' => 'Client company removed']);
         }
 
-        return response(['r' => false, 'm' => 'Company doesn\'t exist']);
+        return response(['r' => false, 'm' => 'Client company doesn\'t exist']);
     }
 }

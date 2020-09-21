@@ -220,9 +220,14 @@ export default {
                     let res = x.data
 
                     if (res.r) {
+                        res.data.upload_info = {
+                            uploading: false, progress: 0
+                        }
                         this.clients.push(res.data)
                         this.toggleEntry(false)
                     }
+
+                    this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
                 })
         },
         triggerEdit(id) {
@@ -249,23 +254,33 @@ export default {
                         c.name = this.cName
                         this.toggleEntry(false)
                     }
+
+                    this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
                 })
         },
         async delClient(id) {
-            let idx = this.clients.findIndex(c => c.hid === id)
+            let _ = this, idx = _.clients.findIndex(c => c.hid === id)
 
-            if (confirm(`Remove ${this.clients[idx].name} from clients?`)) {
-                this.toggleSaving(true)
-                axios.delete(`${api}/${id}`)
-                    .then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
+            _.$duDialog(null, `Remove ${_.clients[idx].name} from clients?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.toggleSaving(true)
+                        axios.delete(`${api}/${id}`)
+                            .then(x => {
+                                _.toggleSaving(false)
+                                let res = x.data
 
-                        if (res.r) {
-                            this.clients.splice(idx, 1)
-                        }
-                    })
-            }
+                                if (res.r) {
+                                    _.clients.splice(idx, 1)
+                                }
+
+                                _.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
+                            })
+                    }
+                }
+            })
         },
         upLogo(id) {
             this.cId = id

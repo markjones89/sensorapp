@@ -30,12 +30,20 @@ export default {
             this.loggingIn = true;
             axios.post('/login/auth', { email: this.email, password: this.password })
                 .then(res => {
-                    let data = res.data;
-                    this.loggingIn = false;
+                    let data = res.data
+                    // this.loggingIn = false
 
                     if (data.r) 
-                        window.location = this.redirectTo === '' ? `${this.baseUrl}/` : `${this.baseUrl}/${this.redirectTo}`;
-                    else alert(data.m);
+                        window.location = this.redirectTo === '' ? `${this.baseUrl}/` : `${this.baseUrl}/${this.redirectTo}`
+                    else {
+                        // alert(data.m)
+                        this.loggingIn = false
+                        this.$mdtoast(data.m, { type: 'error', interaction: true, interactionTimeout: 5000 })
+                    }
+                })
+                .catch(e => {
+                    this.loggingIn = false
+                    this.$mdtoast('An error occured while trying to login', { type: 'error', interaction: true, interactionTimeout: 5000 })
                 })
         },
         inputKeydown(e) {

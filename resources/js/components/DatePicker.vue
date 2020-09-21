@@ -5,13 +5,13 @@
 [data-hidden="true"] { display: none !important; }
 </style>
 <script>
-import '../lib/datepicker/duDatepickerJs.min.css'
-import duDatepickerJs from '../lib/datepicker/duDatepickerJs.min.js'
+import '../lib/datepicker/duDatepicker.min.css'
+import duDatepicker from '../lib/datepicker/duDatepicker.min.js'
 export default {
     props: ['value', 'showPicker', 'visible', 'range', 'theme', 'minDate', 'maxDate'],
     watch: {
         showPicker: function(show) {
-            duDatepickerJs(this.$refs.datepicker, show ? 'show' : 'hide')
+            duDatepicker(this.$refs.datepicker, show ? 'show' : 'hide')
         }
     },
     mounted() {
@@ -19,7 +19,7 @@ export default {
 
         if (!_.visible) _.$refs.datepicker.setAttribute('data-hidden', true)
 
-        duDatepickerJs(_.$refs.datepicker, {
+        duDatepicker(_.$refs.datepicker, {
             range: _.range, minDate: _.minDate, maxDate: _.maxDate,
             events: {
                 dateChanged: function(data) {
@@ -32,7 +32,7 @@ export default {
         })
     },
     destroyed() {
-        duDatepickerJs(this.$refs.datepicker, 'destroy')
+        duDatepicker(this.$refs.datepicker, 'destroy')
     }
 }
 </script>
