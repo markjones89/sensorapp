@@ -29,9 +29,20 @@
             </div>
             <date-range-toggle @select="rangeSelect" />
             <div id="cost-tree"></div>
-            <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+            <!-- <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
                     @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-                <div class="clearfix"></div>
+                <div class="clearfix"></div> -->
+            <div class="bottom-filters">
+                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
+                    {{ minuteFilter ? minuteFilter : 'Select' }}
+                    <span class="caret">
+                        <caret-icon />
+                    </span>
+                    <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                </span>
+            </div>
         </div>
         <div class="graph-footer">
             <div class="left-options"></div>
@@ -51,23 +62,29 @@
 <script>
 import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
-import { CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, TimeSlider } from '../../components'
+import { CaretIcon, CaretLeftIcon } from '../../components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, TimeSlider } from '../../components'
 import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
 export default {
     title: 'Cost Analysis',
-    components: { CaretLeftIcon, Checkbox, DateRangeToggle, TimeSlider },
+    components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, TimeSlider },
     data() {
         return {
             user: null, loaded: false, showPageOpts: false, showEmbed: false,
             timeFilter: {
                 start: null, end: null
-            }
+            },
+            minuteFilter: '10 minutes', showMinuteFilter: false
         }
     },
     computed: {
         settings() { return this.user.company ? this.user.company.settings : null },
-        baseUrl() { return getBaseUrl() }
+        baseUrl() { return getBaseUrl() },
+        minuteFilters() {
+            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            
+            return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
+        }
     },
     methods: {
         backTo() { this.$router.back() },
@@ -87,7 +104,13 @@ export default {
                 })
         },
         timeStartChange(time) { this.timeFilter.start = time },
-        timeEndChange(time) { this.timeFilter.end = time }
+        timeEndChange(time) { this.timeFilter.end = time },
+        filterMinute(minute) {
+            var min = this.minuteFilters.find(m => m.value == minute);
+
+            this.showMinuteFilter = false;
+            this.minuteFilter = min.label;
+        }
     },
     created() {
         this.user = store.getUser()

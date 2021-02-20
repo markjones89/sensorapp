@@ -15,7 +15,7 @@ $stroke: 3;
     display: inline-flex;
 
     .progress-ring__circle {
-        stroke: #ff5a09;
+        stroke: #ed762c;
         stroke-width: $stroke;
         fill: transparent;
         transition: stroke-dashoffset .85s cubic-bezier(.4,0,.2,1);
@@ -24,7 +24,7 @@ $stroke: 3;
     }
 
     .progress-ring__buffer {
-        stroke: rgba($color: #ff5a09, $alpha: $bufferAlpha);
+        stroke: rgba($color: #ed762c, $alpha: $bufferAlpha);
         stroke-width: $stroke;
         fill: transparent;
     }

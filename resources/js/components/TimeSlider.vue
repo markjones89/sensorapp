@@ -12,8 +12,8 @@
     </div>
 </template>
 <style lang="scss">
-$primary: #FF5A09;
-$buffer: #393939;
+$primary: #ed762c;
+$buffer: #32313d;
 
 .time-slider {
     position: relative;
@@ -58,7 +58,7 @@ $buffer: #393939;
             }
 
             &:active {
-                background-color: darken($color: #FF5A09, $amount: 5%);
+                background-color: darken($color: $primary, $amount: 5%);
             }
         }
     }

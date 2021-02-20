@@ -8,7 +8,7 @@
                     <span class="caret">
                         <caret-icon />
                     </span>
-                    <filter-dropdown :filters="filters" multiple="true" :show="showFilter" v-model="filter" @onSelect="filterSelect" />
+                    <filter-dropdown :filters="filters" :multiple="true" :show="showFilter" v-model="filter" @onSelect="filterSelect" />
                 </span>
                 <span class="graph-filter" @click="showLocFilter = !showLocFilter">
                     {{ locationFilter ? locationFilter : 'Select Location' }}
@@ -63,9 +63,17 @@
                     </div>
                 </div>
             </div>
-            <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
-                @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-            <div class="clearfix"></div>
+            <div class="bottom-filters">
+                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
+                    {{ minuteFilter ? minuteFilter : 'Select' }}
+                    <span class="caret">
+                        <caret-icon />
+                    </span>
+                    <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                </span>
+            </div>
         </div>
         <modal :show="showEmbed" @close="toggleEmbed(false)">
             <template v-slot:header>
@@ -161,7 +169,7 @@
 
     #chart-stats {
         padding: 20px;
-        background-color: #393939;
+        background-color: #393846;
         border-radius: 10px;
 
         .chart-stat {
@@ -214,11 +222,17 @@ export default {
             ], 
             locations: ['United States', 'Japan', 'Australia', 'Philippines', 'UK', 'South Korea', 'China', 'India'],
             filter: [], locationFilter: null,
-            showPageOpts: false, showEmbed: false, showFilter: false, showLocFilter: false
+            minuteFilter: '10 minutes',
+            showPageOpts: false, showEmbed: false, showFilter: false, showLocFilter: false, showMinuteFilter: false
         }
     },
     computed: {
-        settings() { return this.user.company ? this.user.company.settings : null }
+        settings() { return this.user.company ? this.user.company.settings : null },
+        minuteFilters() {
+            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            
+            return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
+        }
     },
     methods: {
         rangeSelect(range, from, to) {
@@ -233,6 +247,12 @@ export default {
             this.locationFilter = loc
 
             this.circlePack.goTo(loc)
+        },
+        filterMinute(minute) {
+            var min = this.minuteFilters.find(m => m.value == minute);
+
+            this.showMinuteFilter = false;
+            this.minuteFilter = min.label;
         },
         pageOptsHandler(e) {
             let _ = this

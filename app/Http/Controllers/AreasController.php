@@ -106,6 +106,20 @@ class AreasController extends Controller
         }
     }
 
+    public function updateTriggerFilter(Request $request, $id) {
+        $atid = Hashids::decode($id)[0];
+        if ($request->minutes == '' || !$request->has('minutes')) {
+            return response(['r' => false, 'm' => 'Minutes is required']);
+        } else {
+            $at = AreaType::find($atid);
+
+            $at->trigger_filter = $request->minutes;
+            $at->save();
+
+            return response(['r' => true, 'm' => 'Area trigger filter saved']);
+        }
+    }
+
     public function delete($id) {
         $mid = Hashids::decode($id)[0];
         $map = AreaMap::find($mid);

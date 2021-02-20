@@ -48,9 +48,17 @@
                         <span class="stat">{{ `${bldgStat}%` }}</span>
                     </div>
                 </div>
-                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
-                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-                <div class="clearfix"></div>
+                <div class="bottom-filters">
+                    <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                        @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                    <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
+                        {{ minuteFilter ? minuteFilter : 'Select' }}
+                        <span class="caret">
+                            <caret-icon />
+                        </span>
+                        <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                    </span>
+                </div>
             </div>
             <div class="graph-footer">
                 <div class="left-options"></div>
@@ -140,7 +148,8 @@ export default {
             wfhStat: 0, bldgStat: 0,
             timeFilter: {
                 start: null, end: null
-            }
+            },
+            minuteFilter: '10 minutes', showMinuteFilter: false
         }
     },
     computed: {
@@ -149,7 +158,12 @@ export default {
             return this.buildings.map(b => { return { value: b.hid, label: b.name } })
         },
         homeScale() { return (this.wfhStat < MIN_SCALE ? MIN_SCALE : this.wfhStat) / 100 },
-        bldgScale() { return (this.bldgStat < MIN_SCALE ? MIN_SCALE : this.bldgStat) / 100 }
+        bldgScale() { return (this.bldgStat < MIN_SCALE ? MIN_SCALE : this.bldgStat) / 100 },
+        minuteFilters() {
+            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            
+            return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
+        }
     }, 
     methods: {
         backTo() { this.$router.back() },
@@ -204,6 +218,12 @@ export default {
         rangeSelect(range, from, to) {},
         timeStartChange(time) { this.timeFilter.start = time },
         timeEndChange(time) { this.timeFilter.end = time },
+        filterMinute(minute) {
+            var min = this.minuteFilters.find(m => m.value == minute);
+
+            this.showMinuteFilter = false;
+            this.minuteFilter = min.label;
+        },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show

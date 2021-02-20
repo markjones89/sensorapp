@@ -41,7 +41,7 @@ $height: 15px;
         margin-top: 1px;
 
         path {
-            fill: #ffffff;
+            fill: #f9f5f0;
         }
     }
 
@@ -55,16 +55,16 @@ $height: 15px;
         display: none;
 
         & ~ .checkbox_box {
-            background-color: #ffffff;
+            background-color: #f9f5f0;
             transition: background-color .15s;
         }
         
         &:checked ~ .checkbox_box {
-            background-color: #FF5A09;
+            background-color: #ed762c;
         }
 
         &:checked ~ .checkbox_label {
-            color: #FF5A09;
+            color: #ed762c;
         }
     }
 }

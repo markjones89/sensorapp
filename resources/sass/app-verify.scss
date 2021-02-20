@@ -1,12 +1,14 @@
-$bg: #393939;
-$primaryColor: #FF5A09;
+@import url("https://fonts.googleapis.com/css?family=Lato:400,500");
+
+$bg: #32313d;
+$primaryColor: #ed762c;
 $btnHeight: 34px;
 $btnRadius: 18px;
 
 html, body {
     margin: 0;
     padding: 0;
-    font-family: 'Source Sans Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Lato, sans-serif;
     height: 100vh;
     color: #fff;
 }
@@ -30,7 +32,7 @@ input {
     color: inherit;
     width: 100%;
     padding: 10px;
-    background-color: #363636;
+    background-color: #393846;
     border: 1px solid rgba(11, 26, 41, 0.08);
     outline: none;
     border-radius: 10px;
@@ -41,7 +43,7 @@ input {
     }
 
     &:disabled {
-        background-color: rgba($color: #363636, $alpha: 0.7);
+        background-color: rgba($color: #393846, $alpha: 0.7);
     }
 }
 
@@ -66,7 +68,7 @@ input {
     outline: none;
     user-select: none;
     cursor: pointer;
-    background-color: #363636;
+    background-color: #393846;
     border-radius: $btnRadius;
 
     & + .btn {
@@ -93,7 +95,7 @@ input {
     #verify-wrapper {
         width: 300px;
         margin: 0 auto;
-        background-color: #2B2B2B;
+        background-color: #282737;
         padding: 24px;
         border-radius: 10px;
 

@@ -1,6 +1,6 @@
 <template>
     <transition name="fadeUp">
-        <div class="filter-dropdown" v-if="show" @click="$event.stopPropagation()" :data-multiple="multiple" ref="dropdown" :style="{ height: height }">
+        <div class="filter-dropdown" v-if="show" @click="$event.stopPropagation()" :data-multiple="multiple" ref="dropdown" :style="{ height: height }" :data-position="position">
             <template v-if="multiple">
                 <checkbox v-for="f in filters" :key="f.value" :label="f.label" :val="f.value" v-model="selectedItems" />
                 <div class="filter-buttons">
@@ -29,10 +29,17 @@
     cursor: default;
     text-align: left;
     white-space: nowrap;
-    background-color: rgb(54, 54, 54);
+    background-color: #393846;
     border-radius: 20px;
     overflow: hidden;
     z-index: 1;
+
+    &[data-position=top] {
+        top: auto;
+        bottom: 100%;
+        margin-top: 0;
+        margin-bottom: 10px;;
+    }
 
     .filter-buttons {
         line-height: normal;
@@ -42,7 +49,7 @@
         a {
             display: inline-block;
             cursor: pointer;
-            color: #FF5A09;
+            color: #ed762c;
         }
     }
 
@@ -85,14 +92,14 @@
         transition: color .24s, background-color .24s linear;
 
         &:hover {
-            color: #FF5A09;
-            background-color: rgba($color: #FF5A09, $alpha: 0.035);
+            color: #ed762c;
+            background-color: rgba($color: #ed762c, $alpha: 0.035);
         }
 
         &:active,
         &.selected--item {
-            color: #FF5A09;
-            background-color: rgba($color: #FF5A09, $alpha: 0.1);
+            color: #ed762c;
+            background-color: rgba($color: #ed762c, $alpha: 0.1);
         }
     }
 }
@@ -101,7 +108,21 @@
 import Checkbox from './Checkbox'
 
 export default {
-    props: ['filters', 'chosen', 'multiple', 'maxItems', 'show'],
+    // props: ['filters', 'chosen', 'multiple', 'maxItems', 'show'],
+    props: {
+        filters: Array,
+        chosen: [String, Number, Boolean],
+        multiple: {
+            type: Boolean, default: false
+        },
+        maxItems: {
+            type: Number, default: 5
+        },
+        position: {
+            type: String, default: 'bottom'
+        },
+        show: Boolean
+    },
     components: { Checkbox },
     data() {
         return {
@@ -120,7 +141,7 @@ export default {
     },
     computed: {
         height() {
-            let max = this.maxItems || 5
+            let max = this.maxItems// || 5
             if (!this.multiple && this.filters.length > max) return `${max * 36}px`
             return 'auto'
         }

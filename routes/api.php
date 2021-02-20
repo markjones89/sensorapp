@@ -53,6 +53,7 @@ Route::get('areas/types', 'AreasController@types');
 Route::post('areas', 'AreasController@create');
 Route::put('areas/{id}', 'AreasController@update');
 Route::put('areas/coord/{id}', 'AreasController@updatePos');
+Route::put('areas/trigger-filter/{id}', 'AreasController@updateTriggerFilter');
 Route::delete('areas/{id}', 'AreasController@delete');
 
 Route::get('work-configs', 'WorkSettingsController@get');

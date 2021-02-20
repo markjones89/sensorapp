@@ -20,7 +20,7 @@
                     <input type="file" ref="logoFile" hidden accept="image/*" @change="logoFileChange" />
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col-12 col-md-6 col-lg-4">
                         <div class="settings-section">
                             <h2>Working Days</h2>
                             <div class="days-list">
@@ -28,7 +28,27 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="settings-section">
+                            <h2>Area Trigger Filter</h2>
+                            <table id="trigger-filters">
+                                <tbody>
+                                    <tr v-for="a in areas" :key="a.hid">
+                                        <td>{{ a.name }}</td>
+                                        <td>
+                                            <div class="input-field">
+                                                <select v-model="a.trigger_filter">
+                                                    <option value="null">Not specified</option>
+                                                    <option v-for="m in getMinutes(a)" :key="m" :value="m">{{ m }} minutes</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4">
                         <div class="settings-section hours-section">
                             <h2>Working Hours</h2>
                             <time-slider :from="entry.start_time" :to="entry.end_time"
@@ -36,7 +56,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" @click="triggerSave">Save Settings</button>
+                <button class="btn btn-primary" @click="triggerSave" :disabled="state.saving && state.savingTriggers">{{ state.saving && state.savingTriggers ? 'Saving...' : 'Save settings' }}</button>
             </div>
         </transition>
         <loader :show="!loaded" type="ripple"/>
@@ -120,6 +140,14 @@
         margin-bottom: 32px;
     }
 }
+#trigger-filters {
+    td {
+        padding: 4px 6px;
+    }
+    .input-field {
+        margin-bottom: 0;
+    }
+}
 </style>
 <script>
 import { store } from '../../store'
@@ -127,6 +155,7 @@ import { getBaseUrl } from '../../helpers'
 import { Checkbox, CircleProgress, Loader, TimeSlider } from '../../components'
 
 const api = '/api/work-configs'
+const atfApi = '/api/area-trigger-filter'
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 export default {
@@ -134,14 +163,14 @@ export default {
     components: { Checkbox, CircleProgress, Loader, TimeSlider },
     data() {
         return {
-            loaded: false, user: null, settings: null,
+            loaded: false, user: null, settings: null, areas: [],
             entry: {
-                start_time: null, end_time: null, work_days: []
+                start_time: null, end_time: null, area_triggers: [], work_days: []
             },
             upload_info: {
                 uploading: false, progress: 0
             },
-            state: { saving: false }
+            state: { saving: false, savingTriggers: false }
         }
     },
     computed: {
@@ -153,6 +182,15 @@ export default {
         }
     },
     methods: {
+        getMinutes(area) {
+            if (area.name == 'Meeting Rooms') {
+                let arr = [];
+                for (let i = 1; i <= 60; i++) { arr.push(i); }
+                return arr;
+            } else {
+                return [5,10,15,20,25,30,35,40,45];
+            }
+        },
         timeFromChange(time) { this.entry.start_time = time },
         timeToChange(time) { this.entry.end_time = time },
         toggleSaving(saving) { this.state.saving = saving },
@@ -170,12 +208,18 @@ export default {
                 this.entry.work_days = days.map(d => { return d.substr(0, 3) })
             }
         },
+        async getAreas() {
+            let { data } = await axios.get('/api/areas/types', { params: {} })
+
+            this.areas = data;
+        },
         triggerSave() {
             if (this.settings) {
                 this.upSettings()
             } else {
                 this.addSettings()
             }
+            this.saveAreaTriggers();
         },
         async addSettings() {
             this.toggleSaving(true)
@@ -203,6 +247,15 @@ export default {
 
                 this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
             })
+        },
+        async saveAreaTriggers() {
+            let total = this.areas.length
+
+            this.state.savingTriggers = true
+            this.areas.forEach((a, i) => {
+                axios.put(`/api/areas/trigger-filter/${a.hid}`, { minutes: a.trigger_filter, })
+                    .then(x => { if (i == total) this.state.savingTriggers = false })
+            });
         },
         upLogo() { this.$refs.logoFile.click() },
         logoFileChange() {
@@ -245,6 +298,7 @@ export default {
         this.user = store.getUser()
     },
     mounted() {
+        this.getAreas()
         this.getSettings()
     }
 }

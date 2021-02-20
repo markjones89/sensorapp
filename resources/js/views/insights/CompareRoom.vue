@@ -58,12 +58,20 @@
                     <span class="caret">
                         <caret-icon />
                     </span>
-                    <filter-dropdown :filters="percents" :maxItems="3" :chosen="percentFilter" :show="showPercentFilter" @onSelect="filterPercent" />
+                    <filter-dropdown :filters="percents" :chosen="percentFilter" position="top" :show="showPercentFilter" @onSelect="filterPercent" />
                 </span>
             </div>
-            <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
-                @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-            <div class="clearfix"></div>
+            <div class="bottom-filters">
+                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
+                    {{ minuteFilter ? minuteFilter : 'Select' }}
+                    <span class="caret">
+                        <caret-icon />
+                    </span>
+                    <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                </span>
+            </div>
         </div>
         <div class="graph-footer">
             <div class="left-options"></div>
@@ -232,7 +240,8 @@ export default {
             sizes: [4, 6, 12, 15], leftFilter: null, rightFilter: null, percents: ['10%','20%','30%','40%','50%','60%','70%','80%','90%','100%'], percentFilter: '70%',
             timeFilter: {
                 start: null, end: null
-            }
+            },
+            minuteFilter: '10 minutes', showMinuteFilter: false
         }
     },
     computed: {
@@ -241,6 +250,11 @@ export default {
             return this.sizes.map(s => {
                 return { value: s, label: `${s}-seated Room` }
             })
+        },
+        minuteFilters() {
+            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            
+            return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
         }
     },
     methods: {
@@ -264,6 +278,12 @@ export default {
 
             //TODO: get data based on time range
             this.generateRandomData()
+        },
+        filterMinute(minute) {
+            var min = this.minuteFilters.find(m => m.value == minute);
+
+            this.showMinuteFilter = false;
+            this.minuteFilter = min.label;
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false

@@ -16,11 +16,11 @@ export function circlePack(wrapper, packData, callbacks) {
 
     let circleColor = d3.scaleOrdinal()
         .domain([0, 1, 2])
-        .range(['#393939', '#5A5E63', '#FF5A09']);
+        .range(['#393846', '#32313d', '#ed762c']);
 
     let barColor = d3.scaleOrdinal()
         .domain([0, 1])
-        .range(['#3DCFA3', '#FF5A09']);
+        .range(['#3DCFA3', '#ed762c']);
 
     function drawAll(nodes, stats) {
         ////////////////////////////////////////////////////////////// 

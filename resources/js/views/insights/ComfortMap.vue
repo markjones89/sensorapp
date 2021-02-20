@@ -55,9 +55,17 @@
                         </div>
                     </div>
                 </div>
-                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
-                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-                <div class="clearfix"></div>
+                <div class="bottom-filters">
+                    <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                        @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                    <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
+                        {{ minuteFilter ? minuteFilter : 'Select' }}
+                        <span class="caret">
+                            <caret-icon />
+                        </span>
+                        <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                    </span>
+                </div>
             </div>
             <div class="graph-footer">
                 <div class="left-options"></div>
@@ -171,13 +179,19 @@ export default {
             building: null, floors: [], floor: null, floorFilter: null, mapper: null,
             timeFilter: {
                 start: null, end: null
-            }
+            },
+            minuteFilter: '10 minutes', showMinuteFilter: false
         }
     },
     computed: {
         settings() { return this.user.company ? this.user.company.settings : null },
         baseUrl() { return getBaseUrl() },
         floorFilters() { return this.floors.map(f => { return { value: f.hid, label: `${f.ordinal_no} Floor` } }) },
+        minuteFilters() {
+            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            
+            return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
+        }
     },
     methods: {
         backTo() { this.$router.back() },
@@ -194,6 +208,12 @@ export default {
         rangeSelect(range, from, to) {},
         timeStartChange(time) { this.timeFilter.start = time },
         timeEndChange(time) { this.timeFilter.end = time },
+        filterMinute(minute) {
+            var min = this.minuteFilters.find(m => m.value == minute);
+
+            this.showMinuteFilter = false;
+            this.minuteFilter = min.label;
+        },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show

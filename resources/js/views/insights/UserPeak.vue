@@ -53,9 +53,17 @@
                         </span>
                     </div>
                 </div>
-                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
-                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-                <div class="clearfix"></div>
+                <div class="bottom-filters">
+                    <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                        @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
+                    <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
+                        {{ minuteFilter ? minuteFilter : 'Select' }}
+                        <span class="caret">
+                            <caret-icon />
+                        </span>
+                        <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                    </span>
+                </div>
             </div>
             <div class="graph-footer">
                 <div class="left-options">
@@ -105,13 +113,19 @@ export default {
             chart: null, bldgFilter: null, areaFilter: 'All Areas',
             timeFilter: {
                 start: null, end: null
-            }
+            },
+            minuteFilter: '10 minutes', showMinuteFilter: false
         }
     },
     computed: {
         settings() { return this.user.company ? this.user.company.settings : null },
         buildingFilters() {
             return this.buildings.map(b => { return { value: b.hid, label: b.name } })
+        },
+        minuteFilters() {
+            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            
+            return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
         }
     },
     methods: {
@@ -166,10 +180,17 @@ export default {
         },
         rangeSelect(range, from, to) {},
         toLive() {
-            this.$router.push({ name: 'live' })
+            this.$router.push({ name: 'occupancy', query: { bid: this.building.hid } })
+            //this.$router.push({ name: 'live', query: { bid: this.building.hid, fid: fid } })
         },
         timeStartChange(time) { this.timeFilter.start = time },
         timeEndChange(time) { this.timeFilter.end = time },
+        filterMinute(minute) {
+            var min = this.minuteFilters.find(m => m.value == minute);
+
+            this.showMinuteFilter = false;
+            this.minuteFilter = min.label;
+        },
         renderChart(data) {
             this.chart = new areaChart('#user-peak-chart', data)
         },
