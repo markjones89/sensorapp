@@ -10,10 +10,10 @@ export function timeGraph(chart, dataUrl, options) {
         events = config.events
 
     var isOuterRadio = 0,
-        // canvasWidth = 960,
+        canvasWidth = 960,
         canvasWidth = container.node().getBoundingClientRect().width - (config.widget ? 0 : 17),
-        // canvasHeight = 600,
-        canvasHeight = container.node().getBoundingClientRect().height || 600,
+        canvasHeight = 500,
+        // canvasHeight = container.node().getBoundingClientRect().height || 600,
         centerX = canvasWidth * .4,
         centerY = canvasHeight / 2,
         // radio = 250,

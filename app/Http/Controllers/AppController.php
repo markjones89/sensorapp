@@ -10,21 +10,23 @@ use Hashids;
 
 class AppController extends Controller
 {
-    public function index(Request $request, $url) {
-        $user = Auth::user();
+    public function index() {
+        // $user = Auth::user();
         
-        if ($url == 'clients') {
-            if ($user->isSuperAdmin()) return view('app');
-            else abort(401);
-        } else if (in_array($url, ['locations', 'work-settings'])) {
-            if ($user->isAdmin()) return view('app');
-            else abort(401);
-        }
+        // if ($user) {
+        //     if ($url == 'clients') {
+        //         if ($user->isSuperAdmin()) return view('app');
+        //         else abort(401);
+        //     } else if (in_array($url, ['locations', 'work-settings'])) {
+        //         if ($user->isAdmin() || ($url == 'locations' && $user->isSuperAdmin())) return view('app');
+        //         else abort(401);
+        //     }
+        // }
 
         return view('app');
     }
 
-    public function location($bid) {
+    /* public function location($bid) {
         $bldgId = Hashids::decode($bid);
 
         if (count($bldgId)) {
@@ -33,7 +35,7 @@ class AppController extends Controller
             if ($bldg) return view('app');
             else abort(404);
         } else abort(404);
-    }
+    } */
 
     public function widget(Request $request, $url) {
         return view('widget');

@@ -38,11 +38,10 @@ function mapper(wrapper, data, options) {
     return container.node().parentNode.getBoundingClientRect().height || 400;
   };
 
-  var width = 800,
-      height = 400;
+  var width = maxWidth(),
+      height = maxHeight();
   var floor = data,
       sensors = floor.sensors || [],
-      areas = floor.areas || [],
       config = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["extend"])(config_defaults, options),
       events = config.events,
       offset = {
@@ -107,16 +106,13 @@ function mapper(wrapper, data, options) {
         scale: offset.scale,
         area: area
       });
-    } else if (state.areaMapping) {
-      var point = {
-        x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-        y: t ? (evt.offsetY - t.y) / t.k : evt.offsetY
-      },
-          drawLayer = areaLayer.select('g.area-draw');
-      if (drawLayer.empty()) startAreaDraw(point);else addPoint(drawLayer, point);
     }
-  }); // set wrapper to inline-block
-  // container.style('display', 'inline-block')
+  });
+
+  if (config.events) {
+    svg.style('pointer-events', 'all');
+  } // set wrapper to inline-block
+
 
   if (config.heatmap || config.comfortmap) {
     svg.append("defs").append("filter").attr("id", "blur").attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%').append("feGaussianBlur").attr("stdDeviation", blurSize());
@@ -124,7 +120,6 @@ function mapper(wrapper, data, options) {
 
   var mapLayer = svg.selectAll('.map-layer').data([0]).enter().append('g').attr('class', 'map-layer');
   var imgLayer = mapLayer.append('g').attr('class', 'image-layer');
-  var areaLayer = mapLayer.append('g').attr('class', 'area-layer');
   var sensorLayer = mapLayer.append('g').attr('class', 'sensor-layer');
   var zoom = d3__WEBPACK_IMPORTED_MODULE_0__["zoom"]().scaleExtent([1, 8]).on('zoom', function () {
     mapLayer.__transform = d3__WEBPACK_IMPORTED_MODULE_0__["event"].transform;
@@ -135,21 +130,8 @@ function mapper(wrapper, data, options) {
 
     imgLayer.attr('transform', mapLayer.__transform);
     sensorLayer.attr('transform', mapLayer.__transform);
-    areaLayer.attr('transform', mapLayer.__transform);
   });
-  mapLayer.call(zoom).on('mousemove', function () {
-    if (!state.drawing) return;
-    var drawLayer = areaLayer.select('g.area-draw');
-    drawLayer.select('line').remove();
-
-    var lastPoint = drawPoints[drawPoints.length - 1],
-        evt = d3__WEBPACK_IMPORTED_MODULE_0__["event"],
-        t = mapLayer.__transform,
-        _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-        _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY;
-
-    drawLayer.insert('line', ':nth-child(2)').attr('x1', lastPoint.x).attr('y1', lastPoint.y).attr('x2', _x).attr('y2', _y).attr('stroke', '#53DBF3').attr('stroke-width', 1).style('pointer-events', 'none');
-  });
+  mapLayer.call(zoom);
   /**
    * Sets the size of the canvas
    * @param {number} w Canvas width
@@ -231,182 +213,6 @@ function mapper(wrapper, data, options) {
     if (content) tooltip.html(content);
     tooltip.style('left', "".concat(x, "px")).style('top', "".concat(y, "px"));
   }
-  /* area mapping functions */
-
-
-  function startAreaDraw(point) {
-    state.drawing = true;
-    var drawLayer = areaLayer.append('g').attr('class', 'area-draw');
-    addPoint(drawLayer, point);
-  }
-
-  function addPoint(drawLayer, point) {
-    drawPoints.push(point);
-    drawLayer.select('polyline').remove(); // draw line
-
-    drawLayer.insert('polyline', ':first-child').data(drawPoints).attr('points', function () {
-      return drawPoints.map(function (p) {
-        return [p.x, p.y].join(',');
-      }).join(' ');
-    }).style('fill', 'none').attr('stroke', '#53DBF3');
-    drawLayer.append('circle').attr('cx', point.x).attr('cy', point.y).attr('r', 4).attr('fill', '#FFEB3B').attr('stroke', '#53DBF3') // .attr('is-handle', 'true')
-    .style('cursor', 'pointer').on('click', function () {
-      return endAreaDraw();
-    });
-  }
-
-  function toPointsDisp(points, scale) {
-    return points.map(function (p) {
-      var c_scale = parseFloat(offset.scale.toFixed(12)); //current scale
-
-      return [p.x / scale * c_scale + offset.x, p.y / scale * c_scale + offset.y].join(',');
-    }).join(' ');
-  }
-
-  function toPointsSave(points) {
-    return points.map(function (p) {
-      return [p.x - offset.x, p.y - offset.y].join(',');
-    }).join(' ');
-  }
-
-  function toPolyPoints(points) {
-    return points.map(function (p) {
-      return [p.x, p.y].join(',');
-    }).join(' ');
-  }
-
-  function addPoly(points, area) {
-    var ag = areaLayer.append('g').attr('class', area ? 'area' : 'area unsaved');
-    var canEdit = config.edit && state.areaMapping,
-        poly = ag.append('polygon') //.data(points)
-    .attr('points', area ? toPointsDisp(points, area.scale) : toPolyPoints(points)).style('fill', '#53DBF3').style('opacity', 0.2).style('cursor', function () {
-      return canEdit ? 'move' : state.sensorMapping ? 'crosshair' : 'default';
-    }).on('click', function (a) {
-      return canEdit && (polyClick(area), d3__WEBPACK_IMPORTED_MODULE_0__["event"].stopPropagation());
-    }).on('mouseover', function (a) {
-      if (state.sensorMapping) return;
-      tooltip.transition().duration(200).style('opacity', 0.9);
-      setTooltip(d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetX + tooltipOffsetX, d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetY - tooltip.node().getBoundingClientRect().height / 2, area.name);
-    }).on('mousemove', function () {
-      if (state.polyMoved || state.sensorMapping) return;
-      setTooltip(d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetX + tooltipOffsetX, d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetY - tooltip.node().getBoundingClientRect().height / 2);
-    }).on('mouseout', function () {
-      tooltip.transition().duration(200).style('opacity', 0);
-    }).call(d3__WEBPACK_IMPORTED_MODULE_0__["drag"]().on('drag', polyDrag).on('end', polyDragEnd));
-
-    if (area) {
-      ag.data([area]); // poly.append("svg:title")
-      //     .text(area.name)
-    }
-
-    if (!canEdit) return;
-    ag.selectAll('circles').data(points).enter().append('circle').attr('cx', function (d) {
-      return area ? d.x / area.scale * parseFloat(offset.scale.toFixed(12)) + offset.x : d.x;
-    }).attr('cy', function (d) {
-      return area ? d.y / area.scale * parseFloat(offset.scale.toFixed(12)) + offset.y : d.y;
-    }).attr('r', 4).attr('fill', '#FFEB3B').attr('stroke', '#53DBF3') // .attr('fill', 'none').attr('stroke', '#8bc34a').attr('stroke-width', 2)
-    .style('cursor', 'move').call(d3__WEBPACK_IMPORTED_MODULE_0__["drag"]().on('drag', polyPointDrag).on('end', polyPointDragEnd));
-  }
-
-  function polyClick(a) {
-    return events && events.areaClick && events.areaClick.call(_, a);
-  }
-
-  function polyDrag() {
-    if (config.edit && state.areaMapping) {
-      var _d3$event = d3__WEBPACK_IMPORTED_MODULE_0__["event"],
-          dx = _d3$event.dx,
-          dy = _d3$event.dy,
-          poly = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this),
-          circles = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).selectAll('circle'),
-          circle,
-          newPoints = [],
-          areaData = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).data()[0];
-      state.polyMoved = dx !== 0 || dy !== 0;
-      circles.each(function (cd) {
-        circle = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this);
-        cd.x += dx;
-        cd.y += dy;
-        circle.attr('cx', function (d) {
-          return areaData ? cd.x / areaData.scale * parseFloat(offset.scale.toFixed(12)) + offset.x : cd.x;
-        }).attr('cy', function (d) {
-          return areaData ? cd.y / areaData.scale * parseFloat(offset.scale.toFixed(12)) + offset.y : cd.y;
-        });
-        newPoints.push({
-          x: cd.x,
-          y: cd.y
-        });
-      });
-      poly.attr('points', toPointsDisp(newPoints, areaData.scale));
-    }
-  }
-
-  function polyDragEnd() {
-    if (config.edit && state.areaMapping) {
-      var areaData = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).data()[0],
-          circles = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).selectAll('circle'),
-          newPoints = [];
-      if (!state.polyMoved) return;
-      state.polyMoved = false;
-      circles.each(function (cd) {
-        return newPoints.push({
-          x: cd.x,
-          y: cd.y
-        });
-      });
-      var polyPoints = toPolyPoints(newPoints);
-      return events && events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale);
-    }
-  }
-
-  function polyPointDrag(d) {
-    // if (state.drawing) return
-    d.dragged = true;
-    var evt = d3__WEBPACK_IMPORTED_MODULE_0__["event"],
-        dragPoint = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this),
-        newPoints = [],
-        poly = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).select('polygon'),
-        circles = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).selectAll('circle'),
-        areaData = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).data()[0];
-    dragPoint.attr('cx', evt.x + offset.x).attr('cy', evt.y + offset.y);
-    d.x += evt.dx;
-    d.y += evt.dy;
-    circles.each(function (cd) {
-      return newPoints.push({
-        x: cd.x,
-        y: cd.y
-      });
-    });
-    poly.attr('points', toPointsDisp(newPoints, areaData.scale));
-  }
-
-  function polyPointDragEnd(d) {
-    if (!d.dragged) return;
-    d.dragged = false;
-    var newPoints = [],
-        // poly = d3.select(this.parentNode).select('polygon'),
-    circles = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).selectAll('circle'),
-        areaData = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this.parentNode).data()[0];
-    circles.each(function (cd) {
-      return newPoints.push({
-        x: cd.x,
-        y: cd.y
-      });
-    });
-    var polyPoints = toPolyPoints(newPoints);
-    return events && events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale);
-  }
-
-  function endAreaDraw() {
-    areaLayer.select('g.area-draw').remove();
-    var polyPoints = toPointsSave(drawPoints, true, offset.scale);
-    addPoly(drawPoints);
-    drawPoints.splice(0);
-    state.drawing = false;
-    return events && events.addArea && events.addArea.call(_, polyPoints, offset.scale);
-  }
-  /* end area mapping functions */
-
   /* sensor functions */
 
 
@@ -460,7 +266,7 @@ function mapper(wrapper, data, options) {
     if (sensors.length === 0) return;
     var canEdit = config.edit && state.sensorMapping;
     sensorLayer.selectAll('.sensor').data(sensors).enter().append('circle').attr('class', 'sensor').attr('data-id', function (d) {
-      return d.hid;
+      return d.id;
     }).attr('r', sensorSize()).attr('stroke-width', config.heatmap || config.comfortmap ? null : 5).attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0)).style('fill', sensorColor(0)).attr("filter", config.heatmap || config.comfortmap ? "url(#blur)" : null).style('cursor', function () {
       return canEdit ? 'move' : 'default';
     }).attr('cx', function (s) {
@@ -473,7 +279,7 @@ function mapper(wrapper, data, options) {
       if (config.comfortmap) return;
       var s_circle = d3__WEBPACK_IMPORTED_MODULE_0__["select"](this),
           s = sensors.find(function (x) {
-        return x.hid === s_circle.attr('data-id');
+        return x.id === s_circle.attr('data-id');
       });
       tooltip.transition().duration(200).style('opacity', 0.95);
       setTooltip(d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetX + tooltipOffsetX, d3__WEBPACK_IMPORTED_MODULE_0__["event"].offsetY - tooltip.node().getBoundingClientRect().height / 2, "<div>ID: ".concat(s.sensor_id, "</div><div>Name: ").concat(s.name ? s.name : '(None)', "</div>"));
@@ -499,20 +305,6 @@ function mapper(wrapper, data, options) {
     sensorLayer.select(".sensor[data-id=\"".concat(id, "\"]")).style('fill', sensorColor(range)).attr('stroke', sensorStroke(range));
   };
   /**
-   * Renders all area polygons
-   */
-
-
-  this.drawAreas = function () {
-    areaLayer.selectAll('g.area').remove(); //clear
-
-    if (mapLayer.__transform) areaLayer.attr('transform', mapLayer.__transform);
-    if (areas.length === 0) return;
-    areas.forEach(function (a) {
-      return addPoly(a.poly_points, a);
-    });
-  };
-  /**
    * Sets the floor data of the mapper
    * @param {Object} data Floor data
    */
@@ -521,7 +313,6 @@ function mapper(wrapper, data, options) {
   this.setData = function (data) {
     floor = data;
     sensors = floor.sensors;
-    areas = floor.areas;
     mapLayer.__transform = null;
     this.redraw(true);
   };
@@ -534,20 +325,23 @@ function mapper(wrapper, data, options) {
   this.redraw = function (fresh) {
     var _this2 = this;
 
-    // remove zoom
+    if (!floor.floor_plan) {
+      imgLayer.selectAll('image').remove();
+      sensorLayer.selectAll('.sensor').remove();
+      return;
+    } // remove zoom
+
+
     if (fresh) {
       mapLayer.__transform = null;
       mapLayer.call(zoom.transform, d3__WEBPACK_IMPORTED_MODULE_0__["zoomIdentity"]);
       calcOffsets(function () {
         _this2.drawFloorPlan();
 
-        _this2.drawAreas();
-
         _this2.drawSensors();
       });
     } else {
       this.drawFloorPlan();
-      this.drawAreas();
       this.drawSensors();
     }
 
@@ -582,8 +376,6 @@ function mapper(wrapper, data, options) {
   this.clearDrawing = function () {
     state.drawing = false;
     drawPoints.splice(0);
-    areaLayer.select('g.area-draw').remove();
-    areaLayer.select('g.area.unsaved').remove();
   };
   /**
    * Sets the sensor mapping state (enabled/disabled)
@@ -598,11 +390,9 @@ function mapper(wrapper, data, options) {
   }; // render floor plan
 
 
-  if (floor) {
+  if (floor && floor.floor_plan) {
     calcOffsets(function () {
       _this3.drawFloorPlan();
-
-      _this3.drawAreas();
 
       _this3.drawSensors();
     });

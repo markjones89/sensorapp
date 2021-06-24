@@ -50,9 +50,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="floor-info" v-for="f in floorsReverse" :key="f.hid">
+                                <tr class="floor-info" v-for="f in floorsReverse" :key="f.id">
                                     <td>{{ `${f.ordinal_no} Floor` }}</td>
-                                    <td><span class="occ-badge live-badge" :class="getLiveColor(f.occupancy_live, f.occupancy_limit)" @click="toLive(f.hid)">{{ f.occupancy_live }}</span></td>
+                                    <td><span class="occ-badge live-badge" :class="getLiveColor(f.occupancy_live, f.occupancy_limit)" @click="toLive(f.id)">{{ f.occupancy_live }}</span></td>
                                     <td><span class="occ-badge limit-badge orange">{{ f.occupancy_limit }}</span></td>
                                 </tr>
                             </tbody>
@@ -142,11 +142,12 @@ $darkenAmount: 10%;
 }
 </style>
 <script>
-import { store } from '../../store'
 import { FilterDropdown, Loader } from '../../components'
 import { BuildingSvg } from '../../components/svg'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
+import { mapState, mapGetters } from 'vuex'
+import { toOrdinal } from '../../helpers'
+
 const api = {
     building: '/api/locations',
     floor: '/api/floors'
@@ -155,55 +156,72 @@ const api = {
 export default {
     props: ['bldg_id'],
     components: { BuildingSvg, CaretIcon, CaretLeftIcon, FilterDropdown, Loader },
-    data() {
-        return {
-            buildings: [], building: null, bldgFilter: null, loaded: false, showPageOpts: false, showEmbed: false, showFilter: false,
-            floors: [], floorsReverse: []
-        }
-    },
+    data: () => ({
+        buildings: [], building: null, bldgFilter: null, loaded: false, showPageOpts: false, showEmbed: false, showFilter: false,
+        floors: [], floorsReverse: []
+    }),
     computed: {
+        ...mapState({
+            user: state => state.user 
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers',
+            api_buildings: 'backend/api_buildings',
+            api_floors: 'backend/api_floors'
+        }),
         buildingFilters() {
-            return this.buildings.map(b => { return { value: b.hid, label: b.name } })
+            return this.buildings.map(b => { return { value: b.id, label: b.name } })
         }
     },
     methods: {
         backTo() { this.$router.back() },
         async getBuildings() {
-            let company = store.getUserCompany()
+            let compId = this.user.company_id
 
-            if (!company) return
-
-            let { data } = await axios.get(api.building, { params: { cid: company.hid, lob: true } })
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header)
 
             this.buildings = data
             if (this.bldg_id) {
-                this.building = data.find(b => b.hid === this.bldg_id)
+                this.building = data.find(b => b.id === this.bldg_id)
             } else {
                 this.building = data[0]
             }
             this.bldgFilter = this.building.name
-            this.getFloors(this.building.hid, () => {
-                this.loaded = true
-            })
-        },
-        async getFloors(id, cb) {
-            let { data } = await axios.get(api.floor, { params: { bid: id } })
 
-            data.forEach(d => {
-                d.occupancy_live = Math.floor((Math.random() * d.occupancy_limit) + 1);
+            await this.getFloors(this.building.id)
+            this.loaded = true
+        },
+        async getFloors(id) {
+            let compId = this.user.company_id
+
+            // let { data } = await axios.get(this.api_floors(compId, id), this.api_header)
+            let res = await axios.all([
+                axios.get(api.floor, { params: { bid: id } }),
+                axios.get(this.api_floors(compId, id), this.api_header)
+            ])
+
+            let refs = res[0].data,
+                floors = res[1].data
+
+            floors.forEach(f => {
+                let ref = refs.find(x => x.ref_id == f.id)
+
+                f.ordinal_no = toOrdinal(f.number)
+                f.occupancy_limit = ref.occupancy_limit
+                f.occupancy_live = Math.floor((Math.random() * f.occupancy_limit) + 1)
             })
-            
-            this.floors = data.sort((a, b) => {
-                if (a.floor_no > b.floor_no) return 1
-                if (a.floor_no < b.floor_no) return -1
+
+            this.floors = floors.sort((a, b) => {
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
                 return 0
             })
-            this.floorsReverse = data.sort((a, b) => {
-                if (a.floor_no > b.floor_no) return -1
-                if (a.floor_no < b.floor_no) return 1
+            this.floorsReverse = floors.sort((a, b) => {
+                if (a.number > b.number) return -1
+                if (a.number < b.number) return 1
                 return 0
             })
-            return cb && cb()
         },
         getLiveColor(live, limit){
             let percent = (live / limit) * 100
@@ -216,17 +234,17 @@ export default {
         },
         filterSelect(value) {
             this.showFilter = false
-            this.building = this.buildings.find(b => b.hid === value)
+            this.building = this.buildings.find(b => b.id === value)
             this.bldgFilter = this.building.name
-            this.getFloors(this.building.hid)
+            this.getFloors(this.building.id)
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         },
-        floorClick(floor) { this.toLive(floor.hid) },
+        floorClick(floor) { this.toLive(floor.id) },
         toLive(fid) {
-            this.$router.push({ name: 'live', query: { bid: this.building.hid, fid: fid } })
+            this.$router.push({ name: 'live', query: { bid: this.building.id, fid: fid } })
         }
     },
     mounted() {

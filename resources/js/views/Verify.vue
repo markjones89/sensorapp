@@ -25,18 +25,39 @@
         </div>
     </div>
 </template>
+<style lang="scss" scoped>
+#app-verify {
+    padding: 92px 0;
+    width: 100%;
+
+    #verify-wrapper {
+        width: 300px;
+        margin: 0 auto;
+        background-color: #282737;
+        padding: 24px;
+        border-radius: 10px;
+
+        h1 {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        #verified {
+            text-align: center;
+        }
+    }
+}
+</style>
 <script>
 import { getBaseUrl, getUrlParam } from '../helpers'
 
 const userApi = '/api/users'
 
 export default {
-    data() {
-        return {
-            securityCode: '', pass: '', confPass: '', verified: false,
-            state: { verifying: false }
-        }
-    },
+    data: () => ({
+        securityCode: '', pass: '', confPass: '', verified: false,
+        state: { verifying: false }
+    }),
     computed: {
         baseUrl() { return getBaseUrl() },
         uid() { return getUrlParam('uid') },

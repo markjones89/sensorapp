@@ -203,17 +203,17 @@
 }
 </style>
 <script>
+import { mapState } from 'vuex'
 import { addEvent, getBaseUrl, removeEvent } from "../helpers"
 import { DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "../components"
 import { circlePack } from '../components/graphs/CirclePack'
 import { CaretIcon } from "../components/icons"
-import { store } from '../store'
 export default {
     title: 'Home',
     components: { CaretIcon, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
     data() {
         return {
-            user: null, circlePack: null, filters: [
+            circlePack: null, filters: [
                 { value: 'CUS', label: 'Cost of Unused Spaces' },
                 { value: 'PU', label: 'Peak Usage' },
                 { value: 'AU', label: 'Average Usage' },
@@ -227,12 +227,14 @@ export default {
         }
     },
     computed: {
-        settings() { return this.user.company ? this.user.company.settings : null },
         minuteFilters() {
             var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
-        }
+        },
+        ...mapState({
+            settings: state => state.user.company ? state.user.company.settings : null
+        })
     },
     methods: {
         rangeSelect(range, from, to) {
@@ -283,7 +285,7 @@ export default {
 
             this.circlePack = new circlePack('#circle-pack', _data, {
                 zoomed: (data) => {
-                    console.log('zoomed', data)
+                    // console.log('zoomed', data)
                 },
                 moreInfo: (data) => {
                     this.$router.push({ name: 'time' })
@@ -298,9 +300,6 @@ export default {
         },
         toPeak() { this.$router.push({ name: 'peak' }) },
         toWFH() { this.$router.push({ name: 'wfh' }) }
-    },
-    created() {
-        this.user = store.getUser()
     },
     mounted() {
         addEvent(document, ['mousedown', 'touchend', 'keydown'], this.pageOptsHandler)

@@ -18,21 +18,26 @@ use Image;
 class UsersController extends Controller
 {
     /* Users API */
-    public function get($id = null) {
+    public function get(Request $request, $id = null) {
         if ($id) {
-            $uid = Hashids::decode($id)[0];
+            $uid = Hashids::connection('user')->decode($id)[0];
             
             return response(User::with(['company', 'role'])->find($uid));
+        }
+
+        // get by company (request payload)
+        if ($request->cid) {
+            return response(User::with(['company', 'role'])->where('company_id', $request->cid)->get());
         }
 
         return response(User::with(['company', 'role'])->get());
     }
 
-    public function getByCompany($cid) {
-        $compId = Hashids::decode($cid)[0];
+    // public function getByCompany($cid) {
+    //     // $compId = Hashids::decode($cid)[0];
 
-        return response(User::with('role')->where('company_id', $compId)->get());
-    }
+    //     return response(User::with('role')->where('company_id', $cid)->get());
+    // }
 
     /**
      * Generates a unique username using an email address
@@ -56,11 +61,12 @@ class UsersController extends Controller
         } else {
             $u = new User;
 
-            $cid = $request->company;
+            //$cid = $request->company;
             $randPass = Str::random(16);
             $hashedPass = Hash::make($randPass);
 
-            $u->company_id = $cid ? Hashids::decode($cid)[0] : null;
+            // $u->company_id = $cid ? Hashids::decode($cid)[0] : null;
+            $u->company_id = $request->company;
             $u->name = $request->name;
             $u->email = $request->email;
             $u->password = $hashedPass;
@@ -105,16 +111,20 @@ class UsersController extends Controller
     }
 
     public function updatePass(Request $request, $id) {
-        $uid = Hashids::connection('user')->decode($id)[0];
-        $user = User::find($uid);
+        if ($request->password == '' || !$request->has('password')) {
+            return response(['r' => false, 'm' => 'Password is required']);
+        } else {
+            $uid = Hashids::connection('user')->decode($id)[0];
+            $user = User::find($uid);
 
-        if ($user) {
-            $user->password = Hash::make($request->password);
-            $user->save();
+            if ($user) {
+                $user->password = Hash::make($request->password);
+                $user->save();
 
-            return response(['r' => true, 'm' => 'Password changed']);
+                return response(['r' => true, 'm' => 'Password changed']);
+            }
+            return response(['r' => false, 'm' => 'User not found']);
         }
-        return response(['r' => false, 'm' => 'User not found']);
     }
 
     public function setPhoto(Request $request, $id) {

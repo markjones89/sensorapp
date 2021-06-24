@@ -14,7 +14,8 @@ class VerifyController extends Controller
             $user = User::find($uid);
 
             if ($user->email_verified_at) return abort(419);
-            return view('verify');
+            //return view('verify');
+            return view('app');
         }
         return abort(400);
     }

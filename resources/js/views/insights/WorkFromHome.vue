@@ -118,7 +118,7 @@
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapGetters, mapState } from "vuex";
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
 import { BuildingSvg, HouseSvg } from '../../components/svg'
@@ -140,22 +140,30 @@ function randomNum() {
 export default {
     title: 'Work From Home',
     components: { BuildingSvg, CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, HouseSvg, Loader, TimeSlider },
-    data() {
-        return {
-            user: null, loaded: false, showPageOpts: false, showEmbed: false,
-            showFilter: false, buildings: [], floors: [],
-            building: null, bldgFilter: null,
-            wfhStat: 0, bldgStat: 0,
-            timeFilter: {
-                start: null, end: null
-            },
-            minuteFilter: '10 minutes', showMinuteFilter: false
-        }
-    },
+    data: () => ({
+        // user: null, 
+        loaded: false, showPageOpts: false, showEmbed: false,
+        showFilter: false, buildings: [], floors: [],
+        building: null, bldgFilter: null,
+        wfhStat: 0, bldgStat: 0,
+        timeFilter: {
+            start: null, end: null
+        },
+        minuteFilter: '10 minutes', showMinuteFilter: false
+    }),
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers',
+            api_buildings: 'backend/api_buildings',
+            api_floors: 'backend/api_floors'
+        }),
         settings() { return this.user.company ? this.user.company.settings : null },
         buildingFilters() {
-            return this.buildings.map(b => { return { value: b.hid, label: b.name } })
+            return this.buildings.map(b => { return { value: b.id, label: b.name } })
         },
         homeScale() { return (this.wfhStat < MIN_SCALE ? MIN_SCALE : this.wfhStat) / 100 },
         bldgScale() { return (this.bldgStat < MIN_SCALE ? MIN_SCALE : this.bldgStat) / 100 },
@@ -168,49 +176,48 @@ export default {
     methods: {
         backTo() { this.$router.back() },
         async getBuildings() {
-            let company = this.user.company
+            let compId = this.user.company_id
 
-            if (!company) return
-
-            let { data } = await axios.get(api.building, { params: { cid: company.hid, lob: true } })
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header)
 
             this.buildings = data
+
             if (this.bldg_id) {
-                this.building = data.find(b => b.hid === this.bldg_id)
+                this.building = data.find(b => b.id === this.bldg_id)
             } else {
                 this.building = data[0]
             }
             this.bldgFilter = this.building.name
-            this.getFloors(this.building.hid, () => {
-                this.loaded = true
+            
+            await this.getFloors(this.building.id)
+
+            this.loaded = true
                 
-                //TODO: show stats
-                this.wfhStat = randomNum()
-                this.bldgStat = 100 - this.wfhStat
-            })
+            //TODO: show stats
+            this.wfhStat = randomNum()
+            this.bldgStat = 100 - this.wfhStat
         },
-        async getFloors(id, cb) {
-            let { data } = await axios.get(api.floor, { params: { bid: id } })
+        async getFloors(id) {
+            let compId = this.user.company_id
+
+            let { data } = await axios.get(this.api_floors(compId, id), this.api_header)
 
             let sorted = data.sort((a, b) => {
-                if (a.floor_no > b.floor_no) return 1
-                if (a.floor_no < b.floor_no) return -1
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
                 return 0
             })
 
             this.floors = sorted.slice(0)
-
-            return cb && cb()
         },
-        filterSelect(value, label) {
+        async filterSelect(value, label) {
             this.showFilter = false
-            this.building = this.buildings.find(b => b.hid === value)
+            this.building = this.buildings.find(b => b.id === value)
             this.bldgFilter = label
-            this.getFloors(this.building.hid, () => {
-                //TODO: update stats
-                this.wfhStat = randomNum()
-                this.bldgStat = 100 - this.wfhStat
-            })
+            await this.getFloors(this.building.id)
+            //TODO: update stats
+            this.wfhStat = randomNum()
+            this.bldgStat = 100 - this.wfhStat
         },
         toCostAnalysis() {
             this.$router.push({ name: 'cost-analysis' })
@@ -228,9 +235,6 @@ export default {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         }
-    },
-    created() {
-        this.user = store.getUser()
     },
     mounted() {
         this.getBuildings()

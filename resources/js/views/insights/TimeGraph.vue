@@ -95,7 +95,7 @@
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapState } from "vuex";
 import { getBaseUrl } from '../../helpers'
 import { Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "../../components"
 import { CaretIcon, CaretLeftIcon } from "../../components/icons"
@@ -106,7 +106,7 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
     data() {
         return {
-            user: null,
+            // user: null,
             showPageOpts: false, showEmbed: false, showHeatMap: false,
             timeGraph: null, heatMap: null,
             timeFilter: {
@@ -116,6 +116,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
         baseUrl() { return getBaseUrl() },
         settings() { return this.user.company ? this.user.company.settings : null },
         minuteFilters() {
@@ -177,9 +180,6 @@ export default {
                 radiusX: 60, radiusY: 60
             })
         }
-    },
-    created() {
-        this.user = store.getUser()
     },
     mounted() {
         this.renderTimeChart()

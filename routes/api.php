@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('clients', 'CompaniesController@get');
 Route::post('clients', 'CompaniesController@create');
 Route::post('clients/logo', 'CompaniesController@setLogo');
-Route::put('clients/{id}', 'CompaniesController@update');
+// Route::put('clients/{id}', 'CompaniesController@update');
 Route::delete('clients/{id}', 'CompaniesController@delete');
 
 Route::get('gcosts', 'GlobalCostsController@get');
@@ -29,14 +29,15 @@ Route::post('gcosts', 'GlobalCostsController@create');
 Route::put('gcosts/{id}', 'GlobalCostsController@update');
 Route::delete('gcosts/{id}', 'GlobalCostsController@delete');
 
-Route::get('locations', 'LocationsController@get');
+// Route::get('locations', 'LocationsController@get');
 Route::get('locations/{company}/costs', 'LocationsController@getCosts');
-Route::post('locations', 'LocationsController@create');
-Route::put('locations/{id}', 'LocationsController@update');
-Route::delete('locations/{id}', 'LocationsController@delete');
+Route::post('locations/{company}/costs', 'LocationsController@saveCosts');
+// Route::post('locations', 'LocationsController@create');
+// Route::put('locations/{id}', 'LocationsController@update');
+// Route::delete('locations/{id}', 'LocationsController@delete');
 
 Route::get('floors', 'FloorsController@get');
-Route::get('floors/{id}/data', 'FloorsController@getData');
+// Route::get('floors/{id}/data', 'FloorsController@getData');
 Route::post('floors', 'FloorsController@create');
 Route::post('floors/plan', 'FloorsController@setFloorPlan');
 Route::put('floors/{id}', 'FloorsController@update');
@@ -44,25 +45,24 @@ Route::delete('floors/{id}', 'FloorsController@delete');
 
 Route::get('sensors', 'SensorsController@get');
 Route::post('sensors', 'SensorsController@create');
-Route::put('sensors/{id}', 'SensorsController@update');
+// Route::put('sensors/{id}', 'SensorsController@update');
 Route::put('sensors/coord/{id}', 'SensorsController@updatePos');
 Route::delete('sensors/{id}', 'SensorsController@delete');
 
-Route::get('areas', 'AreasController@get');
+// Route::get('areas', 'AreasController@get');
 Route::get('areas/types', 'AreasController@types');
-Route::post('areas', 'AreasController@create');
-Route::put('areas/{id}', 'AreasController@update');
-Route::put('areas/coord/{id}', 'AreasController@updatePos');
+// Route::post('areas', 'AreasController@create');
+// Route::put('areas/{id}', 'AreasController@update');
+// Route::put('areas/coord/{id}', 'AreasController@updatePos');
 Route::put('areas/trigger-filter/{id}', 'AreasController@updateTriggerFilter');
-Route::delete('areas/{id}', 'AreasController@delete');
+// Route::delete('areas/{id}', 'AreasController@delete');
 
 Route::get('work-configs', 'WorkSettingsController@get');
 Route::post('work-configs', 'WorkSettingsController@create');
 Route::put('work-configs/{id}', 'WorkSettingsController@update');
 Route::delete('work-configs/{id}', 'WorkSettingsController@delete');
 
-Route::get('users', 'UsersController@get');
-Route::get('users/{cid}', 'UsersController@getByCompany');
+Route::get('users/{id?}', 'UsersController@get');
 Route::post('users', 'UsersController@create');
 Route::post('users/photo/{id}', 'UsersController@setPhoto');
 Route::put('users/{id}', 'UsersController@update');

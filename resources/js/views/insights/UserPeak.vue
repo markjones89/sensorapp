@@ -85,10 +85,11 @@
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapState, mapGetters } from "vuex";
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
 import areaChart from '../../components/graphs/AreaChart'
+import { toOrdinal } from '../../helpers'
 
 const api = {
     building: '/api/locations',
@@ -106,7 +107,8 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider },
     data() {
         return {
-            user: null, loaded: false, showPageOpts: false, showEmbed: false,
+            // user: null, 
+            loaded: false, showPageOpts: false, showEmbed: false,
             buildings: [], building: null,
             areas: ['All Areas', 'Department', 'Informal Meeting Spaces', 'Meeting Rooms', 'Workspace Desk Area'], 
             showFilter: false, showAreaFilter: false,
@@ -118,9 +120,18 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers',
+            api_buildings: 'backend/api_buildings',
+            api_floors: 'backend/api_floors'
+        }),
         settings() { return this.user.company ? this.user.company.settings : null },
         buildingFilters() {
-            return this.buildings.map(b => { return { value: b.hid, label: b.name } })
+            return this.buildings.map(b => { return { value: b.id, label: b.name } })
         },
         minuteFilters() {
             var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
@@ -131,56 +142,73 @@ export default {
     methods: {
         backTo() { this.$router.back() },
         async getBuildings() {
-            let company = store.getUserCompany()
+            let compId = this.user.company_id
 
-            if (!company) return
-
-            let { data } = await axios.get(api.building, { params: { cid: company.hid, lob: true } })
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header)
 
             this.buildings = data
             if (this.bldg_id) {
-                this.building = data.find(b => b.hid === this.bldg_id)
+                this.building = data.find(b => b.id === this.bldg_id)
             } else {
                 this.building = data[0]
             }
             this.bldgFilter = this.building.name
-            this.getFloors(this.building.hid, (chartData) => {
-                this.loaded = true
-                dummy = chartData
-                setTimeout(() => {
-                    this.renderChart(chartData.slice(0))
-                }, 0);
-            })
+
+            let chartData = await this.getFloors(this.building.id)
+            
+            this.loaded = true
+            dummy = chartData
+
+            setTimeout(() => {
+                this.renderChart(chartData.slice(0))
+            }, 0)
         },
-        async getFloors(id, cb) {
-            let { data } = await axios.get(api.floor, { params: { bid: id } })
+        async getFloors(id) {
+            let compId = this.user.company_id
+
+            let { data } = await axios.get(this.api_floors(compId, id), this.api_header)
+
+            data.forEach(f => f.ordinal_no = toOrdinal(f.number))
 
             let sorted = data.sort((a, b) => {
-                if (a.floor_no > b.floor_no) return 1
-                if (a.floor_no < b.floor_no) return -1
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
                 return 0
             })
 
-            return cb && cb(sorted.map(d => {
-                return { label: `${d.ordinal_no} Floor`, xValue: d.floor_no, yValue: randomNum() }
-            }))
+            this.floors = sorted.slice(0)
+
+            return sorted.map(d => {
+                return { label: `${d.ordinal_no} Floor`, xValue: d.number, yValue: randomNum() }
+            })
         },
-        filterSelect(value, label) {
+        async filterSelect(value, label) {
             //TODO: filter building
+            let current = this.building.id
+
             this.showFilter = false
-            this.building = this.buildings.find(b => b.hid === value)
+            this.building = this.buildings.find(b => b.id === value)
             this.bldgFilter = label//this.building.name
-            this.getFloors(this.building.hid, (data) => {
+            
+            if (current == value) {
+                let data = dummy.slice(0).map(d => {
+                    return { label: d.label, xValue: d.xValue, yValue: randomNum() }
+                })
+
+                this.chart.update(data, true)
+            } else {
+                let data = await this.getFloors(this.building.id)
+            
                 dummy = data
                 this.chart.update(data.slice(0), true)
-            })
+            }
         },
         toCostAnalysis() {
             this.$router.push({ name: 'cost-analysis' })
         },
         rangeSelect(range, from, to) {},
         toLive() {
-            this.$router.push({ name: 'occupancy', query: { bid: this.building.hid } })
+            this.$router.push({ name: 'occupancy', query: { bid: this.building.id } })
             //this.$router.push({ name: 'live', query: { bid: this.building.hid, fid: fid } })
         },
         timeStartChange(time) { this.timeFilter.start = time },
@@ -201,15 +229,13 @@ export default {
             let data = dummy.slice(0).map(d => {
                 return { label: d.label, xValue: d.xValue, yValue: randomNum() }
             })
+
             this.chart.update(data, true)
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         }
-    },
-    created() {
-        this.user = store.getUser()
     },
     mounted() {
         this.getBuildings()

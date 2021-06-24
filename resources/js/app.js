@@ -1,6 +1,6 @@
 require('./bootstrap')
 
-window.Vue = require('vue')
+import Vue from 'vue'
 
 // mixins
 import title from './mixins/pageTitle'
@@ -14,8 +14,12 @@ Vue.use(mdtoast)
 Vue.use(duDialog)
 
 import App from './views/App.vue'
+import { store } from './store'
+import router from "./router"
 
 const app = new Vue({
     // el: '#app',
+    store,
+    router,
     render: h => h(App)
 }).$mount('#app')

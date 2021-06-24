@@ -32,6 +32,7 @@ svg { pointer-events: none; }
 
 /* margins */
 .ml-12 { margin-left: 12px; }
+.mr-12 { margin-right: 12px; }
 .mt-24 { margin-top: 24px; }
 
 [hidden="hidden"] { display: none; }
@@ -327,6 +328,10 @@ textarea {
     display: flex;
 
     .page-back {
+        flex: 1 auto;
+    }
+
+    .page-title {
         flex: 1 auto;
     }
 
@@ -723,4 +728,15 @@ textarea {
         border-left-color: $primaryColor !important;
         border-top-color: $primaryColor  !important;
     }
+}
+
+/* Commons */
+.error-display {
+    display: flex;
+    flex-direction: column;
+    font-size: 18px;
+    color: rgba(255, 255, 255, .5);
+    text-align: center;
+    justify-content: center;
+    height: 200px;
 }

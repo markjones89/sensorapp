@@ -1,36 +1,26 @@
 <template>
     <div class="content">
+        <div class="graph-header" v-if="loaded">
+            <h2 class="page-title">{{ building ? `${building.name} Mapping` : 'Mapping' }}</h2>
+            <div class="graph-filters">
+                <template v-if="floor && floor.floor_plan">
+                    <a href="javascript:;" class="btn btn-primary mr-12" v-if="editMapper" @click="toggleEditMode(false)">Close Edit</a>
+                    <a href="javascript:;" class="btn btn-primary mr-12" v-else @click="toggleEditMode(true)">Edit</a>
+                </template>
+                <span class="graph-filter" @click="filterFloor = !filterFloor">
+                    {{ floor ? `${floor.ordinal_no} Floor` : 'Select Floor' }}
+                    <span class="caret">
+                        <caret-icon />
+                    </span>
+                    <filter-dropdown :filters="floorList" :show="filterFloor" @onSelect="selectFloor" />
+                </span>
+            </div>
+        </div>
         <template v-if="loaded">
-            <h1>{{ building ? `${building} Mapping` : 'Mapping' }}</h1>
             <transition name="fade">
                 <div id="sensor-mapper" v-if="loaded">
-                    <div class="row">
-                        <div class="col-12 col-md-3">
-                            <div id="mapper-options">
-                                <div class="input-field">
-                                    <label>Floor</label>
-                                    <!-- <select v-model="floorSel" @change="floorChange"> -->
-                                    <select v-model="floorSel">
-                                        <option v-for="f in  floors" :key="f.hid" :value="f.hid">{{ f.ordinal_no }} Floor</option>
-                                    </select>
-                                </div>
-                                <template v-if="editMapper">
-                                    <button class="btn btn-primary" @click="toggleEditMode(false)">Close Edit</button>
-                                    <div id="switches">
-                                        <switches type-bold="true" v-model="editArea" label="Area Mapping" theme="custom" color="orange" emit-on-mount="false" @input="toggleAreaMap"/>
-                                        <switches type-bold="true" v-model="editSensor" label="Sensor Mapping" theme="custom" color="orange" emit-on-mount="false" @input="toggleSensorMap"/>
-                                    </div>
-                                </template>
-                                <button class="btn btn-primary" v-else @click="toggleEditMode(true)">Edit Mode</button>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="floor-map">
-                                <div id="floor-map">
-                                    <loader :show="mapperLoading" type="spinner"/>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="floor-map" class="floor-map">
+                        <loader :show="mapperLoading" type="spinner"/>
                     </div>
                 </div>
             </transition>
@@ -49,15 +39,18 @@
                     <input type="text" v-model="entry.name" placeholder="(Optional)">
                 </div>
                 <div class="input-field">
-                    <label>Group ID</label>
-                    <input type="text" v-model="entry.group">
-                </div>
-                <div class="input-field">
-                    <label>Area</label>
-                    <select v-model="entry.area">
-                        <option v-for="a in floorAreas" :key="a.hid" :value="a.hid">{{ a.name }}</option>
+                    <label>Group ID (Area)</label>
+                    <!-- <input type="text" v-model="entry.group"> -->
+                    <select v-model="entry.group">
+                        <option v-for="a in floorAreas" :key="a.id" :value="a.id">{{ a.group_id }}</option>
                     </select>
                 </div>
+                <!-- <div class="input-field">
+                    <label>Area</label>
+                    <select v-model="entry.area">
+                        <option v-for="a in floorAreas" :key="a.id" :value="a.id">{{ a.name }}</option>
+                    </select>
+                </div> -->
             </div>
             <template v-slot:footer>
                 <button class="btn btn-primary" @click="addSensor" :disabled="state.saving" v-if="!editMode">{{ state.saving ? 'Adding...' : 'Add'}}</button>
@@ -67,66 +60,9 @@
                 </template>
             </template>
         </modal>
-        <modal :show="showAreaEntry" @close="toggleAreaEntry(false)">
-            <template v-slot:header>
-                <h2>{{ editMode ? 'Edit' : 'Add' }} Area</h2>
-            </template>
-            <div id="entry-wrapper">
-                <div class="input-field">
-                    <label>Type</label>
-                    <select v-model="areaEntry.type">
-                        <option v-for="t in areaTypes" :key="t.hid" :value="t.hid">{{ t.name }}</option>
-                    </select>
-                </div>
-                <div class="input-field">
-                    <label>Name</label>
-                    <input type="text" v-model="areaEntry.name" ref="area">
-                </div>
-                <div class="input-field" v-if="areaByDesk">
-                    <label>Desks</label>
-                    <input type="number" v-model="areaEntry.desks">
-                </div>
-                <div class="input-field" v-else>
-                    <label>Seats</label>
-                    <input type="number" v-model="areaEntry.seats">
-                </div>
-            </div>
-            <template v-slot:footer>
-                <button class="btn btn-primary" @click="addArea" :disabled="state.saving" v-if="!editMode">{{ state.saving ? 'Adding...' : 'Add'}}</button>
-                <template v-if="editMode">
-                    <button class="btn btn-danger btn-link" @click="delArea" :disabled="state.removing">{{ state.removing ? 'Removing...' : 'Remove'}}</button>
-                    <button class="btn btn-primary" @click="upArea" :disabled="state.saving">{{ state.saving ? 'Updating...' : 'Update'}}</button>
-                </template>
-            </template>
-        </modal>
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
-<style lang="scss">
-$color: #FF5A09;
-.vue-switcher-theme--custom {
-    &.vue-switcher-color--orange {
-        div {
-            background-color: lighten($color, 10%);
-
-            &:after {
-                // for the circle on the switch
-                background-color: darken($color, 5%);
-            }
-        }
-
-        &.vue-switcher--unchecked {
-            div {
-                background-color: lighten($color, 30%);
-
-                &:after {
-                    background-color: lighten($color, 10%);
-                }
-            }
-        }
-    }
-}
-</style>
 <style lang="scss" scoped>
 #sensor-mapper {
     display: flex;
@@ -150,22 +86,20 @@ $color: #FF5A09;
             margin: 5px 5px 20px;
         }
     }
-    .floor-map {
-        display: flex;
-        align-items: flex-start;
 
-        #floor-map {
-            position: relative;
-        }
+    #floor-map {
+        position: relative;
+        flex: 1 auto;
     }
 }
 </style>
 <script>
-import { getBaseUrl } from '../../helpers'
+import { mapGetters, mapMutations, mapState } from 'vuex'
+import { getBaseUrl, toOrdinal } from '../../helpers'
 import { Loader, Modal } from '../../components'
-import Switches from 'vue-switches'
 import floorMapper from '../../components/FloorMapper.js'
-import { store } from '../../store'
+import { FilterDropdown } from '../../components'
+import { CaretIcon } from '../../components/icons'
 
 const api = {
     bldg: '/api/locations',
@@ -177,107 +111,150 @@ const api = {
 export default {
     title: 'Floor Mapper',
     props: ['bldg_id', 'bldg_name', 'floor_id'],
-    components: { Loader, Modal, Switches },
-    data() {
-        return {
-            mapper: null, mapperLoading: false,
-            loaded: false, bldg: null, areaTypes: [], floors: [], floorAreas: [], 
-            floorSel: null, editMapper: false, editArea: false, editSensor: false,
-            showEntry: false, showAreaEntry: false, editMode: false,
-            entry: { id: null, sensor: '', name: '', group: '', area: null, pos_x: 0, pos_y: 0, scale: 0 },
-            areaEntry: { id: null, type: null, name: '', desks: 0, seats: 0, points: '', scale: 0 },
-            state: { saving: false, removing: false }
-        }
-    },
+    components: { Loader, FilterDropdown, CaretIcon, Modal },
+    data: () => ({
+        mapper: null, mapperLoading: false,
+        loaded: false,
+        areaTypes: [],
+        floorAreas: [],
+        filterFloor: false,
+        floorSel: null, editMapper: false, editArea: false, editSensor: false,
+        showEntry: false, showAreaEntry: false, editMode: false,
+        entry: { id: null, sensor: '', name: '', group: '', pos_x: 0, pos_y: 0, scale: 0 },
+        state: { saving: false, removing: false }
+    }),
     computed: {
+        ...mapState({
+            user: state => state.user,
+            company_id: state => state.locations.client
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_buildings: 'backend/api_buildings',
+            api_building_overview: 'backend/api_building_overview',
+            api_sensors: 'backend/api_sensors',
+            api_sensor: 'backend/api_sensor',
+            api_sensors_by_node: 'backend/api_sensors_by_node',
+            buildings: 'locations/getBuildings',
+            building: 'locations/getBuilding'
+        }),
         baseUrl() { return getBaseUrl() },
-        floor() {
-            return this.floorSel ? this.floors.find(f => f.hid === this.floorSel) : null
+        floors() { return this.$store.getters['locations/getFloors'](this.bldg_id) },
+        floorList() {
+            return this.floors.sort((a, b) => {
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
+                return 0
+            }).map(x => { return { label: `${x.ordinal_no} Floor`, value: x.id } })
         },
-        building() {
-            return this.bldg_name ? this.bldg_name : 
-                this.bldg ? this.bldg.name : ''
-        },
-        areaByDesk() {
-            let type = this.areaTypes.find(x => x.hid === this.areaEntry.type)
-
-            return type && type.name === 'Workspace Desk Area'
-        }
+        floor() { return this.floorSel ? this.floors.find(f => f.id === this.floorSel) : null },
     },
     watch: {
-        floorSel: function(floor, oldFloor) {
-            this.getFloorData(this.floorSel, () => {
-                this.mapper.setData(this.floor)
-            })
-        }
+        floorSel: function(floor, oldFloor) { this.getSensors(floor, () => { this.mapper.setData(this.floor) }) },
+        editSensor: function(isEdit) { this.mapper.setSensorMapping(isEdit) }
     },
     methods: {
+        ...mapMutations({
+            setBuildings: 'locations/setBuildings',
+            setBuilding: 'locations/setBuilding',
+            setFloors: 'locations/setFloors'
+        }),
         async getAreaTypes() {
             let { data } = await axios.get(`${api.area}/types`)
 
             this.areaTypes = data
         },
-        async getBldg(id, cb) {
-            let { data } = await axios.get(api.bldg, { params: { id: id } })
+        async getBuilding(id, cb) {
+            let bldg = null
+            if (this.buildings.length > 0) {
+                bldg = this.buildings.find(x => x.id == id)
+            } else {
+                let res = await axios.get(this.api_buildings(this.company_id), this.api_header)
+                bldg = res.data.find(x => x.id == id)
+                this.setBuildings(res.data)
+            }
 
-            store.setBldg(data)
-            this.bldg = data
+            this.setBuilding(bldg)
 
             return cb && cb()
         },
-        async getFloors(bid, cb) {
-            let { data } = await axios.get(api.floor, { params: { bid: bid } })
+        async getFloors(cb) {
+            let res = await axios.all([
+                axios.get(api.floor, { bid: this.bldg_id }),
+                axios.get(this.api_building_overview(this.company_id, this.bldg_id), this.api_header)
+            ])
 
-            data.forEach(floor => {
-                floor.floor_plan_url = `${this.baseUrl}/plans/${floor.floor_plan}`
-                floor.upload_info = {
+            let refs = res[0].data,
+                floors = res[1].data.children
+
+            floors.forEach(f => {
+                let ref = refs.find(x => x.ref_id == f.id)
+                f.ordinal_no = toOrdinal(f.number)
+                f.occupancy_limit = ref?.occupancy_limit
+                f.floor_plan = ref?.floor_plan
+                f.floor_plan_url = ref?.floor_plan ? `${this.baseUrl}/plans/${ref.floor_plan}` : null
+                f.upload_info = {
                     uploading: false, progress: 0
                 }
+
+                f.areas = f.children
+                delete f.children
             })
 
-            let sorted = data.sort((a, b) => {
-                if (a.floor_no > b.floor_no) return 1
-                if (a.floor_no < b.floor_no) return -1
+            floors.sort((a, b) => {
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
                 return 0
             })
 
-            store.setFloors(sorted)
-            this.floors = sorted
+            this.setFloors({ bid: this.bldg_id, floors })
 
             if (this.floor_id) {
                 this.floorSel = this.floor_id
             } else if (this.floors.length > 0) {
-                this.floorSel = this.floors[0].hid
+                this.floorSel = this.floors[0].id
             }
             
             return cb && cb()
         },
-        async getFloorData(fid, cb) {
-            let { data } = await axios.get(`${api.floor}/${fid}/data`)
-            let floor = this.floors.find(f => f.hid === fid)
+        async getSensors(fid, cb) {
+            let res = await axios.all([
+                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header),
+                axios.get(api.sensor, { fid: fid })
+            ])
+            let floor = this.floors.find(f => f.id === fid)
+            let sensors = res[0].data,
+                sensorMap = res[1].data
 
-            floor.sensors = data.sensors
-            floor.areas = data.areas
-            this.floorAreas = data.areas
+            sensors.forEach(s => {
+                let map = sensorMap.find(x => x.ref_id == s.id)
 
-            // setTimeout(() => { if (cb) cb() }, 0)
+                if (map) {
+                    s.pos_x = map.pos_x
+                    s.pos_y = map.pos_y
+                    s.scale = map.scale
+                }
+            })
+
+            floor.sensors = sensors
+            this.floorAreas = floor.areas
+
             return cb && cb()
+        },
+        selectFloor(i) {
+            this.floorSel = i
+            this.filterFloor = false
         },
         toggleEditMode(edit) {
             this.editMapper = edit
+            this.editSensor = edit
             this.mapper.editMode(edit)
         },
-        toggleAreaMap() {
-            if(this.editArea) this.editSensor = !this.editArea
-            this.mapper.setAreaMapping(this.editArea)
-        },
-        toggleSensorMap() {
-            if(this.editSensor) this.editArea = !this.editSensor
-            this.mapper.setSensorMapping(this.editSensor)
-        },
+        toggleSensorMap() { this.mapper.setSensorMapping(this.editSensor) },
         setupMapper() {
             let _ = this
             _.mapper = new floorMapper('#floor-map', _.floor, {
+                events: true,
                 events: {
                     imgLoad: function() { _.mapperLoading = true },
                     imgLoaded: function() { _.mapperLoading = false },
@@ -285,23 +262,11 @@ export default {
                         _.triggerAdd(data.x, data.y, data.scale, data.area)
                     },
                     sensorClick: function(sensor) {
-                        _.triggerEdit(sensor.hid)
+                        _.triggerEdit(sensor.id)
                     },
                     sensorMoved: function(sensor) {
-                        axios.put(`${api.sensor}/coord/${sensor.hid}`, {
+                        axios.put(`${api.sensor}/coord/${sensor.id}`, {
                             pos_x: sensor.pos_x, pos_y: sensor.pos_y, scale: sensor.scale
-                        })
-                    },
-                    addArea: function(points, scale) {
-                        _.triggerAddArea(points, scale)
-                    },
-                    areaClick: function(area) {
-                        _.triggerEditArea(area.hid)
-                    },
-                    areaPtUpdate: function(area, points, scale) {
-                        if (!area) return
-                        axios.put(`${api.area}/coord/${area.hid}`, {
-                            points: points, scale: scale
                         })
                     }
                 }
@@ -318,8 +283,7 @@ export default {
             this.entry.id = null
             this.entry.sensor = ''
             this.entry.name = ''
-            this.entry.group = ''
-            this.entry.area = area ? area.hid : null
+            // this.entry.group = ''
             this.entry.pos_x = x
             this.entry.pos_y = y
             this.entry.scale = scale
@@ -329,34 +293,47 @@ export default {
         },
         async addSensor() {
             this.toggleSaving(true)
-            axios.post(api.sensor, {
-                floor: this.floor.hid,
+            console.log(this.entry.group, this.floorAreas)
+            let area = this.floorAreas.find(x => x.id == this.entry.group)
+            let data = {
                 sensor_id: this.entry.sensor,
                 name: this.entry.name,
-                group: this.entry.group,
-                area: this.entry.area,
-                pos_x: this.entry.pos_x,
-                pos_y: this.entry.pos_y,
-                scale: this.entry.scale
-            }).then(x => {
-                this.toggleSaving(false)
-                let res = x.data
+                parent: area.group_id
+            }
+            let resp = await axios.post(this.api_sensors(this.company_id, this.bldg_id, this.floorSel, area.id), data, this.api_header)
 
-                if (res.r) {
-                    this.floor.sensors.push(res.data)
-                    this.mapper.drawSensors()
-                    this.toggleEntry(false)
-                }
-            })
+            if (resp.status == 200) {
+                data.id = resp.data.child_id
+
+                axios.post(api.sensor, {
+                    ref_id: data.id,
+                    floor_id: this.floorSel,
+                    pos_x: this.entry.pos_x,
+                    pos_y: this.entry.pos_y,
+                    scale: this.entry.scale
+                }).then(x => {
+                    let res = x.data
+
+                    if (res.r) {
+                        data.pos_x = this.entry.pos_x
+                        data.pos_y = this.entry.pos_y
+                        data.scale = this.entry.scale
+
+                        this.floor.sensors.push(data)
+                        this.mapper.drawSensors()
+                        this.toggleEntry(false)
+                    }
+                })
+            }
+            else this.toggleSaving(false)
         },
         triggerEdit(id) {
-            let s = this.floor.sensors.find(s => s.hid === id)
+            let s = this.floor.sensors.find(s => s.id === id)
 
             this.entry.id = id
             this.entry.sensor = s.sensor_id
             this.entry.name = s.name
             this.entry.group = s.group_id
-            this.entry.area = s.aid
             this.entry.pos_x = s.pos_x
             this.entry.pos_y = s.pos_y
             this.entry.scale = s.scale
@@ -366,32 +343,30 @@ export default {
         },
         async upSensor() {
             this.toggleSaving(true)
-            axios.put(`${api.sensor}/${this.entry.id}`, {
+            let area = this.floorAreas.find(x => x.id == this.entry.group)
+            let data = {
                 sensor_id: this.entry.sensor,
                 name: this.entry.name,
-                group: this.entry.group,
-                area: this.entry.area
-            }).then(x => {
-                this.toggleSaving(false)
-                let res = x.data
+                parent: area.group_id
+            }
+            let _id = this.entry.id
+            let resp = await axios.put(this.api_sensor(this.company_id, this.bldg_id, this.floorSel, area.id, _id), data, this.api_header)
+            if (resp.status == 200) {
+                let s = this.floor.sensors.find(s => s.id === this.entry.id)
+                
+                s.sensor_id = data.sensor_id
+                s.name = data.name
+                s.parent = data.parent
 
-                if (res.r) {
-                    let s = this.floor.sensors.find(s => s.hid === this.entry.id)
-                    
-                    s.sensor_id = this.entry.sensor
-                    s.name = this.entry.name
-                    s.aid = this.entry.area
-                    s.group_id = this.entry.group
-
-                    this.mapper.drawSensors()
-                    this.toggleEntry(false)
-                }
-            })
+                this.mapper.drawSensors()
+                this.toggleEntry(false)
+            }
+            else this.toggleSaving(false)
         },
         async delSensor() {
             let _ = this,
                 _id = _.entry.id,
-                _idx = _.floor.sensors.findIndex(s => s.hid === _id),
+                _idx = _.floor.sensors.findIndex(s => s.id === _id),
                 _sensor = _.floor.sensors[_idx]
 
             _.$duDialog(null, `Remove sensor <strong>${_sensor.sensor_id}</strong>?`, _.$duDialog.OK_CANCEL, {
@@ -400,166 +375,53 @@ export default {
                     okClick: function (e) {
                         this.hide()
                         _.state.removing = true
-                        axios.delete(`${api.sensor}/${_id}`).then(x => {
-                            _.state.removing = false
-                            let res = x.data
-
-                            if (res.r) {
+                        axios.delete(_.api_sensor(_.company_id, _.bldg_id, _.floorSel, _sensor.area_id), _.api_header).then(resp => {
+                            if (resp.status == 200) {
+                                axios.delete(`${api.sensor}/${_id}`)
+                                _.state.removing = false
                                 _.floor.sensors.splice(_idx, 1)
                                 _.mapper.drawSensors()
                                 _.toggleEntry(false)
-                            }
-                        })
-                    }
-                }
-            })
-        },
-        /* area */
-        toggleAreaEntry(show) {
-            this.showAreaEntry = show
-
-            if (show) setTimeout(() => { this.$refs.area.focus() }, 0)
-            else if (this.areaEntry.id == null) {
-                this.mapper.clearDrawing()
-            }
-        },
-        triggerAddArea(points, scale) {
-            this.areaEntry.id = null
-            this.areaEntry.type = this.areaTypes[0] ? this.areaTypes[0].hid : null
-            this.areaEntry.name = ''
-            this.areaEntry.desks = 0
-            this.areaEntry.seats = 0
-            this.areaEntry.points = points
-            this.areaEntry.scale = scale
-            this.editMode = false
-
-            this.toggleAreaEntry(true)
-        },
-        async addArea() {
-            this.toggleSaving(true)
-            axios.post(api.area, {
-                floor: this.floor.hid,
-                type: this.areaEntry.type,
-                name: this.areaEntry.name,
-                desks: this.areaByDesk ? this.areaEntry.desks : null,
-                seats: this.areaByDesk ? null : this.areaEntry.seats,
-                points: this.areaEntry.points,
-                scale: this.areaEntry.scale
-            }).then(x => {
-                this.toggleSaving(false)
-                let res = x.data
-
-                if (res.r) {
-                    this.floor.areas.push(res.data)
-                    this.mapper.drawAreas()
-                    this.toggleAreaEntry(false)
-                }
-            })
-        },
-        triggerEditArea(id) {
-            let a = this.floor.areas.find(a => a.hid === id)
-
-            this.areaEntry.id = id
-            this.areaEntry.type = a.tid
-            this.areaEntry.name = a.name
-            this.areaEntry.desks = a.desks
-            this.areaEntry.seats = a.seats
-            this.areaEntry.points = a.poly_points.map(p => {
-                return [p.x, p.y].join(',')
-            }).join(' ')
-            this.areaEntry.scale = a.scale
-            this.editMode = true
-
-            this.toggleAreaEntry(true)
-        },
-        async upArea() {
-            this.toggleSaving(true)
-            axios.put(`${api.area}/${this.areaEntry.id}`, {
-                type: this.areaEntry.type,
-                name: this.areaEntry.name,
-                desks: this.areaByDesk ? this.areaEntry.desks : null,
-                seats: this.areaByDesk ? null : this.areaEntry.seats
-            }).then(x => {
-                this.toggleSaving(false)
-                let res = x.data
-
-                if (res.r) {
-                    let a = this.floor.areas.find(a => a.hid === this.areaEntry.id)
-                    
-                    a.tid = this.areaEntry.type
-                    a.name = this.areaEntry.name
-                    a.desks = this.areaEntry.desks
-                    a.seats = this.areaEntry.seats
-
-                    this.mapper.drawAreas()
-                    this.toggleAreaEntry(false)
-                }
-            })
-        },
-        async delArea() {
-            let _ = this,
-                _id = _.areaEntry.id,
-                _idx = _.floor.areas.findIndex(s => s.hid === _id),
-                _area = _.floor.areas[_idx]
-
-            _.$duDialog(null, `Remove <strong>${_area.name}</strong>? area`, _.$duDialog.OK_CANCEL, {
-                okText: 'Remove',
-                callbacks: {
-                    okClick: function (e) {
-                        this.hide()
-                        _.state.removing = true
-                        axios.delete(`${api.area}/${_id}`).then(x => {
-                            _.state.removing = false
-                            let res = x.data
-
-                            if (res.r) {
-                                _.floor.areas.splice(_idx, 1)
-                                _.mapper.drawAreas()
-                                _.toggleAreaEntry(false)
-                            }
+                            } else _.state.removing = false
                         })
                     }
                 }
             })
         }
     },
-    created() {
-        this.getAreaTypes()
+    async created() {
+        await this.getAreaTypes()
     },
     mounted() {
         let _ = this
-        let bldg = store.getBldg(),
-            floors = store.getFloors()
+        let bldg = this.building,
+            floors = this.floors
 
-        if (bldg && bldg.hid === _.bldg_id) {
+        if (bldg && bldg.id === _.bldg_id) {
             _.bldg = bldg
             
             if (floors.length > 0) {
-                _.floors = store.getFloors()
                 if (_.floor_id) {
                     _.floorSel = _.floor_id
                 } else if (_.floors.length > 0) {
-                    _.floorSel = _.floors[0].hid
+                    _.floorSel = _.floors[0].id
                 }
                 _.loaded = true
 
                 if (!_.floor) return
-                _.getFloorData(_.floor.hid, function() {
-                    _.setupMapper()
-                })
             } else {
-                _.getFloors(_.bldg_id, function() {
+                _.getFloors(function() {
                     _.loaded = true
-                    _.getFloorData(_.floor.hid, function() {
+                    _.getSensors(_.floor.id, function() {
                         _.setupMapper()
                     })
                 })
             }
         } else {
-            _.getBldg(_.bldg_id, function() {
-                _.getFloors(_.bldg_id, function() {
+            _.getBuilding(_.bldg_id, function() {
+                _.getFloors(function() {
                     _.loaded = true
-                    _.getFloorData(_.floor.hid, function() {
+                    _.getSensors(_.floor.id, function() {
                         _.setupMapper()
                     })
                 })

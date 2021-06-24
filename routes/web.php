@@ -14,22 +14,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/widgets/{url}', 'AppController@widget')
-    ->where(['url' => 'time-chart|live'])
+Route::get('/widgets/{url}', 'AppController@index') //AppController@widget
+    ->where(['url' => 'timechart|live'])
     ->name('widget');
 
+Route::get('/profile/authenticated', 'AuthController@getAuthenticatedUser');    // for axios call
+
 Route::middleware(['guest'])->group(function(){
-    Route::get('/login', 'AuthController@login')->name('login');
-    Route::post('/login/auth', 'AuthController@authenticate'); // for axios call
+    Route::get('/login', 'AppController@index')->name('login'); //AuthController@login
+    Route::post('/authenticate', 'AuthController@authenticate'); // for axios call
 
     Route::get('/verify', 'VerifyController@index')->name('verify');
-    Route::get('/verify/update-pass', 'VerifyController@updatePass');
+
+    Route::get('/reset', 'AppController@index')->name('reset'); // AuthController@login
+    Route::get('/reset/{uid}', 'AppController@index')->name('reset-user'); // AuthController@login
+    Route::post('/reset/send-link', 'AuthController@sendResetLink');
 });
 
 Route::middleware(['auth'])->group(function(){
     Route::get('/logout', 'AuthController@logout');
-    Route::get('/profile/authenticated', 'AuthController@getAuthenticatedUser');    // for axios call
-
     Route::get('/users/init-dependencies', 'UsersController@initDependencies');      // for axios call
 
     Route::group(['prefix' => 'assets'], function () {
@@ -51,8 +54,8 @@ Route::middleware(['auth'])->group(function(){
 
     Route::get('/', function () { return view('app'); });
     Route::group(['prefix' => 'locations'], function () {
-        Route::get('{bid}/floors', 'AppController@location');
-        Route::get('{bid}/mapper', 'AppController@location');
+        Route::get('{bid}/setup', 'AppController@index');
+        Route::get('{bid}/mapper', 'AppController@index');
     });
 
     Route::get('/{url}', 'AppController@index')

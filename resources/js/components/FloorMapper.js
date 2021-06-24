@@ -14,10 +14,9 @@ function mapper(wrapper, data, options) {
     let maxWidth = () => container.node().parentNode.getBoundingClientRect().width || 800, 
         maxHeight = () => container.node().parentNode.getBoundingClientRect().height || 400
 
-    let width = 800, height = 400
+    let width = maxWidth(), height = maxHeight()
     let floor = data,
         sensors = floor.sensors || [],
-        areas = floor.areas || [],
         config = extend(config_defaults, options),
         events = config.events,
         offset = { x: 0, y: 0, scale: 0 },
@@ -81,19 +80,14 @@ function mapper(wrapper, data, options) {
                 let area = elem.tagName === 'polygon' ? d3.select(elem.parentNode).data()[0] : null
 
                 return events && events.sensorAdd && events.sensorAdd.call(_, { x: _x, y: _y, scale: offset.scale, area })
-            } else if (state.areaMapping) {
-                let point = {
-                    x: t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-                    y: t ? (evt.offsetY - t.y) / t.k : evt.offsetY
-                }, drawLayer = areaLayer.select('g.area-draw')
-
-                if (drawLayer.empty()) startAreaDraw(point)
-                else addPoint(drawLayer, point)
             }
         })
 
+    if (config.events) {
+        svg.style('pointer-events', 'all')
+    }
+
     // set wrapper to inline-block
-    // container.style('display', 'inline-block')
     if (config.heatmap || config.comfortmap) {
         svg.append("defs")
             .append("filter")
@@ -107,7 +101,6 @@ function mapper(wrapper, data, options) {
         .enter().append('g').attr('class', 'map-layer')
 
     const imgLayer = mapLayer.append('g').attr('class', 'image-layer')
-    const areaLayer = mapLayer.append('g').attr('class', 'area-layer')
     const sensorLayer = mapLayer.append('g').attr('class', 'sensor-layer')
 
     const zoom = d3.zoom().scaleExtent([1, 8])
@@ -123,32 +116,9 @@ function mapper(wrapper, data, options) {
             // mapLayer.attr('transform', mapLayer.__transform)
             imgLayer.attr('transform', mapLayer.__transform)
             sensorLayer.attr('transform', mapLayer.__transform)
-            areaLayer.attr('transform', mapLayer.__transform)
         })
 
     mapLayer.call(zoom)
-        .on('mousemove', function () {
-            if (!state.drawing) return
-
-            let drawLayer = areaLayer.select('g.area-draw')
-
-            drawLayer.select('line').remove()
-
-            let lastPoint = drawPoints[drawPoints.length - 1],
-                evt = d3.event,
-                t = mapLayer.__transform,
-                _x = t ? (evt.offsetX - t.x) / t.k : evt.offsetX,
-                _y = t ? (evt.offsetY - t.y) / t.k : evt.offsetY
-
-            drawLayer.insert('line', ':nth-child(2)')
-                .attr('x1', lastPoint.x)
-                .attr('y1', lastPoint.y)
-                .attr('x2', _x)
-                .attr('y2', _y)
-                .attr('stroke', '#53DBF3')
-                .attr('stroke-width', 1)
-                .style('pointer-events', 'none')
-        })
 
     /**
      * Sets the size of the canvas
@@ -228,217 +198,6 @@ function mapper(wrapper, data, options) {
                 .style('top', `${y}px`)
     }
 
-    /* area mapping functions */
-    function startAreaDraw(point) {
-        state.drawing = true
-
-        let drawLayer = areaLayer.append('g').attr('class', 'area-draw');
-
-        addPoint(drawLayer, point)
-    }
-
-    function addPoint(drawLayer, point) {
-        drawPoints.push(point)
-
-        drawLayer.select('polyline').remove()
-
-        // draw line
-        drawLayer.insert('polyline', ':first-child').data(drawPoints)
-            .attr('points', () => {
-                return drawPoints.map(p => {
-                    return [p.x, p.y].join(',')
-                }).join(' ')
-            })
-            .style('fill', 'none')
-            .attr('stroke', '#53DBF3');
-
-        drawLayer.append('circle')
-            .attr('cx', point.x)
-            .attr('cy', point.y)
-            .attr('r', 4)
-            .attr('fill', '#FFEB3B').attr('stroke', '#53DBF3')
-            // .attr('is-handle', 'true')
-            .style('cursor', 'pointer')
-            .on('click', () => endAreaDraw())
-    }
-
-    function toPointsDisp(points, scale) {
-        return points.map(p => {
-            let c_scale = parseFloat(offset.scale.toFixed(12)) //current scale
-
-            return [
-                ((p.x / scale) * c_scale) + offset.x,
-                ((p.y / scale) * c_scale) + offset.y
-            ].join(',')
-        }).join(' ')
-    }
-
-    function toPointsSave(points) {
-        return points.map(p => {
-            return [p.x - offset.x, p.y - offset.y].join(',')
-        }).join(' ')
-    }
-
-    function toPolyPoints(points) {
-        return points.map(p => {
-            return [p.x, p.y].join(',')
-        }).join(' ')
-    }
-
-    function addPoly(points, area) {
-        let ag = areaLayer.append('g').attr('class', area ? 'area' : 'area unsaved')
-
-        let canEdit = config.edit && state.areaMapping,
-            poly = ag.append('polygon')//.data(points)
-                .attr('points', area ? toPointsDisp(points, area.scale) : toPolyPoints(points))
-                .style('fill', '#53DBF3').style('opacity', 0.2)
-                .style('cursor', () => { return canEdit ? 'move' : (state.sensorMapping ? 'crosshair' : 'default') })
-                .on('click', a => canEdit && (polyClick(area), d3.event.stopPropagation()))
-                .on('mouseover', function(a) {
-                    if (state.sensorMapping) return
-
-                    tooltip.transition().duration(200).style('opacity', 0.9)
-                    setTooltip(d3.event.offsetX + tooltipOffsetX, 
-                        d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2),
-                        area.name)
-                })
-                .on('mousemove', function() {
-                    if (state.polyMoved || state.sensorMapping) return
-
-                    setTooltip(d3.event.offsetX + tooltipOffsetX, 
-                        d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2))
-                })
-                .on('mouseout', function() { tooltip.transition().duration(200).style('opacity', 0) })
-                .call(d3.drag()
-                    .on('drag', polyDrag)
-                    .on('end', polyDragEnd))
-
-        if (area) {
-            ag.data([area])
-
-            // poly.append("svg:title")
-            //     .text(area.name)
-        }
-
-        if (!canEdit) return
-
-        ag.selectAll('circles')
-            .data(points).enter()
-            .append('circle')
-            .attr('cx', d => {
-                return area ? 
-                    ((d.x / area.scale) * parseFloat(offset.scale.toFixed(12))) + offset.x : d.x
-            })
-            .attr('cy', d => {
-                return area ? 
-                    ((d.y / area.scale) * parseFloat(offset.scale.toFixed(12))) + offset.y : d.y
-            })
-            .attr('r', 4)
-            .attr('fill', '#FFEB3B').attr('stroke', '#53DBF3')
-            // .attr('fill', 'none').attr('stroke', '#8bc34a').attr('stroke-width', 2)
-            .style('cursor', 'move')
-            .call(d3.drag()
-                .on('drag', polyPointDrag)
-                .on('end', polyPointDragEnd)
-            )
-    }
-
-    function polyClick(a) { return events && events.areaClick && events.areaClick.call(_, a)  }
-
-    function polyDrag() {
-        if (config.edit && state.areaMapping) {
-            let { dx, dy } = d3.event,
-                poly = d3.select(this),
-                circles = d3.select(this.parentNode).selectAll('circle'), circle, newPoints = [],
-                areaData = d3.select(this.parentNode).data()[0]
-            
-            state.polyMoved = dx !== 0 || dy !== 0
-
-            circles.each(function (cd) {
-                circle = d3.select(this)
-                cd.x += dx
-                cd.y += dy
-
-                circle.attr('cx', d => {
-                    return areaData ? 
-                        ((cd.x / areaData.scale) * parseFloat(offset.scale.toFixed(12))) + offset.x : cd.x
-                })
-                .attr('cy', d => {
-                    return areaData ?
-                        ((cd.y / areaData.scale) * parseFloat(offset.scale.toFixed(12))) + offset.y : cd.y
-                })
-                newPoints.push({ x: cd.x, y: cd.y })
-            })
-
-            poly.attr('points', toPointsDisp(newPoints, areaData.scale))
-        }
-    }
-
-    function polyDragEnd() {
-        if (config.edit && state.areaMapping) {
-            let areaData = d3.select(this.parentNode).data()[0],
-                circles = d3.select(this.parentNode).selectAll('circle'), newPoints = []
-
-            if (!state.polyMoved) return
-
-            state.polyMoved = false
-            circles.each(cd => newPoints.push({ x: cd.x, y: cd.y }))
-
-            let polyPoints = toPolyPoints(newPoints)
-
-            return events && events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
-        }
-    }
-
-    function polyPointDrag (d) {
-        // if (state.drawing) return
-        d.dragged = true
-
-        let evt = d3.event, dragPoint = d3.select(this), newPoints = [],
-            poly = d3.select(this.parentNode).select('polygon'),
-            circles = d3.select(this.parentNode).selectAll('circle'),
-            areaData = d3.select(this.parentNode).data()[0]
-
-        dragPoint.attr('cx', evt.x + offset.x)
-            .attr('cy', evt.y + offset.y)
-
-        d.x += evt.dx
-        d.y += evt.dy
-
-        circles.each(cd => newPoints.push({ x: cd.x, y: cd.y }))
-        poly.attr('points', toPointsDisp(newPoints, areaData.scale))
-    }
-
-    function polyPointDragEnd (d) {
-        if (!d.dragged) return
-
-        d.dragged = false
-
-        let newPoints = [], 
-            // poly = d3.select(this.parentNode).select('polygon'),
-            circles = d3.select(this.parentNode).selectAll('circle'),
-            areaData = d3.select(this.parentNode).data()[0]
-
-        circles.each(cd => newPoints.push({ x: cd.x, y: cd.y }))
-
-        let polyPoints = toPolyPoints(newPoints)
-
-        return events && events.areaPtUpdate && events.areaPtUpdate.call(_, areaData === 0 ? null : areaData, polyPoints, offset.scale)
-    }
-
-    function endAreaDraw() {
-        areaLayer.select('g.area-draw').remove()
-
-        let polyPoints = toPointsSave(drawPoints, true, offset.scale)
-
-        addPoly(drawPoints)
-        drawPoints.splice(0)
-        state.drawing = false
-
-        return events && events.addArea && events.addArea.call(_, polyPoints, offset.scale)
-    }
-    /* end area mapping functions */
-
     /* sensor functions */
     function sensorClick(s) { return events && events.sensorClick && events.sensorClick.call(_, s) }
 
@@ -499,7 +258,7 @@ function mapper(wrapper, data, options) {
             .data(sensors)
             .enter()
             .append('circle')
-            .attr('class', 'sensor').attr('data-id', d => d.hid)
+            .attr('class', 'sensor').attr('data-id', d => d.id)
             .attr('r', sensorSize())
             .attr('stroke-width', config.heatmap || config.comfortmap ? null : 5)
             .attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0))
@@ -519,7 +278,7 @@ function mapper(wrapper, data, options) {
             .on('mouseover', function() {
                 if (config.comfortmap) return
                 let s_circle = d3.select(this),
-                    s = sensors.find(x => x.hid === s_circle.attr('data-id'))
+                    s = sensors.find(x => x.id === s_circle.attr('data-id'))
                 tooltip.transition().duration(200).style('opacity', 0.95)
 
                 setTooltip(d3.event.offsetX + tooltipOffsetX, 
@@ -555,26 +314,12 @@ function mapper(wrapper, data, options) {
     }
 
     /**
-     * Renders all area polygons
-     */
-    this.drawAreas = function () {
-        areaLayer.selectAll('g.area').remove() //clear
-
-        if (mapLayer.__transform) areaLayer.attr('transform', mapLayer.__transform)
-
-        if (areas.length === 0) return
-
-        areas.forEach(a => addPoly(a.poly_points, a))
-    }
-
-    /**
      * Sets the floor data of the mapper
      * @param {Object} data Floor data
      */
     this.setData = function (data) {
         floor = data
         sensors = floor.sensors
-        areas = floor.areas
         mapLayer.__transform = null
 
         this.redraw(true)
@@ -585,6 +330,11 @@ function mapper(wrapper, data, options) {
      * @param {Boolean} fresh Determines if zoom will be reset
      */
     this.redraw = function (fresh) {
+        if (!floor.floor_plan) {
+            imgLayer.selectAll('image').remove()
+            sensorLayer.selectAll('.sensor').remove()
+            return
+        }
         // remove zoom
         if (fresh) {
             mapLayer.__transform = null
@@ -592,12 +342,10 @@ function mapper(wrapper, data, options) {
 
             calcOffsets(() => {
                 this.drawFloorPlan()
-                this.drawAreas()
                 this.drawSensors()
             })
         } else {
             this.drawFloorPlan()
-            this.drawAreas()
             this.drawSensors()
         }
 
@@ -629,8 +377,6 @@ function mapper(wrapper, data, options) {
     this.clearDrawing = function() {
         state.drawing = false
         drawPoints.splice(0)
-        areaLayer.select('g.area-draw').remove()
-        areaLayer.select('g.area.unsaved').remove()
     }
 
     /**
@@ -644,10 +390,9 @@ function mapper(wrapper, data, options) {
     }
 
     // render floor plan
-    if (floor) {
+    if (floor && floor.floor_plan) {
         calcOffsets(() => {
             this.drawFloorPlan()
-            this.drawAreas()
             this.drawSensors()
         })
     }

@@ -150,7 +150,8 @@
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapMutations, mapState } from 'vuex'
+// import { store } from '../../store'
 import { getBaseUrl } from '../../helpers'
 import { Checkbox, CircleProgress, Loader, TimeSlider } from '../../components'
 
@@ -163,7 +164,10 @@ export default {
     components: { Checkbox, CircleProgress, Loader, TimeSlider },
     data() {
         return {
-            loaded: false, user: null, settings: null, areas: [],
+            loaded: false, 
+            // user: null, 
+            settings: null, 
+            areas: [],
             entry: {
                 start_time: null, end_time: null, area_triggers: [], work_days: []
             },
@@ -174,6 +178,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
         baseUrl() { return getBaseUrl() },
         daysArr() {
             return days.map(d => {
@@ -182,6 +189,7 @@ export default {
         }
     },
     methods: {
+        ...mapMutations(['setCompanyLogo']),
         getMinutes(area) {
             if (area.name == 'Meeting Rooms') {
                 let arr = [];
@@ -195,7 +203,7 @@ export default {
         timeToChange(time) { this.entry.end_time = time },
         toggleSaving(saving) { this.state.saving = saving },
         async getSettings() {
-            let { data } = await axios.get(api, { params: { cid: this.user.cid } })
+            let { data } = await axios.get(api, { params: { cid: this.user.company.hid } })
 
             this.settings = data.ws
             this.loaded = true
@@ -267,7 +275,7 @@ export default {
                     _.upload_info.uploading = false
                     if (success) {
                         if (res.r) {
-                            store.setCompanyLogo(res.logo)
+                            _.setCompanyLogo(res.logo)
                         }
                     } else {
                         console.error(res)
@@ -294,9 +302,9 @@ export default {
             .catch(err => cb(false, err))
         }
     },
-    created() {
-        this.user = store.getUser()
-    },
+    // created() {
+    //     this.user = store.getUser()
+    // },
     mounted() {
         this.getAreas()
         this.getSettings()

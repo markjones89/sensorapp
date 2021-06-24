@@ -1,6 +1,6 @@
 <template>
     <div class="content">
-        <h1>{{ user.isAdmin ? `${userCompany} Users` : 'Users' }}</h1>
+        <h1>Users</h1>
         <transition name="fadeUp" appear>
             <div id="user-list" v-if="loaded">
                 <div class="role-group" v-for="g in groupedUsers" :key="g.hid">
@@ -133,7 +133,7 @@
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapState, mapGetters } from 'vuex'
 import { Loader, Modal } from '../../components'
 
 const api = '/api/users'
@@ -143,7 +143,8 @@ export default {
     components: { Loader, Modal },
     data() {
         return {
-            user: null, clients: [], roles: [], users: [],
+            // user: null, 
+            clients: [], roles: [], users: [],
             loaded: false, showEntry: false, editMode: false,
             entry: {
                 showClient: false, client: null, role: '', name: '', email: '', id: null
@@ -154,9 +155,15 @@ export default {
         }
     },
     computed: {
-        userCompany() { return this.user ? this.user.company.name : null },
+        ...mapState({
+            user: state => state.user
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers'
+        }),
         compId() {
-            return this.user.isSuper ? this.entry.client : store.getUser().cid
+            return this.user.isSuper ? this.entry.client : this.user.company_id
         },
         groupedUsers() {
             return this.roles.map(r => {
@@ -170,16 +177,39 @@ export default {
         }
     },
     methods: {
-        async getDependencies() {
-            let cid = store.getUser().cid
-            let { data } = await axios.get('/users/init-dependencies')
+        async getDependencies(cb) {
+            let res = await axios.all([
+                axios.get(this.api_customers, this.api_header),
+                axios.get('/users/init-dependencies')
+            ])
 
-            // console.log(data)
-            this.clients = data.clients
-            this.roles = data.roles
+            let clients = res[1].data.clients
+
+            if (clients) {
+                let custs = res[0].data
+                this.clients = []
+                
+                clients.forEach(c => {
+                    let cust = custs.find(x => x.id == c.ref_id)
+
+                    if (cust) {
+                        c.name = cust.name
+                        this.clients.push(c)
+                    }
+                })
+            }
+
+            this.roles = res[1].data.roles
+
+            return cb && cb()
         },
         async getData() {
-            let { data } = await axios.get(this.user.isSuper ? api : `${api}/${this.compId}`)
+            let params = this.user.isSuper ? null : { params: { cid: this.compId } }
+            let { data } = await axios.get(api, params)
+
+            data.forEach(d => {
+                if (d.company) d.company.name = this.clients.find(x => x.ref_id == d.company_id)?.name
+            })
 
             this.users = data
             this.loaded = true
@@ -210,8 +240,6 @@ export default {
                 this.toggleSaving(false)
                 let res = x.data
 
-                // console.log(res)
-
                 if (res.r) {
                     this.users.push(res.data)
                     this.toggleEntry(false)
@@ -221,12 +249,13 @@ export default {
             })
         }
     },
-    created() {
-        this.user = store.getUser()
-        this.getDependencies()
-    },
+    // async created() {
+    //     await this.getDependencies()
+    // },
     mounted() {
-        this.getData()
+        this.getDependencies(() => {
+            this.getData()
+        })
     }
 }
 </script>

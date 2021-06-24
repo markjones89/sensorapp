@@ -10,6 +10,7 @@
     <link href="{{ asset(mix('css/app.css')) }}" rel="stylesheet" type="text/css">
 </head>
 <body>
+    <input type="hidden" id="sensor_api" value="{{ env('SENSOR_API') }}">
     <div id="app">
         <div class="app-loader">
             <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->

@@ -38,11 +38,6 @@ mix.webpackConfig({
 
 mix.js('resources/js/app.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css')
-    .js('resources/js/app-login.js', 'public/js')
-    .sass('resources/sass/app-login.scss', 'public/css')
-    .js('resources/js/app-verify.js', 'public/js')
-    .sass('resources/sass/app-verify.scss', 'public/css')
-    .js('resources/js/app-widget.js', 'public/js')
     // widgets
     .js('resources/js/widgets/time-chart.js', 'public/js/widgets');
 

@@ -207,7 +207,7 @@ $skewDeg: 30deg;
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapState } from 'vuex'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { Checkbox, DateRangeToggle, FilterDropdown, TimeSlider } from '../../components'
 import { TwoPersonChairSvg } from '../../components/svg'
@@ -234,7 +234,8 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, TimeSlider, TwoPersonChairSvg },
     data() {
         return {
-            user: null, showPageOpts: false, showEmbed: false, buildings: [], showFilter: false,
+            // user: null, 
+            showPageOpts: false, showEmbed: false, buildings: [], showFilter: false,
             comparer: null,
             showLeftFilter: false, showRightFilter: false, showPercentFilter: false,
             sizes: [4, 6, 12, 15], leftFilter: null, rightFilter: null, percents: ['10%','20%','30%','40%','50%','60%','70%','80%','90%','100%'], percentFilter: '70%',
@@ -245,6 +246,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
         settings() { return this.user.company ? this.user.company.settings : null },
         sizeFilters() {
             return this.sizes.map(s => {
@@ -325,9 +329,6 @@ export default {
             }
             this.comparer.setData(data)
         }
-    },
-    created() {
-        this.user = store.getUser()
     },
     mounted() {
         let data = {

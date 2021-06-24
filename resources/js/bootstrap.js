@@ -29,3 +29,22 @@ window.axios.defaults.baseURL = getBaseUrl(true);
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+window.NProgress = require('nprogress')
+import 'nprogress/nprogress.css'
+
+axios.interceptors.request.use(function (config) {
+    NProgress.start()
+    return config
+}, function (error) {
+    NProgress.done()
+    return Promise.reject(error)
+})
+
+axios.interceptors.response.use(function (response) {
+    NProgress.done()
+    return response
+}, function (error) {
+    NProgress.done()
+    return Promise.reject(error)
+})

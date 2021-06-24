@@ -1,24 +1,38 @@
 <template>
     <div class="content">
-        <h1>{{ user.isAdmin ? `${userCompany} Locations` : 'Locations' }}</h1>
+        <div class="graph-header" v-if="loaded">
+            <h2 class="page-title">Locations</h2>
+            <div class="graph-filters" v-if="user.isSuper">
+                <span class="graph-filter" @click="filterClient = !filterClient">
+                    {{ clientName ? clientName : 'Select Location' }}
+                    <span class="caret">
+                        <caret-icon />
+                    </span>
+                    <filter-dropdown :filters="clientList" :show="filterClient" @onSelect="selectClient" />
+                </span>
+            </div>
+        </div>
         <transition name="fadeUp" appear>
-            <div id="location-list" v-if="loaded">
+            <div id="location-list" v-if="loaded && !apiError">
                 <location-item v-for="l in locationList" :key="l.name" :item="l" :subs="l.children" :depth="0"
-                    @onAdd="triggerAdd" @onEdit="triggerEdit" @onDel="delLoc" @onSetup="toFloors" @onMapper="toMapper">
+                    @onAdd="triggerAdd" @onEdit="triggerEdit" @onDel="delLoc" @onSetup="toSetup" @onMapper="toMapper" @collapse="toggleSubs">
                 </location-item>
-                <button class="btn btn-primary" id="add-btn" @click="triggerAdd(null, null, 0)">Add Location</button>
+                <button class="btn btn-primary" id="add-btn" @click="triggerAdd(null, null)">Add Building</button>
+            </div>
+            <div v-if="loaded && apiError" class="error-display">
+                {{ apiError }}
             </div>
         </transition>
         <modal :show="showEntry" @close="toggleEntry(false)">
             <template v-slot:header>
-                <h2>{{ editMode ? 'Edit' : 'Add' }} {{ entry.is_building ? 'Building' : 'Location' }}</h2>
+                <h2>{{ editMode ? 'Edit' : 'Add' }} Building</h2>
             </template>
             <div id="loc-entry">
                 <div class="input-field">
                     <label>Name</label>
                     <input type="text" v-model="entry.name" ref="location">
                 </div>
-                <h3 class="section-header" v-if="entry.is_building">Address</h3>
+                <h3 class="section-header">Address</h3>
                 <div class="input-field">
                     <label>Continent</label>
                     <select v-model="entry.continent">
@@ -31,49 +45,47 @@
                         <option v-for="c in countries" :key="c.country">{{ c.country }}</option>
                     </select>
                 </div>
-                <div class="input-field" v-if="entry.parent">
+                <div class="input-field">
                     <label>State/Province</label>
                     <select v-model="entry.state">
                         <option v-for="s in states" :key="s">{{ s }}</option>
                     </select>
                 </div>
-                <div class="input-field" v-if="entry.parent">
+                <div class="input-field">
                     <label>City/Municipality</label>
                     <select v-model="entry.city">
                         <option v-for="c in cities" :key="c">{{ c }}</option>
                     </select>
                 </div>
-                <template v-if="entry.is_building">
-                    <h3 class="section-header">Details</h3>
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Rental per m<sup>2</sup></label>
-                                <input type="text" v-model="entry.info.rental_metre" @keyup="metreRentalKeyUp">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Rental per ft<sup>2</sup></label>
-                                <input type="text" v-model="entry.info.rental_foot" @keyup="footRentalKeyUp">
-                            </div>
+                <h3 class="section-header">Details</h3>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="input-field">
+                            <label>Rental per m<sup>2</sup></label>
+                            <input type="text" v-model="entry.info.rental_sqm" @keyup="metreRentalKeyUp">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Workspace Furniture Cost</label>
-                                <input type="text" v-model="entry.info.furniture_cost">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="input-field">
-                                <label>Allocated People</label>
-                                <input type="text" v-model="entry.info.people_alloc">
-                            </div>
+                    <div class="col-12 col-md-6">
+                        <div class="input-field">
+                            <label>Rental per ft<sup>2</sup></label>
+                            <input type="text" v-model="entry.info.rental_sqft" @keyup="footRentalKeyUp">
                         </div>
                     </div>
-                </template>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="input-field">
+                            <label>Workspace Furniture Cost</label>
+                            <input type="text" v-model="entry.info.furniture_cost">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="input-field">
+                            <label>Allocated People</label>
+                            <input type="text" v-model="entry.info.employee_allocation">
+                        </div>
+                    </div>
+                </div>
             </div>
             <template v-slot:footer>
                 <button class="btn btn-primary" @click="addLoc" :disabled="state.saving" v-if="!editMode">{{ state.saving ? 'Adding...' : 'Add'}}</button>
@@ -94,6 +106,7 @@
 #loc-entry {
     position: relative;
     width: 400px;
+    max-width: 100%;
 
     .section-header {
         margin: 32px 0 8px 0;
@@ -103,51 +116,51 @@
 }
 </style>
 <script>
-import { store } from '../../store'
-import { LocationItem, Loader, Modal } from '../../components'
+import { mapGetters, mapMutations, mapState } from 'vuex'
+import { addEvent, removeEvent } from '../../helpers'
+import { FilterDropdown, LocationItem, Loader, Modal } from '../../components'
+import { CaretIcon } from '../../components/icons'
 
 const api = {
-    world: {
-        base: 'https://parseapi.back4app.com/classes',
-        headers: {
-            'X-Parse-Application-Id': 'lH1HNSjLv6tTI1b73YXStT3y7QTAzCSrC8zUSRzN',
-            'X-Parse-REST-API-Key': 'gOCHE8UmreKHG72ADFHNABow3jlwJ3SHMDPOhWl5'
-        },
-        continent: 'Continentscountriescities_Continent',
-        country: 'Continentscountriescities_Country',
-        state: 'Continentscountriescities_Subdivisions_States_Provinces',
-        city: 'Continentscountriescities_City'
-    },
+    url: '/api/locations',
     locations: '/api/locations',
     gcosts: '/api/gcosts'
 }
-
 const METRE_FOOT_FACTOR = 0.092903
 
 export default {
     title: 'Locations',
-    components: { LocationItem, Loader, Modal },
-    data() {
-        return {
-            user: null, locations: [], cityRef: [], gCostsRef: [], cCostsRef: [],
-            entry: {
-                parent: null, id: null, name: '', continent: '', country: '', state: '', city: '', is_building: false,
-                info: {
-                    rental_metre: 0, rental_foot: 0, furniture_cost: 0, people_alloc: 0
-                }
-            },
-            loaded: false, showEntry: false, editMode: false,
-            state: {
-                saving: false
+    components: { CaretIcon, FilterDropdown, LocationItem, Loader, Modal },
+    data: () => ({
+        // clients: [], 
+        locations: [], cityRef: [], gCostsRef: [], cCostsRef: [],
+        filterClient: false, clientId: null, clientName: null, apiError: null,
+        entry: {
+            parent: null, id: null, name: '', continent: '', country: '', state: '', city: '', //is_building: false,
+            info: {
+                rental_sqm: 0, rental_sqft: 0, furniture_cost: 0, employee_allocation: 0
             }
-        }
-    },
-    computed: {
-        userCompany() { return this.user ? this.user.company.name : null },
-        compId() { return this.user ? this.user.cid : null },
-        continents() {
-            return this.cityRef.map(x => { return x.continent })
         },
+        loaded: false, showEntry: false, editMode: false,
+        state: {
+            saving: false
+        }
+    }),
+    computed: {
+        ...mapState({
+            user: state => state.user,
+            clients: state => state.clients,
+            client: state => state.locations.client
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers',
+            api_buildings: 'backend/api_buildings',
+            api_building: 'backend/api_building',
+            buildings: 'locations/getBuildings',
+            building: 'locations/getBuilding'
+        }),
+        continents() { return this.cityRef.map(x => { return x.continent }) },
         countries() {
             return this.cityRef.filter(x => x.continent === this.entry.continent)
                 .map(x => { 
@@ -179,16 +192,17 @@ export default {
         },
         locationList() {
             let _ = this,
-                keys = ['continent', 'parent', 'state', 'city'],
+                locs = this.locations.sort((a, b) => {
+                    if (a.name > b.name) return 1
+                    else if (a.name < b.name) return -1
+                    return 0
+                }),
+                keys = ['continent', 'country', 'state', 'city'],
                 grouped = [],
                 temp = { _: grouped }
 
-            function getParent(id) { return _.locations.find(x => x.hid === id) }
-
             // location grouping
-            _.locations.forEach(function (a) {
-                a.parent = getParent(a.pid || a.hid).name
-
+            locs.forEach(function (a) {
                 keys.reduce(function (r, k) {
                     if (!r[a[k]]) {
 
@@ -197,18 +211,16 @@ export default {
                         if (a[k]) {
                             let l = { ['name']: a[k], ['children']: r[a[k]]._ }
 
-                            if (k === 'parent') {
-                                l.pid = a.pid
-                                l.hid = a.hid
-                            }
-
-                            if (k !== 'continent') {
+                            if (k === 'city') {
                                 l.continent = a.continent
                                 l.country = a.country
+                                l.state = a.state
+                                l.city = a.city
                             }
 
-                            if (['state', 'city'].indexOf(k) > -1) l.state = a.state
-                            if (k === 'city') l.city = a.city
+                            if (['continent', 'country', 'state', 'city'].indexOf(k) >= 0) {
+                                l.collapsed = a[`${k}_collapsed`]
+                            }
 
                             r._.push(l)
                         }
@@ -216,9 +228,13 @@ export default {
                     return r[a[k]]
                 }, temp)._.push(a)
             })
+
+            // console.log('groupedLocations', grouped)
             
             return grouped
-        }
+        },
+        clientList() { return this.clients.map(x => { return { label: x.name, value: x.id } }) },
+        companyId() { return this.clientId || this.user.company_id }
     },
     watch: {
         'entry.city': function(value) {
@@ -227,50 +243,74 @@ export default {
             let gcosts = this.gCostsRef.find(c => c.country === this.entry.country && c.city === value)
             let ccosts = this.cCostsRef.find(c => c.country === this.entry.country && c.city === value)
 
-            console.log(gcosts, ccosts)
-
             if (ccosts) {
-                this.entry.info.rental_metre = ccosts.rental_metre
-                this.entry.info.rental_foot = ccosts.rental_foot
+                this.entry.info.rental_sqm = ccosts.rental_metre
+                this.entry.info.rental_sqft = ccosts.rental_foot
                 this.entry.info.furniture_cost = ccosts.furniture_cost
             } else if (gcosts) {
-                this.entry.info.rental_metre = gcosts.rental_metre
-                this.entry.info.rental_foot = gcosts.rental_foot
+                this.entry.info.rental_sqm = gcosts.rental_metre
+                this.entry.info.rental_sqft = gcosts.rental_foot
                 this.entry.info.furniture_cost = gcosts.furniture_cost
             }
         }
     },
     methods: {
-        async jsonGet() {
-            let { data } = await axios.get('/assets/cities')
-            this.cityRef = data
+        ...mapMutations({
+            setClients: 'setClients',
+            setClient: 'locations/setClient',
+            setBuildings: 'locations/setBuildings',
+            setBuilding: 'locations/setBuilding',
+            setFloors: 'locations/setFloors'
+        }),
+        async getReferences() {
+            let resp = await axios.all([
+                axios.get('/assets/cities'),
+                axios.get(`${api.url}/${this.companyId}/costs`)
+            ])
+
+            this.cityRef = resp[0].data
+            this.gCostsRef = resp[1].data.global_costs
+            this.cCostsRef = resp[1].data.cust_costs
         },
-        async jsonPut(json) {
-            axios.put('/assets/cities', { data: json })
-        },
-        async getCostsRefs() {
-            let { data } = await axios.get(`${api.locations}/${this.user.company.hid}/costs`)
-            this.gCostsRef = data.global_costs
-            this.cCostsRef = data.cust_costs
-        },
+        async putCityRefs(json) { axios.put('/assets/cities', { data: json }) },
         async getData() {
-            let { data } = await axios.get(api.locations, { params: { cid: this.compId } })
+            let compId = this.clientId || this.user.company_id
 
-            data.forEach(l => {
-                if (l.state && l.city) {
-                    l.is_building = true
-                }
-            })
+            if (!compId) return
 
-            this.locations = data
+            try {
+                let { data } = await axios.get(this.api_buildings(compId), this.api_header)
+
+                data.forEach(d => {
+                    let cache = this.buildings.find(x => x.id == d.id)
+
+                    d.continent_collapsed = cache?.continent_collapsed ?? false
+                    d.country_collapsed = cache?.country_collapsed ?? false
+                    d.state_collapsed = cache?.state_collapsed ?? false
+                    d.city_collapsed = cache?.city_collapsed ?? false
+                })
+
+                this.locations = data
+                this.setBuildings(this.locations)
+                this.apiError = null
+            } catch (error) {
+                this.locations = []
+                this.setBuildings([])
+                this.apiError = error.response.data.message
+            }
             this.loaded = true
         },
-        metreRentalKeyUp() {
-            this.entry.info.rental_foot = (this.entry.info.rental_metre * METRE_FOOT_FACTOR).toFixed(2)
+        selectClient(id, name) {
+            this.clientId = id
+            this.clientName = name
+            this.filterClient = false
+            this.setClient(id)
+            this.loaded = false
+            this.getReferences()
+            this.getData()
         },
-        footRentalKeyUp() {
-            this.entry.info.rental_metre = (this.entry.info.rental_foot / METRE_FOOT_FACTOR).toFixed(2)
-        },
+        metreRentalKeyUp() { this.entry.info.rental_sqft = (this.entry.info.rental_sqm * METRE_FOOT_FACTOR).toFixed(2) },
+        footRentalKeyUp() { this.entry.info.rental_sqm = (this.entry.info.rental_sqft / METRE_FOOT_FACTOR).toFixed(2) },
         toggleEntry(show) {
             this.showEntry = show
 
@@ -278,19 +318,15 @@ export default {
         },
         toggleSaving(saving) { this.state.saving = saving },
         triggerAdd(parent, tItem, depth) {
-            let tz = Intl.DateTimeFormat().resolvedOptions().timeZone,
-                isBuilding = depth > 0
+            let tz = Intl.DateTimeFormat().resolvedOptions().timeZone//, isBuilding = depth > 0
 
             this.entry.parent = parent
             this.entry.id = null
             this.entry.name = ''
-            this.entry.is_building = isBuilding
-            
-            // building info
-            this.entry.info.rental_metre = 0
-            this.entry.info.rental_foot = 0
+            this.entry.info.rental_sqm = 0
+            this.entry.info.rental_sqft = 0
             this.entry.info.furniture_cost = 0
-            this.entry.info.people_alloc = 0
+            this.entry.info.employee_allocation = 0
 
             if (tz.startsWith('Africa')) this.entry.continent = 'Africa'
             else if (tz.startsWith('America')) this.entry.continent = 'North America'
@@ -315,69 +351,66 @@ export default {
             this.editMode = false
             this.toggleEntry(true)
         },
-        getEntry(isEdit) {
+        getEntry() {
             let data = {
                 name: this.entry.name,
-                continent: this.entry.continent,
+                city: this.entry.city,
+                state: this.entry.state,
                 country: this.entry.country,
-                state: this.entry.parent ? this.entry.state : null,
-                city: this.entry.parent ? this.entry.city : null
-            }
-
-            if (!isEdit) data.company = this.compId
-            if (this.entry.parent) data.parent = this.entry.parent
-
-            if (this.entry.is_building) {
-                data.building_info = {
-                    rental_metre: this.entry.info.rental_metre,
-                    rental_foot: this.entry.info.rental_foot,
-                    furniture_cost: this.entry.info.furniture_cost,
-                    people_alloc: this.entry.info.people_alloc
-                }
+                continent: this.entry.continent,
+                rental_sqm: this.entry.info.rental_sqm,
+                rental_sqft: this.entry.info.rental_sqft,
+                furniture_cost: this.entry.info.furniture_cost,
+                employee_allocation: this.entry.info.employee_allocation
             }
 
             return data
         },
-        saveCustCosts(country, city, rental_metre, rental_foot, furniture_cost) {
+        saveCustCosts(country, city, rental_sqm, rental_sqft, furniture_cost) {
             let ccosts = this.cCostsRef.find(c => c.country === country && c.city === city)
 
             if (ccosts) {
-                ccosts.rental_metre = rental_metre
-                ccosts.rental_foot = rental_foot
+                ccosts.rental_sqm = rental_sqm
+                ccosts.rental_sqft = rental_sqft
                 ccosts.furniture_cost = furniture_cost
             } else {
                 this.cCostsRef.push({
                     country: country, city: city,
-                    rental_metre: rental_metre,
-                    rental_foot: rental_foot,
+                    rental_sqm: rental_sqm,
+                    rental_sqft: rental_sqft,
                     furniture_cost: furniture_cost
                 })
             }
         },
         async addLoc() {
-            let _entry = this.getEntry(false)
+            let _entry = this.getEntry()
+
             this.toggleSaving(true)
-            axios.post(api.locations, _entry)
-                .then(x => {
-                    this.toggleSaving(false)
-                    let res = x.data
+            let res = await axios.post(this.api_buildings(this.companyId), _entry, this.api_header)
 
-                    if (res.r) {
-                        res.data.is_building = this.entry.is_building
+            if (res.status == 200) {
+                _entry.id = res.data.child_id
+                _entry.continent_collapsed = false
+                _entry.country_collapsed = false
+                _entry.state_collapsed = false
+                _entry.city_collapsed = false
+                this.locations.push(_entry)
+                this.toggleSaving(false)
+                this.toggleEntry(false)
+                // save costs cache
+                axios.post(`${api.url}/${this.user.company.hid}/costs`, _entry)
+                    .then(x => {
+                        let res = x.data
 
-                        this.locations.push(res.data)
-
-                        if (res.saved_to_cust) {
+                        if (res.r) {
                             this.saveCustCosts(this.entry.country, this.entry.city,
-                                _entry.building_info.rental_metre, _entry.building_info.rental_foot, _entry.building_info.furniture_cost)
+                                _entry.rental_sqm, _entry.rental_sqft, _entry.furniture_cost)
                         }
-
-                        this.toggleEntry(false)
-                    }
-                })
+                    })
+            } else this.toggleSaving(false)
         },
         triggerEdit(id) {
-            let l = this.locations.find(l => l.hid === id)
+            let l = this.locations.find(l => l.id === id)
 
             this.entry.id = id
             this.entry.parent = l.pid
@@ -386,105 +419,134 @@ export default {
             this.entry.country = l.country
             this.entry.state = l.state
             this.entry.city = l.city
-            this.entry.is_building = l.is_building
-
-            if (l.building_info) {
-                this.entry.info.rental_metre = l.building_info.rental_metre
-                this.entry.info.rental_foot = l.building_info.rental_foot
-                this.entry.info.furniture_cost = l.building_info.furniture_cost
-                this.entry.info.people_alloc = l.building_info.people_alloc
-            } else {
-                this.entry.info.rental_metre = 0
-                this.entry.info.rental_foot = 0
-                this.entry.info.furniture_cost = 0
-                this.entry.info.people_alloc = 0
-            }
+            this.entry.info.rental_sqm = l.rental_sqm
+            this.entry.info.rental_sqft = l.rental_sqft
+            this.entry.info.furniture_cost = l.furniture_cost
+            this.entry.info.employee_allocation = l.employee_allocation
 
             this.editMode = true
-
             this.toggleEntry(true)
         },
         async upLoc() {
+            let _entry = this.getEntry(),
+                _id = this.entry.id
+
             this.toggleSaving(true)
-            let _entry = this.getEntry(true)
-            axios.put(`${api.locations}/${this.entry.id}`, _entry)
-                .then(x => {
-                    this.toggleSaving(false)
-                    let res = x.data
+            let res = await axios.put(this.api_building(this.companyId, _id), _entry, this.api_header)
 
-                    if (res.r) {
-                        let l = this.locations.find(l => l.hid == this.entry.id)
+            if (res.status == 200) {
+                let l = this.locations.find(x => x.id == _id)
+                l.name = this.entry.name
+                l.city = this.entry.city
+                l.state = this.entry.state
+                l.country = this.entry.country
+                l.continent = this.entry.continent
+                l.rental_sqm = this.entry.info.rental_sqm
+                l.rental_sqft = this.entry.info.rental_sqft
+                l.furniture_cost = this.entry.info.furniture_cost
+                l.employee_allocation = this.entry.info.employee_allocation
 
-                        l.name = this.entry.name
-                        l.continent = this.entry.continent
-                        l.country = this.entry.country
-                        l.state = this.entry.state
-                        l.city = this.entry.city
+                this.toggleSaving(false)
+                this.toggleEntry(false)
+                // save costs cache
+                axios.post(`${api.url}/${this.user.company.hid}/costs`, _entry)
+                    .then(x => {
+                        let res = x.data
 
-                        if (this.entry.is_building) l.building_info = _entry.building_info
-                        
-                        if (res.saved_to_cust) {
+                        if (res.r) {
                             this.saveCustCosts(this.entry.country, this.entry.city,
-                                _entry.building_info.rental_metre, _entry.building_info.rental_foot, _entry.building_info.furniture_cost)
+                                _entry.rental_sqm, _entry.rental_sqft, _entry.furniture_cost)
                         }
-
-                        this.toggleEntry(false)
-                    }
-                })
+                    })
+            } else this.toggleSaving(false)
         },
         async delLoc(id) {
             let _ = this,
-                idx = _.locations.findIndex(l => l.hid === id)
+                idx = _.locations.findIndex(l => l.id === id)
 
-            _.$duDialog(null, `Remove <strong>${_.locations[idx].name}</strong> from locations?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove <strong>${_.locations[idx].name}</strong>?`, _.$duDialog.OK_CANCEL, {
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {
                         this.hide()
                         _.toggleSaving(true)
-                        axios.delete(`${api.locations}/${id}`)
+                        axios.delete(_.api_building(this.companyId, id), _.api_header)
                             .then(x => {
                                 _.toggleSaving(false)
                                 let res = x.data
 
-                                if (res.r) {
-                                    _.locations.splice(idx, 1)
-                                }
+                                if (res.status == 200) _.locations.splice(idx, 1)
                             })
                     }
                 }
             })
         },
-        toFloors(id) {
-            let bldg = this.locations.find(l => l.hid === id),
-                sBldg = store.getBldg()
+        toggleSubs(item, type, collapse) {
+            this.locations.filter(l => l[type] == item.name)
+                .forEach(l => l[`${type}_collapsed`] = collapse)
+            item.collapsed = collapse
+        },
+        toSetup(id) {
+            let bldg = this.locations.find(l => l.id === id),
+                sBldg = this.building
 
             if ((sBldg && sBldg.hid !== bldg.hid) ||
                 !sBldg) {
-                store.setBldg(bldg)
-                store.setFloors([])
+                this.setBuilding(bldg)
+                this.setFloors([])
             }
-            this.$parent.$router.push({ name: 'floors', params: { bid: id, bldg_name: bldg.name } })
+            this.$parent.$router.push({ name: 'building_setup', params: { bid: id, bldg_name: bldg.name } })
         },
         toMapper(id) {
-            let bldg = this.locations.find(l => l.hid === id),
-                sBldg = store.getBldg()
+            let bldg = this.locations.find(l => l.id === id),
+                sBldg = this.building
 
             if ((sBldg && sBldg.hid !== bldg.hid) ||
                 !sBldg) {
-                store.setBldg(bldg)
-                store.setFloors([])
+                this.setBuilding(bldg)
+                this.setFloors([])
             }
             this.$parent.$router.push({ name: 'mapper', params: { bid: id, bldg_name: bldg.name } })
+        },
+        pageOptsHandler(e) {
+            let _ = this
+
+            if (['mousedown', 'touchend'].indexOf(e.type) >= 0) {
+                if (!e.target.closest('.graph-filter')) {
+                    _.filterClient = false
+                }
+            } else if (e.type === 'keydown') {
+                if (e.keyCode === 27) _.filterClient = false
+            }
         }
     },
-    created() {
-        this.user = store.getUser()
-        this.jsonGet()
-        this.getCostsRefs()
+    async created() {
+        if (this.user.isSuper) {
+            if (this.clients.length == 0) {
+                let { data } = await axios.get(this.api_customers, this.api_header)
+            
+                this.setClients(data)
+            }
+            
+            if (this.client) {
+                this.clientId = this.client
+                this.clientName = this.clients.find(x => x.id == this.client).name
+            } else {
+                this.selectClient(this.clients[0].id, this.clients[0].name)
+            }
+        } else await this.getReferences()
     },
-    mounted() {
-        this.getData()
+    async mounted() {
+        if (this.buildings.length === 0) await this.getData()
+        else {
+            this.locations = this.buildings
+            this.loaded = true
+        }
+
+        addEvent(document, ['mousedown', 'touchend', 'keydown'], this.pageOptsHandler)
+    },
+    destroyed() {
+        removeEvent(document, ['mousedown', 'touchend', 'keydown'], this.pageOptsHandler)
     }
 }
 </script>

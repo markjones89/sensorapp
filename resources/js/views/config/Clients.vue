@@ -19,7 +19,7 @@
                     <div class="client-info">
                         <div class="client-opts">
                             <a class="client-opt" @click="triggerEdit(c.hid)">Edit</a>
-                            <a class="client-opt" @click="delClient(c.hid)">Remove</a>
+                            <!-- <a class="client-opt" @click="delClient(c.hid)">Remove</a> -->
                         </div>
                     {{ c.name }}
                     </div>
@@ -159,6 +159,7 @@
 }
 </style>
 <script>
+import { mapGetters } from 'vuex'
 import { getBaseUrl } from '../../helpers'
 import { CircleProgress, Loader, Modal } from '../../components'
 
@@ -167,15 +168,13 @@ const api = '/api/clients'
 export default {
     title: 'Clients',
     components: { CircleProgress, Loader, Modal },
-    data() {
-        return {
-            clients: [], cName: '', cId: null,
-            loaded: false, clientEntry: false, editMode: false,
-            state: {
-                saving: false
-            }
+    data: () => ({
+        clients: [], cName: '', cId: null, refId: null,
+        loaded: false, clientEntry: false, editMode: false,
+        state: {
+            saving: false
         }
-    },
+    }),
     computed: {
         baseUrl() { return getBaseUrl() },
         clientList() {
@@ -184,19 +183,32 @@ export default {
                 if (a.name < b.name) return -1
                 return 0
             })
-        }
+        },
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers'
+        })
     },
     methods: {
         async getData() {
-            let { data } = await axios.get(api)
+            let res = await axios.all([
+                axios.get(this.api_customers, this.api_header),
+                axios.get(api)
+            ])
+
+            let custs = res[0].data,
+                data = res[1].data
 
             data.forEach(c => {
-                c.upload_info = {
-                    uploading: false, progress: 0
+                let cust = custs.find(x => x.id == c.ref_id)
+
+                if (cust) {
+                    c.name = cust.name
+                    c.upload_info = { uploading: false, progress: 0 }
+                    this.clients.push(c)
                 }
             })
 
-            this.clients = data
             this.loaded = true
         },
         toggleEntry(show) {
@@ -207,6 +219,7 @@ export default {
         toggleSaving(saving) { this.state.saving = saving },
         triggerAdd() {
             this.cId = null
+            this.refId = null
             this.cName = ''
             this.editMode = false
 
@@ -214,28 +227,30 @@ export default {
         },
         async addClient() {
             this.toggleSaving(true)
-            axios.post(api, { name: this.cName })
-                .then(x => {
-                    this.toggleSaving(false)
-                    let res = x.data
+            let cust = await axios.post(this.api_customers, { name: this.cName }, this.api_header)
 
-                    if (res.r) {
-                        res.data.upload_info = {
-                            uploading: false, progress: 0
+            if (cust.status == 200) {
+                axios.post(api, { ref_id: cust.data.id })
+                    .then(x => {
+                        this.toggleSaving(false)
+                        let res = x.data
+
+                        if (res.r) {
+                            res.data.name = this.cName
+                            res.data.upload_info = { uploading: false, progress: 0, name: this.cName }
+                            this.clients.push(res.data)
+                            this.toggleEntry(false)
                         }
-                        this.clients.push(res.data)
-                        this.toggleEntry(false)
-                    }
 
-                    this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
-                })
+                        this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
+                    })
+            } else this.toggleSaving(false)
         },
         triggerEdit(id) {
             let c = this.clients.find(c => c.hid === id)
 
-            console.log(id)
-
             this.cId = id
+            this.refId = c.ref_id
             this.cName = c.name
             this.editMode = true
 
@@ -243,19 +258,21 @@ export default {
         },
         async upClient() {
             this.toggleSaving(true)
-            axios.put(`${api}/${this.cId}`, { name: this.cName })
+            axios.put(`${this.api_customers}/${this.refId}`, { name: this.cName }, this.api_header)
                 .then(x => {
                     this.toggleSaving(false)
-                    let res = x.data
+                    if (x.status == 200) {
+                        let res = x.data
 
-                    if (res.r) {
-                        let c = this.clients.find(c => c.hid == this.cId)
+                        if (res.r) {
+                            let c = this.clients.find(c => c.hid == this.cId)
 
-                        c.name = this.cName
-                        this.toggleEntry(false)
+                            c.name = this.cName
+                            this.toggleEntry(false)
+                        }
+
+                        this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
                     }
-
-                    this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
                 })
         },
         async delClient(id) {

@@ -12,22 +12,27 @@ use Image;
 class CompaniesController extends Controller
 {
     /* API */
-    public function get($id = null) {
-        if ($id) {
+    public function get(Request $request) {
+        // by ID
+        if ($request->id) {
             $cid = Hashids::decode($id)[0];
             
             return response(Company::find($cid));
+        } 
+        // by ref_id
+        else if ($request->rid) {
+            return response(Company::where('ref_id', $request->rid)->first());
         }
 
         return response(Company::all());
     }
 
     public function create(Request $request) {
-        if ($request->name == '' || !$request->has('name')) {
-            return response(['r' => false, 'm' => 'Company name is required']);
+        if ($request->ref_id == '' || !$request->has('ref_id')) {
+            return response(['r' => false, 'm' => 'Company ID reference is required']);
         } else {
             $comp = new Company;
-            $comp->name = $request->name;
+            $comp->ref_id = $request->ref_id;
             $comp->save();
 
             // default settings
@@ -41,19 +46,19 @@ class CompaniesController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
-        if ($request->name == '' || !$request->has('name')) {
-            return response(['r' => false, 'm' => 'Company name is required']);
-        } else {
-            $cid = Hashids::decode($id)[0];
-            $comp = Company::find($cid);
+    // public function update(Request $request, $id) {
+    //     if ($request->name == '' || !$request->has('name')) {
+    //         return response(['r' => false, 'm' => 'Company name is required']);
+    //     } else {
+    //         $cid = Hashids::decode($id)[0];
+    //         $comp = Company::find($cid);
 
-            $comp->name = $request->name;
-            $comp->save();
+    //         $comp->name = $request->name;
+    //         $comp->save();
 
-            return response(['r' => true, 'm' => 'Client company updated']);
-        }
-    }
+    //         return response(['r' => true, 'm' => 'Client company updated']);
+    //     }
+    // }
 
     public function setLogo(Request $request) {
         if ($request->hasFile('logo')) {

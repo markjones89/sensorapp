@@ -129,33 +129,42 @@
 }
 </style>
 <script>
-import { addEvent, removeEvent, getBaseUrl } from '../../helpers'
+import { addEvent, removeEvent, getBaseUrl, toOrdinal } from '../../helpers'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { FilterDropdown, Loader } from '../../components'
 import floorMapper from '../../components/FloorMapper.js'
+import { mapState, mapGetters } from 'vuex'
 
 const api = {
     building: '/api/locations',
-    floor: '/api/floors'
+    floor: '/api/floors',
+    sensor: '/api/sensors'
 }
 export default {
     title: 'Live',
     props: ['bldg_id', 'floor_id'],
     components: { CaretIcon, CaretLeftIcon, FilterDropdown, Loader },
-    data() {
-        return {
-            loaded: false, mapper: null, showPageOpts: false, showEmbed: false,
-            liveWS: null, building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
-            stats: {
-                desk_free: 0, desk_occupied: 0,
-                rooms_free: 0, rooms_occupied: 0
-            },
-            sci_id: null // sensor change interval
-        }
-    },
+    data: () =>({
+        loaded: false, mapper: null, showPageOpts: false, showEmbed: false,
+        liveWS: null, building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
+        stats: {
+            desk_free: 0, desk_occupied: 0,
+            rooms_free: 0, rooms_occupied: 0
+        },
+        sci_id: null // sensor change interval
+    }),
     computed: {
+        ...mapState({
+            user: state => state.user 
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_building_overview: 'backend/api_building_overview',
+            api_floors: 'backend/api_floors',
+            api_sensors_by_node: 'backend/api_sensors_by_node'
+        }),
         baseUrl() { return getBaseUrl() },
-        floorFilters() { return this.floors.map(f => { return { value: f.hid, label: `${f.ordinal_no} Floor` } }) },
+        floorFilters() { return this.floors.map(f => { return { value: f.id, label: `${f.ordinal_no} Floor` } }) },
         deskSensors() {
             return this.floor.sensors.filter(s => s.area && s.area.type_id === 4)
         },
@@ -187,7 +196,7 @@ export default {
 
             if (sensor && state) {
                 sensor.sensor_state = state
-                this.mapper.setSensorColor(sensor.hid, state)
+                this.mapper.setSensorColor(sensor.id, state)
                 this.setStats()
             }
         },
@@ -204,71 +213,89 @@ export default {
         },
         windowUnload() { this.wsClose('Page closed') },
         backTo() { this.$router.back() },
-        filterSelect(value, label) {
+        async filterSelect(value, label) {
             this.showFilter = false
-            this.floor = this.floors.find(f => f.hid === value)
+            this.floor = this.floors.find(f => f.id === value)
             this.floorFilter = label
 
-            this.getFloorData(value, () => {
-                this.mapper.setData(this.floor)
-            })
+            await this.getFloorData(value)
+            this.mapper.setData(this.floor)
         },
         toHeatMap() {
-            this.$router.push({ name: 'heat-map', query: { bid: this.bldg_id, fid: this.floor.hid } })
+            this.$router.push({ name: 'heat-map', query: { bid: this.bldg_id, fid: this.floor.id } })
         },
         toComfortMap() {
-            this.$router.push({ name: 'comfort-map', query: { bid: this.bldg_id, fid: this.floor.hid } })
+            this.$router.push({ name: 'comfort-map', query: { bid: this.bldg_id, fid: this.floor.id } })
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         },
         async getBuilding(id) {
-            let { data } = await axios.get(api.building, { params: { id: id } })
-            
-            this.building = data
-            this.getFloors(id, () => {
-                let selected_floor = this.floor_id ? this.floor_id : this.floors[0].hid
+            let compId = this.user.company_id
 
-                this.floor = this.floors.find(f => f.hid === selected_floor)
-                this.floorFilter = `${this.floor.ordinal_no} Floor`
+            let res = await axios.all([
+                axios.get(api.floor, { params: { bid: id } }),
+                axios.get(this.api_building_overview(compId, id), this.api_header)
+            ])
 
-                this.getFloorData(selected_floor, () => {
-                    this.loaded = true
-                    setTimeout(() => {
-                        this.setFloorMap()
-                    }, 0)
-                })
+            let floorRefs = res[0].data,
+                bldgOverview = res[1].data,
+                floors = []
+
+            bldgOverview.children.forEach(f => {
+                let ref = floorRefs.find(x => x.ref_id == f.id)
+
+                f.ordinal_no = toOrdinal(f.number)
+                f.occupancy_limit = ref?.occupancy_limit
+                f.floor_plan = ref?.floor_plan
+                f.floor_plan_url = ref?.floor_plan ? `${this.baseUrl}/plans/${ref.floor_plan}` : null
+
+                delete f.children
+                delete f.building
+
+                floors.push(f)
             })
-        },
-        async getFloors(bid, cb) {
-            let { data } = await axios.get(api.floor, { params: { bid: bid } })
 
-            data.forEach(f => {
-                f.floor_plan_url = `${this.baseUrl}/plans/${f.floor_plan}`
-            })
-
-            let sorted = data.sort((a, b) => {
-                if (a.floor_no > b.floor_no) return 1
-                if (a.floor_no < b.floor_no) return -1
+            delete bldgOverview.children
+            this.building = bldgOverview
+            this.floors = floors.sort((a, b) => {
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
                 return 0
             })
 
-            this.floors = sorted
+            let selected_floor = this.floor_id ? this.floor_id : this.floors[0].id
 
-            return cb && cb()
+            this.floor = this.floors.find(f => f.id === selected_floor)
+            this.floorFilter = `${this.floor.ordinal_no} Floor`
+
+            await this.getFloorData(selected_floor)
+            
+            this.loaded = true
+            setTimeout(() => { this.setFloorMap() }, 0)
         },
-        async getFloorData(fid, cb) {
-            let { data } = await axios.get(`${api.floor}/${fid}/data`, { params: { so: true } })
+        async getFloorData(fid) {
+            let res = await axios.all([
+                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header),
+                axios.get(api.sensor, { fid: fid })
+            ])
 
-            data.sensors.forEach(s => { s.sensor_state = 'available' })
+            let sensors = res[0].data,
+                refs = res[1].data
 
-            this.floor.sensors = data.sensors
-            this.floor.areas = []
+            sensors.forEach(s => {
+                let map = refs.find(x => x.ref_id == s.id)
 
+                if (map) {
+                    s.pos_x = map.pos_x
+                    s.pos_y = map.pos_y
+                    s.scale = map.scale
+                }
+            })
+
+            this.floor.sensors = sensors
             this.setStats()
-
-            return cb && cb()
         },
         setFloorMap() {
             let _ = this

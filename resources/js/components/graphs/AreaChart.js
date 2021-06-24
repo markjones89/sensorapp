@@ -15,7 +15,9 @@ function areaChart(wrapper, data, callbacks) {
 
     let ticks = data.length
 
-    data.push({ label: '', xValue: d3.max(data, d => d.xValue) + 1, yValue: data[data.length - 1].yValue })
+    data.push({ label: '', xValue: (d3.max(data, d => d.xValue) ?? 0) + 1, yValue: data[data.length - 1]?.yValue ?? 0 })
+
+    console.log('create.data', data)
 
     // copy a mirror of the data with negative values
     let negativeMirror = getMirror(data)
@@ -95,7 +97,9 @@ function areaChart(wrapper, data, callbacks) {
     }
 
     this.update = function(data, fresh) {
-        if (fresh) data.push({ label: '', xValue: d3.max(data, d => d.xValue) + 1, yValue: data[data.length - 1].yValue })
+        if (fresh) data.push({ label: '', xValue: (d3.max(data, d => d.xValue) ?? 0) + 1, yValue: data[data.length - 1]?.yValue ?? 0 })
+
+        console.log('update.data', data)
 
         let _ticks = data.length,
             _maxY = d3.max(data, d => d.yValue), _minY = -_maxY,

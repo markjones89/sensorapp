@@ -69,7 +69,7 @@
 }
 </style>
 <script>
-import { store } from '../../store'
+import { mapState } from 'vuex'
 import { getBaseUrl } from '../../helpers'
 import { Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "../../components"
 import { CaretIcon, CaretLeftIcon } from "../../components/icons"
@@ -79,7 +79,7 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
     data() {
         return {
-            user: null,
+            // user: null,
             showPageOpts: false, showEmbed: false,
             timeFilter: {
                 start: null, end: null
@@ -88,6 +88,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
         baseUrl() { return getBaseUrl() },
         settings() { return this.user.company ? this.user.company.settings : null },
         minuteFilters() {
@@ -135,9 +138,6 @@ export default {
         toLive() {
             this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
         }
-    },
-    created() {
-        this.user = store.getUser()
     },
     mounted() {
         this.renderChart()

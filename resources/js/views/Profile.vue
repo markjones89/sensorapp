@@ -113,7 +113,7 @@
 }
 </style>
 <script>
-import { store } from '../store'
+import { mapMutations, mapState } from 'vuex'
 import { addEvent, getBaseUrl, removeEvent } from '../helpers'
 import { Modal, Loader } from '../components'
 import { Cropper } from 'vue-advanced-cropper'
@@ -125,7 +125,7 @@ export default {
     components: { Cropper, Loader, Modal },
     data() {
         return {
-            user: null, photo: null, photoPreview: null, selected_photo: null,
+            photo: null, photoPreview: null, selected_photo: null,
             showUpload: false, cropperHeight: 500,
             state: {
                 uploading: false, img_loading: false
@@ -133,14 +133,19 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            user: state => state.user
+        }),
         baseUrl() { return getBaseUrl() },
         photoUrl() {
             return this.user && this.user.photo ? `${this.baseUrl}/storage/user-photos/${this.user.photo}` : 
                 `${this.baseUrl}/images/user0001.jpg`
-        },
-        // photoPreview() { return this.photo ? this.photo.toDataURL() : null }
+        }
     },
     methods: {
+        ...mapMutations([
+            'setUserPhoto'
+        ]),
         imageReady() { this.state.img_loading = false },
         imageCropped({canvas}) {
             this.photo = canvas
@@ -190,7 +195,7 @@ export default {
                     let res = x.data
 
                     if (res.r) {
-                        store.setUserPhoto(res.photo)
+                        this.setUserPhoto(res.photo)
                         _.toggleUpPhoto(false)
                     }
                 })
@@ -207,8 +212,6 @@ export default {
         },
     },
     mounted() {
-        this.user = store.getUser()
-
         addEvent(window, 'resize', this.calcCropperHeight)
     },
     destroyed() {

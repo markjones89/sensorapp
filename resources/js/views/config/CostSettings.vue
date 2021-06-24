@@ -6,8 +6,8 @@
                 <table>
                     <thead>
                         <tr>
-                            <th width="150">Country</th>
-                            <th width="150">City</th>
+                            <th width="200">Country</th>
+                            <th width="200">City</th>
                             <th>Rental per m<sup>2</sup></th>
                             <th>Rental per ft<sup>2</sup></th>
                             <th>Workspace Furniture Cost</th>
@@ -17,7 +17,7 @@
                         <tr v-if="costs.length === 0">
                             <td colspan="5">No records</td>
                         </tr>
-                        <tr v-else v-for="c in costs" :key="c.hid" class="cost-item" @click="triggerEdit(c.hid)">
+                        <tr v-else v-for="c in costList" :key="c.hid" class="cost-item" @click="triggerEdit(c.hid)">
                             <td>{{ c.country }}</td>
                             <td>{{ c.city }}</td>
                             <td>{{ c.rental_metre.toLocaleString('en-US', {style: "currency", currency: "USD", minimumFractionDigits: 2}) }}</td>
@@ -76,6 +76,7 @@
     
     table {
         border-collapse: collapse;
+        width: 100%;
 
         th {
             padding: 0 8px;
@@ -89,8 +90,8 @@
         }
 
         td {
-            padding: 0 8px;
-            line-height: 32px;
+            padding: 10px;
+            // line-height: 32px;
         }
 
         .cost-item {
@@ -149,6 +150,13 @@ export default {
             })
 
             return _cities
+        },
+        costList() {
+            return this.costs.sort((a, b) => {
+                if (a.country > b.country || (a.country == b.country && a.city > b.city)) return 1
+                if (a.country < b.country || (a.country == b.country && a.city < b.city)) return -1
+                return 0
+            })
         }
     },
     /* watch: {
