@@ -14,7 +14,7 @@ class DropBuildingIdFloorsTable extends Migration
     public function up()
     {
         Schema::table('floors', function (Blueprint $table) {
-            $table->dropForeign(['building_id', 'floor_id']);
+            $table->dropForeign(['building_id']);
             $table->dropColumn('building_id');
         });
     }

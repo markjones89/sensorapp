@@ -14,7 +14,6 @@ class UpdateFloorsTable extends Migration
     public function up()
     {
         Schema::table('floors', function (Blueprint $table) {
-            $table->dropColumn('floor_id');
             $table->dropColumn('floor_no');
             $table->dropColumn('size_metre');
             $table->dropColumn('size_feet');
