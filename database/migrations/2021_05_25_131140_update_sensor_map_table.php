@@ -16,6 +16,7 @@ class UpdateSensorMapTable extends Migration
         Schema::table('sensor_map', function (Blueprint $table) {
             $table->longText('ref_id')->after('id'); // sensor id from sensor backend
             $table->dropForeign(['floor_id']);
+            $table->dropColumn('floor_id');
             $table->dropColumn('area_id');
             $table->dropColumn('sensor_id');
             $table->dropColumn('name');
