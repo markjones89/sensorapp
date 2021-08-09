@@ -150,7 +150,11 @@ export default {
         floor() { return this.floorSel ? this.floors.find(f => f.id === this.floorSel) : null },
     },
     watch: {
-        floorSel: function(floor, oldFloor) { this.getSensors(floor, () => { this.mapper.setData(this.floor) }) },
+        floorSel: function(floor, oldFloor) {
+            if (this.floor) {
+                this.getSensors(floor, () => { this.mapper.setData(this.floor) })
+            }
+        },
         editSensor: function(isEdit) { this.mapper.setSensorMapping(isEdit) }
     },
     methods: {
@@ -169,7 +173,7 @@ export default {
             if (this.buildings.length > 0) {
                 bldg = this.buildings.find(x => x.id == id)
             } else {
-                let res = await axios.get(this.api_buildings(this.company_id), this.api_header)
+                let res = await axios.get(this.api_buildings(this.company_id), this.api_header())
                 bldg = res.data.find(x => x.id == id)
                 this.setBuildings(res.data)
             }
@@ -181,7 +185,7 @@ export default {
         async getFloors(cb) {
             let res = await axios.all([
                 axios.get(api.floor, { bid: this.bldg_id }),
-                axios.get(this.api_building_overview(this.company_id, this.bldg_id), this.api_header)
+                axios.get(this.api_building_overview(this.company_id, this.bldg_id), this.api_header())
             ])
 
             let refs = res[0].data,
@@ -219,7 +223,7 @@ export default {
         },
         async getSensors(fid, cb) {
             let res = await axios.all([
-                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header),
+                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header()),
                 axios.get(api.sensor, { fid: fid })
             ])
             let floor = this.floors.find(f => f.id === fid)
@@ -293,14 +297,14 @@ export default {
         },
         async addSensor() {
             this.toggleSaving(true)
-            console.log(this.entry.group, this.floorAreas)
+            // console.log(this.entry.group, this.floorAreas)
             let area = this.floorAreas.find(x => x.id == this.entry.group)
             let data = {
                 sensor_id: this.entry.sensor,
                 name: this.entry.name,
                 parent: area.group_id
             }
-            let resp = await axios.post(this.api_sensors(this.company_id, this.bldg_id, this.floorSel, area.id), data, this.api_header)
+            let resp = await axios.post(this.api_sensors(this.company_id, this.bldg_id, this.floorSel, area.id), data, this.api_header())
 
             if (resp.status == 200) {
                 data.id = resp.data.child_id
@@ -322,6 +326,7 @@ export default {
                         this.floor.sensors.push(data)
                         this.mapper.drawSensors()
                         this.toggleEntry(false)
+                        this.toggleSaving(false)
                     }
                 })
             }
@@ -350,7 +355,7 @@ export default {
                 parent: area.group_id
             }
             let _id = this.entry.id
-            let resp = await axios.put(this.api_sensor(this.company_id, this.bldg_id, this.floorSel, area.id, _id), data, this.api_header)
+            let resp = await axios.put(this.api_sensor(this.company_id, this.bldg_id, this.floorSel, area.id, _id), data, this.api_header())
             if (resp.status == 200) {
                 let s = this.floor.sensors.find(s => s.id === this.entry.id)
                 
@@ -360,6 +365,7 @@ export default {
 
                 this.mapper.drawSensors()
                 this.toggleEntry(false)
+                this.toggleSaving(false)
             }
             else this.toggleSaving(false)
         },

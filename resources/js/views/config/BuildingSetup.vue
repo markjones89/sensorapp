@@ -44,7 +44,7 @@
                         <section id="area-list" v-if="floor !== null">
                             <h2>{{ floor.ordinal_no }} Floor Areas</h2>
                             <div v-if="areaList.length === 0" style="margin:16px">No areas</div>
-                            <ul v-else>
+                            <ul v-else class="custom-scroll">
                                 <li v-for="area in areaList" :key="area.id">
                                     <div class="area-info">
                                         <span class="area-name">{{ area.group_id }}</span>
@@ -148,6 +148,420 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
+
+<script>
+import { mapState, mapGetters, mapMutations } from 'vuex'
+import { CircleProgress, Loader, Modal } from '../../components'
+import { getBaseUrl, preloadImage, toOrdinal, addEvent, removeEvent }  from '../../helpers'
+
+const api = {
+    floors: '/api/floors',
+    area: '/api/areas'
+}
+const METRE_FOOT_FACTOR = 0.092903
+
+export default {
+    title: 'Building Setup',
+    props: ['bldg_id', 'bldg_name'],
+    components: { CircleProgress, Loader, Modal },
+    data: () => ({
+        floor: null, listTransition: 'fadeUp',
+        loaded: false, showEntry: false, editMode: false,
+        entry: { id: null, fNo: 1, size_sqm: 0, size_sqft: 0, occupancy_limit: 0 },
+        areaModal: false, areaTypes: [],
+        areaEntry: { id: null, group_id: '', type: '', limit: 0, sensor_count: 0 },
+        showPlan: false, planUrl: null,
+        state: {
+            saving: false, imgLoaded: false
+        }
+    }),
+    computed: {
+        ...mapState({
+            user: state => state.user,
+            // company_id: state => state.user.company_id
+            company_id: state => state.locations.client,
+            buildings: state => state.locations.buildings,
+            building: state => state.locations.building
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_buildings: 'backend/api_buildings',
+            api_building_overview: 'backend/api_building_overview',
+            api_floors: 'backend/api_floors',
+            api_floor: 'backend/api_floor',
+            api_areas: 'backend/api_areas',
+            api_area: 'backend/api_area',
+        }),
+        floors() { return this.$store.getters['locations/getFloors'](this.bldg_id) },
+        baseUrl() { return getBaseUrl() },
+        floorList() {
+            return this.floors.sort((a, b) => {
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
+                return 0
+            })
+        },
+        areaList() {
+            return this.floor == null ? [] : this.floor.areas.sort((a, b) => {
+                if (a.name > b.name) return 1
+                if (a.name < b.name) return -1
+                return 0
+            })
+        },
+        areaByDesk() { return this.areaEntry.type === 'Workspace Desk Area' }
+    },
+    methods: {
+        ...mapMutations({
+            setBuildings: 'locations/setBuildings',
+            setBuilding: 'locations/setBuilding',
+            setFloors: 'locations/setFloors'
+        }),
+        async getBuilding(id, cb) {
+            let bldg = null
+            if (this.buildings.length > 0) {
+                bldg = this.buildings.find(x => x.id == id)
+            } else {
+                let res = await axios.get(this.api_buildings(this.company_id), this.api_header())
+                bldg = res.data.find(x => x.id == id)
+                this.setBuildings(res.data)
+            }
+
+            this.setBuilding(bldg)
+        },
+        async getFloors() {
+            let res = await axios.all([
+                axios.get(api.floors, { bid: this.bldg_id }),
+                axios.get(this.api_building_overview(this.company_id, this.bldg_id), this.api_header())
+            ])
+
+            let refs = res[0].data,
+                floors = [...(res[1].data.children || [])]
+
+            floors.forEach(f => {
+                let ref = refs.find(x => x.ref_id == f.id)
+                f.ordinal_no = toOrdinal(f.number)
+                f.occupancy_limit = ref?.occupancy_limit
+                f.floor_plan = ref?.floor_plan
+                f.floor_plan_url = ref?.floor_plan ? `${this.baseUrl}/plans/${ref.floor_plan}` : null
+                f.upload_info = {
+                    uploading: false, progress: 0
+                }
+
+                f.areas = f.children
+                delete f.children
+            })
+
+            console.log('getFloors', floors)
+            this.setFloors({ bid: this.bldg_id, floors })
+            this.loaded = true
+        },
+        toggleEntry(show) {
+            this.showEntry = show
+
+            if (show) setTimeout(() => { this.$refs.fNo.focus() }, 0)
+        },
+        toggleSaving(saving) { this.state.saving = saving },
+        sqmKeyup() { this.entry.size_sqft = (this.entry.size_sqm / METRE_FOOT_FACTOR).toFixed(2) },
+        sqftKeyup() { this.entry.size_sqm = (this.entry.size_sqft * METRE_FOOT_FACTOR).toFixed(2) },
+        triggerAdd() {
+            this.entry.id = null
+            this.entry.fNo = this.floors.length > 0 ? (Math.max(...this.floors.map(x => x.number)) + 1) : 1
+            this.entry.size_sqm = 0
+            this.entry.size_sqft = 0
+            this.entry.occupancy_limit = 0
+            this.editMode = false
+
+            this.toggleEntry(true)
+        },
+        async addFloor() {
+            this.toggleSaving(true)
+            let floor = { 
+                number: this.entry.fNo,
+                size_sqm: this.entry.size_sqm,
+                size_sqft: this.entry.size_sqft,
+                building: this.building.name
+            }
+            let resp = await axios.post(this.api_floors(this.company_id, this.bldg_id), floor, this.api_header())
+
+            if (resp.status == 200) {
+                floor.id = resp.data.child_id
+                floor.ordinal_no = toOrdinal(floor.number)
+                axios.post(api.floors, {
+                    building_id: this.bldg_id,
+                    ref_id: floor.id,
+                    occupancy_limit: this.entry.occupancy_limit
+                }).then(x => {
+                        this.toggleSaving(false)
+                        let res = x.data
+
+                        if (res.r) {
+                            floor.occupancy_limit = this.entry.occupancy_limit
+                            floor.upload_info = {
+                                uploading: false, progress: 0
+                            }
+                            floor.floor_plan = null
+                            floor.floor_plan_url = null
+                            floor.areas = []
+                            this.building.floors.push(floor)
+                            this.toggleEntry(false)
+                        }
+                    })
+            } else this.toggleSaving(false)
+        },
+        triggerEdit(id) {
+            let f = this.floors.find(f => f.id === id)
+
+            this.entry.id = id
+            this.entry.fNo = f.number
+            this.entry.size_sqm = f.size_sqm
+            this.entry.size_sqft = f.size_sqft
+            this.entry.occupancy_limit = f.occupancy_limit
+            this.editMode = true
+
+            this.toggleEntry(true)
+        },
+        async upFloor() {
+            this.toggleSaving(true)
+            let floor = { 
+                number: this.entry.fNo,
+                size_sqm: this.entry.size_sqm,
+                size_sqft: this.entry.size_sqft,
+                building: this.building.name
+            }
+            let _id = this.entry.id
+            let resp = await axios.put(this.api_floor(this.company_id, this.bldg_id, _id), floor, this.api_header())
+
+            if (resp.status == 200) {
+                // floor.id = resp.data.child_id
+                // floor.ordinal_no = toOrdinal(floor.number)
+                let f = this.floors.find(x => x.id === _id)
+                f.number = floor.number
+                f.ordinal_no = toOrdinal(floor.number)
+                f.size_sqm = floor.size_sqm
+                f.size_sqft = floor.size_sqft
+                f.building = floor.building
+                f.occupancy_limit = this.entry.occupancy_limit
+
+                axios.put(`${api.floors}/${_id}`, { occupancy_limit: this.entry.occupancy_limit })
+                    .then(x => {
+                        this.toggleSaving(false)
+                        let res = x.data
+
+                        if (res.r) this.toggleEntry(false)
+                    })
+            } else this.toggleSaving(false)
+        },
+        async delFloor(id) {
+            let _ = this,
+                idx = _.floors.findIndex(f => f.id === id)
+
+            _.$duDialog(null, `Remove <strong>${_.floors[idx].ordinal_no} Floor</strong>?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.toggleSaving(true)
+                        axios.delete(_.api_floor(_.company_id, _.bldg_id, id), _.api_header).then(resp => {
+                            if (resp.status == 200) {
+                                _.toggleSaving(false)
+                                _.floors.splice(idx, 1)
+                                axios.delete(`${api.floors}/${id}`)
+                            } else _.toggleSaving(true)
+                        })
+                    }
+                }
+            })
+        },
+        upFloorPlan(id) {
+            this.entry.id = id
+            this.$refs.fpFile.click()
+        },
+        fpFileChange() {
+            let _ = this, file = _.$refs.fpFile.files[0]
+
+            if (file) {
+                let f = _.floors.find(f => f.id === _.entry.id)
+
+                f.upload_info.uploading = true
+                _.upload(file, function(success, res) {
+                    f.upload_info.uploading = false
+                    if (success) {
+                        if (res.r) {
+                            f.floor_plan = res.floor_plan
+                            f.floor_plan_url = `${_.baseUrl}/plans/${f.floor_plan}`
+                        }
+                    } else {
+                        console.error(res)
+                    }
+                })
+            }
+        },
+        async upload(file, cb) {
+            let formData = new window.FormData(),
+                f = this.floors.find(f => f.id === this.entry.id)
+
+            formData.append('floor_plan', file)
+            formData.append('id', this.entry.id)
+            formData.append('bid', this.bldg_id)
+            formData.append('occupancy_limit', this.entry.occupancy_limit)
+
+            axios.post(`${api.floors}/plan`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: function(progress) {
+                    var percentCompleted = Math.round((progress.loaded * 100) / progress.total)
+
+                    f.upload_info.progress = percentCompleted
+                }
+            }).then(x => cb(true, x.data))
+            .catch(err => cb(false, err))
+        },
+        togglePlan(show) { 
+            this.showPlan = show 
+            this.listTransition = 'fade'
+        },
+        viewFloorPlan(id, plan) {
+            let _ = this
+            _.floor = _.floors.find(f => f.id === id)
+            _.togglePlan(true)
+
+            _.state.imgLoaded = false
+            preloadImage(_.floor.floor_plan_url, function() { _.state.imgLoaded = true })
+        },
+        selectFloor(f) { this.floor = f },
+        deSelectFloor(e) {
+            let _ = this
+
+            if (['mousedown', 'touchend'].indexOf(e.type) >= 0) {
+                if (!e.target.closest('#floor-list .floor, .fp-preview, #area-list, #area-modal')) {
+                    _.floor = null
+                }
+            } else if (e.type === 'keydown') {
+                if (e.keyCode === 27) _.floor = null
+            }
+        },
+        toMapper(id) {
+            this.$parent.$router.push({ name: 'mapper', query: { fid: id }, params: { bid: this.bldg_id, bldg_name: this.bldg_name } })
+        },
+        async getAreaTypes() {
+            let { data } = await axios.get(`${api.area}/types`)
+
+            this.areaTypes = data
+        },
+        toggleAreaModal(show) {
+            this.areaModal = show
+
+            if (show) setTimeout(() => { this.$refs.group_id.focus() }, 0)
+        },
+        newArea() {
+            this.areaEntry.id = null
+            this.areaEntry.group_id = ''
+            // this.areaEntry.type = null
+            this.areaEntry.limit = 0
+            this.areaEntry.sensor_count = 0
+            this.editMode = false
+
+            this.toggleAreaModal(true)
+        },
+        async addArea() {
+            this.toggleSaving(true)
+            let area = {
+                group_id: this.areaEntry.group_id,
+                type: this.areaEntry.type,
+                limit: this.areaEntry.limit,
+                sensor_count: this.areaEntry.sensor_count
+            }
+
+            let resp = await axios.post(this.api_areas(this.company_id, this.bldg_id, this.floor.id), area, this.api_header())
+
+            if (resp.status == 200) {
+                area.id = resp.data.child_id
+                this.floor.areas.push(area)
+                this.toggleSaving(false)
+                this.toggleAreaModal(false)
+            }
+            else this.toggleSaving(false)
+        },
+        editArea(id) {
+            let a = this.floor.areas.find(x => x.id == id)
+            this.areaEntry.id = id
+            this.areaEntry.group_id = a.group_id
+            this.areaEntry.type = a.type
+            this.areaEntry.limit = a.limit
+            this.areaEntry.sensor_count = a.sensor_count
+            this.editMode = true
+
+            this.toggleAreaModal(true)
+        },
+        async updateArea() {
+            this.toggleSaving(true)
+            let area = {
+                group_id: this.areaEntry.group_id,
+                type: this.areaEntry.type,
+                limit: this.areaEntry.limit,
+                sensor_count: this.areaEntry.sensor_count
+            }
+            let _id = this.areaEntry.id
+            let resp = await axios.put(this.api_area(this.company_id, this.bldg_id, this.floor.id, _id), area, this.api_header())
+
+            if (resp.status == 200) {
+                let a = this.floor.areas.find(x => x.id == _id)
+                a.group_id = area.group_id
+                a.type = area.type
+                a.limit = area.limit
+                a.sensor_count = area.sensor_count
+
+                this.toggleSaving(false)
+                this.toggleAreaModal(false)
+            }
+            else this.toggleSaving(false)
+        },
+        async delArea(id) {
+            let _ = this,
+                idx = _.floor.areas.findIndex(f => f.id === id)
+
+            _.$duDialog(null, `Remove <strong>${_.floor.areas.group_id}</strong>?`, _.$duDialog.OK_CANCEL, {
+                okText: 'Remove',
+                callbacks: {
+                    okClick: function (e) {
+                        this.hide()
+                        _.toggleSaving(true)
+                        axios.delete(_.api_area(_.company_id, _.bldg_id, _.floor.id, id), _.api_header).then(resp => {
+                            if (resp.status == 200) {
+                                _.floor.areas.splice(idx, 1)
+                                _.toggleSaving(false)
+                            }
+                            else _.toggleSaving(true)
+                        })
+                    }
+                }
+            })
+        }
+    },
+    async created() {
+        let bldg = this.building,
+            floors = this.floors
+
+        if (bldg && bldg.id === this.bldg_id) {
+            if (floors && floors.length > 0) this.loaded = true
+            else await this.getFloors()
+        } else {
+            await this.getBuilding(this.bldg_id)
+            await this.getFloors()
+        }
+        await this.getAreaTypes()
+    },
+    mounted() {
+        addEvent(document, ['mousedown', 'touchend', 'keydown'], this.deSelectFloor)
+    },
+    destroyed() {
+        removeEvent(document, ['mousedown', 'touchend', 'keydown'], this.deSelectFloor)
+    }
+}
+</script>
+
+
 <style lang="scss" scoped>
 #floor-list {
     margin-top: 24px;
@@ -344,16 +758,18 @@
     bottom: 36px;
     width: 350px;
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 16px;
     border-radius: 10px;
     background-color: rgb(48, 47, 63);
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
 
     ul {
         padding: 0;
         margin: 12px 0;
         list-style: none;
+        overflow: auto;
 
         li {
             padding: 4px;
@@ -383,414 +799,3 @@
     }
 }
 </style>
-<script>
-import { mapState, mapGetters, mapMutations } from 'vuex'
-import { CircleProgress, Loader, Modal } from '../../components'
-import { getBaseUrl, preloadImage, toOrdinal, addEvent, removeEvent }  from '../../helpers'
-
-const api = {
-    floors: '/api/floors',
-    area: '/api/areas'
-}
-const METRE_FOOT_FACTOR = 0.092903
-
-export default {
-    title: 'Building Setup',
-    props: ['bldg_id', 'bldg_name'],
-    components: { CircleProgress, Loader, Modal },
-    data: () => ({
-        floor: null, listTransition: 'fadeUp',
-        loaded: false, showEntry: false, editMode: false,
-        entry: { id: null, fNo: 1, size_sqm: 0, size_sqft: 0, occupancy_limit: 0 },
-        areaModal: false, areaTypes: [],
-        areaEntry: { id: null, group_id: '', type: '', limit: 0, sensor_count: 0 },
-        showPlan: false, planUrl: null,
-        state: {
-            saving: false, imgLoaded: false
-        }
-    }),
-    computed: {
-        ...mapState({
-            user: state => state.user,
-            // company_id: state => state.user.company_id
-            company_id: state => state.locations.client,
-            buildings: state => state.locations.buildings,
-            building: state => state.locations.building
-        }),
-        ...mapGetters({
-            api_header: 'backend/api_header',
-            api_buildings: 'backend/api_buildings',
-            api_building_overview: 'backend/api_building_overview',
-            api_floors: 'backend/api_floors',
-            api_floor: 'backend/api_floor',
-            api_areas: 'backend/api_areas',
-            api_area: 'backend/api_area',
-        }),
-        floors() { return this.$store.getters['locations/getFloors'](this.bldg_id) },
-        baseUrl() { return getBaseUrl() },
-        floorList() {
-            return this.floors.sort((a, b) => {
-                if (a.number > b.number) return 1
-                if (a.number < b.number) return -1
-                return 0
-            })
-        },
-        areaList() {
-            return this.floor == null ? [] : this.floor.areas.sort((a, b) => {
-                if (a.name > b.name) return 1
-                if (a.name < b.name) return -1
-                return 0
-            })
-        },
-        areaByDesk() { return this.areaEntry.type === 'Workspace Desk Area' }
-    },
-    methods: {
-        ...mapMutations({
-            setBuildings: 'locations/setBuildings',
-            setBuilding: 'locations/setBuilding',
-            setFloors: 'locations/setFloors'
-        }),
-        async getBuilding(id, cb) {
-            let bldg = null
-            if (this.buildings.length > 0) {
-                bldg = this.buildings.find(x => x.id == id)
-            } else {
-                let res = await axios.get(this.api_buildings(this.company_id), this.api_header)
-                bldg = res.data.find(x => x.id == id)
-                this.setBuildings(res.data)
-            }
-
-            this.setBuilding(bldg)
-        },
-        async getFloors() {
-            let res = await axios.all([
-                axios.get(api.floors, { bid: this.bldg_id }),
-                axios.get(this.api_building_overview(this.company_id, this.bldg_id), this.api_header)
-            ])
-
-            let refs = res[0].data,
-                floors = [...(res[1].data.children || [])]
-
-            floors.forEach(f => {
-                let ref = refs.find(x => x.ref_id == f.id)
-                f.ordinal_no = toOrdinal(f.number)
-                f.occupancy_limit = ref?.occupancy_limit
-                f.floor_plan = ref?.floor_plan
-                f.floor_plan_url = ref?.floor_plan ? `${this.baseUrl}/plans/${ref.floor_plan}` : null
-                f.upload_info = {
-                    uploading: false, progress: 0
-                }
-
-                f.areas = f.children
-                delete f.children
-            })
-
-            console.log('getFloors', floors)
-            this.setFloors({ bid: this.bldg_id, floors })
-            this.loaded = true
-        },
-        toggleEntry(show) {
-            this.showEntry = show
-
-            if (show) setTimeout(() => { this.$refs.fNo.focus() }, 0)
-        },
-        toggleSaving(saving) { this.state.saving = saving },
-        sqmKeyup() { this.entry.size_sqft = (this.entry.size_sqm / METRE_FOOT_FACTOR).toFixed(2) },
-        sqftKeyup() { this.entry.size_sqm = (this.entry.size_sqft * METRE_FOOT_FACTOR).toFixed(2) },
-        triggerAdd() {
-            this.entry.id = null
-            this.entry.fNo = this.floors.length > 0 ? (Math.max(...this.floors.map(x => x.number)) + 1) : 1
-            this.entry.size_sqm = 0
-            this.entry.size_sqft = 0
-            this.entry.occupancy_limit = 0
-            this.editMode = false
-
-            this.toggleEntry(true)
-        },
-        async addFloor() {
-            this.toggleSaving(true)
-            let floor = { 
-                number: this.entry.fNo,
-                size_sqm: this.entry.size_sqm,
-                size_sqft: this.entry.size_sqft,
-                building: this.building.name
-            }
-            let resp = await axios.post(this.api_floors(this.company_id, this.bldg_id), floor, this.api_header)
-
-            if (resp.status == 200) {
-                floor.id = resp.data.child_id
-                floor.ordinal_no = toOrdinal(floor.number)
-                axios.post(api.floors, {
-                    building_id: this.bldg_id,
-                    ref_id: floor.id,
-                    occupancy_limit: this.entry.occupancy_limit
-                }).then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
-
-                        if (res.r) {
-                            floor.occupancy_limit = this.entry.occupancy_limit
-                            floor.upload_info = {
-                                uploading: false, progress: 0
-                            }
-                            floor.floor_plan = null
-                            floor.floor_plan_url = null
-                            floor.areas = []
-                            this.building.floors.push(floor)
-                            this.toggleEntry(false)
-                        }
-                    })
-            } else this.toggleSaving(false)
-        },
-        triggerEdit(id) {
-            let f = this.floors.find(f => f.id === id)
-
-            this.entry.id = id
-            this.entry.fNo = f.number
-            this.entry.size_sqm = f.size_sqm
-            this.entry.size_sqft = f.size_sqft
-            this.entry.occupancy_limit = f.occupancy_limit
-            this.editMode = true
-
-            this.toggleEntry(true)
-        },
-        async upFloor() {
-            this.toggleSaving(true)
-            let floor = { 
-                number: this.entry.fNo,
-                size_sqm: this.entry.size_sqm,
-                size_sqft: this.entry.size_sqft,
-                building: this.building.name
-            }
-            let _id = this.entry.id
-            let resp = await axios.put(this.api_floor(this.company_id, this.bldg_id, _id), floor, this.api_header)
-
-            if (resp.status == 200) {
-                // floor.id = resp.data.child_id
-                // floor.ordinal_no = toOrdinal(floor.number)
-                let f = this.floors.find(x => x.id === _id)
-                f.number = floor.number
-                f.ordinal_no = toOrdinal(floor.number)
-                f.size_sqm = floor.size_sqm
-                f.size_sqft = floor.size_sqft
-                f.building = floor.building
-                f.occupancy_limit = this.entry.occupancy_limit
-
-                axios.put(`${api.floors}/${_id}`, { occupancy_limit: this.entry.occupancy_limit })
-                    .then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
-
-                        if (res.r) this.toggleEntry(false)
-                    })
-            } else this.toggleSaving(false)
-        },
-        async delFloor(id) {
-            let _ = this,
-                idx = _.floors.findIndex(f => f.id === id)
-
-            _.$duDialog(null, `Remove <strong>${_.floors[idx].ordinal_no} Floor</strong>?`, _.$duDialog.OK_CANCEL, {
-                okText: 'Remove',
-                callbacks: {
-                    okClick: function (e) {
-                        this.hide()
-                        _.toggleSaving(true)
-                        axios.delete(_.api_floor(_.company_id, _.bldg_id, id), _.api_header).then(resp => {
-                            if (resp.status == 200) {
-                                _.toggleSaving(false)
-                                _.floors.splice(idx, 1)
-                                axios.delete(`${api.floors}/${id}`)
-                            } else _.toggleSaving(true)
-                        })
-                    }
-                }
-            })
-        },
-        upFloorPlan(id) {
-            this.entry.id = id
-            this.$refs.fpFile.click()
-        },
-        fpFileChange() {
-            let _ = this, file = _.$refs.fpFile.files[0]
-
-            if (file) {
-                let f = _.floors.find(f => f.id === _.entry.id)
-
-                f.upload_info.uploading = true
-                _.upload(file, function(success, res) {
-                    f.upload_info.uploading = false
-                    if (success) {
-                        if (res.r) {
-                            f.floor_plan = res.floor_plan
-                            f.floor_plan_url = `${_.baseUrl}/plans/${f.floor_plan}`
-                        }
-                    } else {
-                        console.error(res)
-                    }
-                })
-            }
-        },
-        async upload(file, cb) {
-            let formData = new window.FormData(),
-                f = this.floors.find(f => f.id === this.entry.id)
-
-            formData.append('floor_plan', file)
-            formData.append('id', this.entry.id)
-            formData.append('bid', this.bldg_id)
-            formData.append('occupancy_limit', this.entry.occupancy_limit)
-
-            axios.post(`${api.floors}/plan`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                onUploadProgress: function(progress) {
-                    var percentCompleted = Math.round((progress.loaded * 100) / progress.total)
-
-                    f.upload_info.progress = percentCompleted
-                }
-            }).then(x => cb(true, x.data))
-            .catch(err => cb(false, err))
-        },
-        togglePlan(show) { 
-            this.showPlan = show 
-            this.listTransition = 'fade'
-        },
-        viewFloorPlan(id, plan) {
-            let _ = this
-            _.floor = _.floors.find(f => f.id === id)
-            _.togglePlan(true)
-
-            _.state.imgLoaded = false
-            preloadImage(_.floor.floor_plan_url, function() { _.state.imgLoaded = true })
-        },
-        selectFloor(f) { this.floor = f },
-        deSelectFloor(e) {
-            let _ = this
-
-            if (['mousedown', 'touchend'].indexOf(e.type) >= 0) {
-                if (!e.target.closest('#floor-list .floor, .fp-preview, #area-list, #area-modal')) {
-                    _.floor = null
-                }
-            } else if (e.type === 'keydown') {
-                if (e.keyCode === 27) _.floor = null
-            }
-        },
-        toMapper(id) {
-            this.$parent.$router.push({ name: 'mapper', query: { fid: id }, params: { bid: this.bldg_id, bldg_name: this.bldg_name } })
-        },
-        async getAreaTypes() {
-            let { data } = await axios.get(`${api.area}/types`)
-
-            this.areaTypes = data
-        },
-        toggleAreaModal(show) {
-            this.areaModal = show
-
-            if (show) setTimeout(() => { this.$refs.group_id.focus() }, 0)
-        },
-        newArea() {
-            this.areaEntry.id = null
-            this.areaEntry.group_id = ''
-            // this.areaEntry.type = null
-            this.areaEntry.limit = 0
-            this.areaEntry.sensor_count = 0
-            this.editMode = false
-
-            this.toggleAreaModal(true)
-        },
-        async addArea() {
-            this.toggleSaving(true)
-            let area = {
-                group_id: this.areaEntry.group_id,
-                type: this.areaEntry.type,
-                limit: this.areaEntry.limit,
-                sensor_count: this.areaEntry.sensor_count
-            }
-
-            let resp = await axios.post(this.api_areas(this.company_id, this.bldg_id, this.floor.id), area, this.api_header)
-
-            if (resp.status == 200) {
-                area.id = resp.data.child_id
-                this.floor.areas.push(area)
-                this.toggleSaving(false)
-                this.toggleAreaModal(false)
-            }
-            else this.toggleSaving(false)
-        },
-        editArea(id) {
-            let a = this.floor.areas.find(x => x.id == id)
-            this.areaEntry.id = id
-            this.areaEntry.group_id = a.group_id
-            this.areaEntry.type = a.type
-            this.areaEntry.limit = a.limit
-            this.areaEntry.sensor_count = a.sensor_count
-            this.editMode = true
-
-            this.toggleAreaModal(true)
-        },
-        async updateArea() {
-            this.toggleSaving(true)
-            let area = {
-                group_id: this.areaEntry.group_id,
-                type: this.areaEntry.type,
-                limit: this.areaEntry.limit,
-                sensor_count: this.areaEntry.sensor_count
-            }
-            let _id = this.areaEntry.id
-            let resp = await axios.put(this.api_area(this.company_id, this.bldg_id, this.floor.id, _id), area, this.api_header)
-
-            if (resp.status == 200) {
-                let a = this.floor.areas.find(x => x.id == _id)
-                a.group_id = area.group_id
-                a.type = area.type
-                a.limit = area.limit
-                a.sensor_count = area.sensor_count
-
-                this.toggleSaving(false)
-                this.toggleAreaModal(false)
-            }
-            else this.toggleSaving(false)
-        },
-        async delArea(id) {
-            let _ = this,
-                idx = _.floor.areas.findIndex(f => f.id === id)
-
-            _.$duDialog(null, `Remove <strong>${_.floor.areas.group_id}</strong>?`, _.$duDialog.OK_CANCEL, {
-                okText: 'Remove',
-                callbacks: {
-                    okClick: function (e) {
-                        this.hide()
-                        _.toggleSaving(true)
-                        axios.delete(_.api_area(_.company_id, _.bldg_id, _.floor.id, id), _.api_header).then(resp => {
-                            if (resp.status == 200) {
-                                _.floor.areas.splice(idx, 1)
-                                _.toggleSaving(false)
-                            }
-                            else _.toggleSaving(true)
-                        })
-                    }
-                }
-            })
-        }
-    },
-    async created() {
-        let bldg = this.building,
-            floors = this.floors
-
-        if (bldg && bldg.id === this.bldg_id) {
-            if (floors && floors.length > 0) this.loaded = true
-            else await this.getFloors()
-        } else {
-            await this.getBuilding(this.bldg_id)
-            await this.getFloors()
-        }
-        await this.getAreaTypes()
-    },
-    mounted() {
-        addEvent(document, ['mousedown', 'touchend', 'keydown'], this.deSelectFloor)
-    },
-    destroyed() {
-        removeEvent(document, ['mousedown', 'touchend', 'keydown'], this.deSelectFloor)
-    }
-}
-</script>

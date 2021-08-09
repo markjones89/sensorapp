@@ -3,16 +3,18 @@ import * as d3 from 'd3'
 export function circlePack(wrapper, packData, callbacks) {
     const _wrapper = d3.select(wrapper)
 
-    let diameter,
+    let _packData = packData,
+        diameter,
         commaFormat = d3.format(','),
         moneyFormat = d3.format('$,.2s'),
         root,
-        allOccupations = [],
+        // allOccupations = [],
         focus,
         focus0,
         k0,
         scaleFactor,
         barsDrawn = false;
+        // rotationText = [-14,4,23,-18,-10.5,-20,20,20,46,-30,-25,-20,20,15,-30,-15,-45,12,-15,-16,15,15,5,18,5,15,20,-20,-25];
 
     let circleColor = d3.scaleOrdinal()
         .domain([0, 1, 2])
@@ -37,7 +39,7 @@ export function circlePack(wrapper, packData, callbacks) {
         /////////////////////// Create SVG  /////////////////////// 
         ////////////////////////////////////////////////////////////// 
 
-        _wrapper.style('display', 'inline-block')
+        _wrapper//.style('display', 'inline-block')
             .select('svg').remove()
 
         let svg = _wrapper.append("svg").attr('class', 'circle-packs')
@@ -46,11 +48,11 @@ export function circlePack(wrapper, packData, callbacks) {
             .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-        diameter = Math.min(width * 0.95, height * 0.95);
+        diameter = Math.min(width * 0.9, height * 0.9);
 
         const pack = data => d3.pack()
             .size([diameter, diameter])
-            .padding(5)
+            .padding(8)
             (d3.hierarchy(data)
                 .sum(d => d.value)
                 .sort((a, b) => b.value - a.value));
@@ -109,7 +111,8 @@ export function circlePack(wrapper, packData, callbacks) {
                                 return d.seriesOffsetY
                             })
                             .attr('x', d => {
-                                d.seriesOffsetX = -current.r * 0.15
+                                // d.seriesOffsetX = -current.r * 0.15
+                                d.seriesOffsetX = -current.r * 0.05
                                 return d.seriesOffsetX
                             })
                             .attr("dy", "1.5em")
@@ -120,7 +123,8 @@ export function circlePack(wrapper, packData, callbacks) {
                             .text('Average')
 
                         d3.select(this).append('text').attr('class', 'innerBarSeriesText peak')
-                            .attr('x', d => -(d.seriesOffsetX / 0.15) * 0.2)
+                            // .attr('x', d => -(d.seriesOffsetX / 0.15) * 0.2)
+                            .attr('x', d => -(d.seriesOffsetX / 0.05) * 0.3)
                             .attr('y', d => d.seriesOffsetY)
                             .attr("dy", "1.5em")
                             .style('font-size', d => `${Math.round(d.fontSeriesSize)}px`)
@@ -137,7 +141,7 @@ export function circlePack(wrapper, packData, callbacks) {
                                 
                                 d.avgWidth = isNaN(d.average) ? 0 : barScale(scale)//barScale(d.average)
                                 d.peakWidth = isNaN(d.peak) ? 0 : barScale(scale)//barScale(d.peak)
-                                d.totalOffset = -current.r * 0.15;
+                                d.totalOffset = -current.r * 0.05;
 
                                 return d.totalOffset;
                             })
@@ -177,6 +181,7 @@ export function circlePack(wrapper, packData, callbacks) {
                             })
                             .style('transform', d => `translateX(${d.avgWidth}px)`)
                             .style("fill", barColor(1)) */
+
                         barWrapperInner.append('path')
                             .attr("class", "innerBar peak")
                             // .attr('d', d => `M0,0 h${d.avgWidth} q5,0 5,5 v${d.height} q0,5 -5,5 h-${d.avgWidth} z`)
@@ -186,7 +191,7 @@ export function circlePack(wrapper, packData, callbacks) {
                         barWrapperInner.append("text")
                             .attr("class", "innerText category")
                             .attr("dx", function (d) {
-                                d.dx = -current.r * 0.05
+                                d.dx = -(current.r * 0.15)
                                 return d.dx
                             })
                             .attr("dy", "1.5em")
@@ -196,18 +201,6 @@ export function circlePack(wrapper, packData, callbacks) {
                                 return `${Math.round(d.fontSize)}px`
                             })
                             .text(d => d.category)
-
-                        //Draw percent text on the right side
-                        barWrapperInner.append("text")
-                            .attr("class", "innerText percent")
-                            .attr("dx", function (d) { 
-                                d.dx_p = current.r * 0.025
-                                return d.dx_p
-                            })
-                            .attr("dy", "1.5em")
-                            .style('font-size', d => `${Math.round(d.fontSize)}px`)
-                            .style('transform', d => `translateX(${(d.avgWidth + d.peakWidth)}px)`)
-                            .text('10%') // percent data
 
                         /* Draw the value inside the bars */
                         // average value
@@ -222,11 +215,12 @@ export function circlePack(wrapper, packData, callbacks) {
                             .text(function (d, i) { return commaFormat(d.average); })
                             .attr("dx", function (d) {
                                 d.r = current.r;
-                                d.valueLoc = (d.avgWidth / 2) - d.r * 0.03
+                                d.valueLoc = (d.avgWidth / 2) - d.r
 
                                 return d.valueLoc
                             })
                             .style("fill", "white")
+                            .style('text-anchor', 'middle')
 
                         // peak value
                         barWrapperInner.append("text")
@@ -236,11 +230,42 @@ export function circlePack(wrapper, packData, callbacks) {
                             .text(function (d, i) { return commaFormat(d.peak) })
                             .attr("dx", function (d) {
                                 d.r = current.r
-                                d.valueLoc = (d.avgWidth + (d.peakWidth / 2)) - d.r * 0.03
+                                d.valueLoc = (d.avgWidth + (d.peakWidth / 2)) - d.r
 
                                 return d.valueLoc
                             })
-                            .style("fill", "white");
+                            .style("fill", "white")
+                            .style('text-anchor', 'middle')
+
+                        //Draw percent text on the left side
+                        barWrapperInner.append("text")
+                            .attr("class", "innerText avg-percent")
+                            .attr("dx", function (d) { 
+                                d.dx_ap = -current.r * 0.025
+                                return d.dx_ap
+                            })
+                            .attr("dy", "1.8em")
+                            .style("font-size", function (d) {
+                                d.fontSizePercent = current.r / 22
+                                return Math.round(d.fontSizePercent) + "px"
+                            })
+                            // .style('transform', d => `translateX(-${(d.avgWidth + d.peakWidth)}px)`)
+                            .text('5%') // average percent data
+
+                        //Draw percent text on the right side
+                        barWrapperInner.append("text")
+                            .attr("class", "innerText peak-percent")
+                            .attr("dx", function (d) { 
+                                d.dx_pp = current.r * 0.125
+                                return d.dx_pp
+                            })
+                            .attr("dy", "1.8em")
+                            .style("font-size", function (d) {
+                                d.fontSizePercent = current.r / 22
+                                return Math.round(d.fontSizePercent) + "px"
+                            })
+                            .style('transform', d => `translateX(${(d.avgWidth + d.peakWidth)}px)`)
+                            .text('10%') // peak percent data
                     }//if
                 });//each barWrapperOuter 
         }
@@ -324,8 +349,8 @@ export function circlePack(wrapper, packData, callbacks) {
             .enter().append("g")
             .attr("class", "plotWrapper")
             .attr("id", function (d, i) {
-                allOccupations[i] = d.data.name;
-                if (d.ID != undefined) return "plotWrapper_" + d.ID;
+                // allOccupations[i] = d.data.name;
+                if (d.data.ID != undefined) return "plotWrapper_" + d.data.ID;
                 else return "plotWrapper_node";
             });
 
@@ -347,7 +372,8 @@ export function circlePack(wrapper, packData, callbacks) {
             .attr("class", function (d, i) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
             .style("fill", function (d) { return d.children ? circleColor(d.depth) : null; })
             .attr("r", function (d) {
-                if (d.ID === "1.1.1.1") scaleFactor = d.value / (d.r * d.r);
+                // if (d.ID === "1.1.1.1") scaleFactor = d.value / (d.r * d.r);
+                if (d.data.building_name) scaleFactor = d.value / (d.r * d.r);
                 return d.r;
             })
             .on("click", function (d) {
@@ -366,6 +392,7 @@ export function circlePack(wrapper, packData, callbacks) {
         circle.filter(function (d, i) { return d3.select(this).attr("class") === "node"; })
             .each(function (d, i) {
                 overlapNode[i] = {
+                    ID: d.data.ID,
                     name: d.data.name,
                     value: d.value,
                     depth: d.depth,
@@ -415,7 +442,7 @@ export function circlePack(wrapper, packData, callbacks) {
         //Create a wrapper for everything inside a leaf circle
         let barWrapperOuter = plotWrapper.append("g")
             .attr("id", function (d) {
-                if (d.ID != undefined) return d.ID;
+                if (d.data.ID != undefined) return d.data.ID;
                 else return "node";
             })
             .style("opacity", 0)
@@ -467,7 +494,7 @@ export function circlePack(wrapper, packData, callbacks) {
     //Change the sizes of everything inside the circle and the arc texts
     function zoomTo(d) {
         focus = d;
-        let v = [focus.x, focus.y, focus.r * 2.05],
+        let v = [focus.x, focus.y, focus.r * 2],
             k = diameter / v[2];
 
         //Remove the tspans of all the titles
@@ -496,22 +523,22 @@ export function circlePack(wrapper, packData, callbacks) {
             d3.selectAll(".hiddenArcWrapper").selectAll(".circleArcHidden")
                 .attr("d", function (d, i) { return `M ${(-d.r * k)} 0 A ${(d.r * k)} ${(d.r * k)} 45 0 1 ${(d.r * k)} 0`; })
                 .attr("transform", function (d, i) {
-                    // return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")rotate(" + rotationText[i] + ")";
                     return `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})`;
+                    // return `translate(${(d.x - v[0]) * k},${(d.y - v[1]) * k})rotate(${rotationText[i]})`;
                 });
 
             //Save the names of the circle itself and first children
-            let kids = [d.data.name];
+            let kids = []//[d.data.ID];
             if (typeof d.children !== "undefined") {
                 for (let i = 0; i < d.children.length; i++) {
-                    kids.push(d.children[i].data.name)
+                    kids.push(d.children[i].data.ID)
                 };
             }//if
 
             //Update the font sizes and hide those not close the the parent
             d3.selectAll(".hiddenArcWrapper").selectAll(".circleText")
                 .style("font-size", function (d) { return Math.round(d.fontSize * k) + 'px' })
-                .style("opacity", function (d) { return kids.indexOf(d.name) >= 0 ? 1 : 0 })
+                .style("opacity", function (d) { return kids.indexOf(d.ID) >= 0 ? 1 : 0 })
 
             ////////////////////////////////////////////////////////////// 
             ////////////////////// The bar charts ////////////////////////
@@ -522,23 +549,28 @@ export function circlePack(wrapper, packData, callbacks) {
                 .style("display", "none")
                 //If the font-size becomes to small do not show it or if the ID does not start with currentID
                 .filter(function (d) {
-                    return Math.round(d.fontTitleSize * k) > 4 & d.data.ID.lastIndexOf(currentID, 0) === 0; })
+                    // return Math.round(d.fontTitleSize * k) > 4 & d.data.ID.lastIndexOf(currentID, 0) === 0; 
+                    return Math.round(d.fontTitleSize * k) > 4
+                })
                 .style("display", null)
                 .attr("y", function (d) { return d.titleHeight * k; })
                 .style("font-size", function (d) { return Math.round(d.fontTitleSize * k) + 'px' })
                 // .text(function (d, i) { return `Total ${commaFormat(d.data.value)} (in thousands) | ${d.data.name}` })
                 // .text(function (d, i) { return `${d.data.name} | Total $${commaFormat(d.data.value)}` })
-                .text(function (d, i) { return `${d.data.name} | ${d3.format('$,.2s')(d.data.value)}` })
+                .text(function (d, i) { return `${d.data.name} | ${d3.format(moneyFormat)(d.data.value)}` })
                 .each(function (d) { wrap(this, k * d.textLength); });
             
             d3.selectAll('.innerBarSeriesText')
                 .style('display', 'none')
-                .filter(function (d) { return Math.round(d.fontSeriesSize * k) > 4 & d.data.ID.lastIndexOf(currentID, 0) === 0 })
+                .filter(function (d) {
+                    // return Math.round(d.fontSeriesSize * k) > 4 & d.data.ID.lastIndexOf(currentID, 0) === 0 
+                    return Math.round(d.fontSeriesSize * k) > 4
+                })
                 .style("display", null)
                 .attr("x", function(d) { 
                     // return (d.seriesOffsetX + (this.classList.contains('peak') ? 12 : 0)) * k
                     return this.classList.contains('peak') ?
-                        (-(d.seriesOffsetX / 0.15) * 0.2) * k :
+                        (-(d.seriesOffsetX / 0.05) * 0.3) * k :
                         d.seriesOffsetX * k
                 })
                 .attr("y", d => d.seriesOffsetY * k)
@@ -548,7 +580,10 @@ export function circlePack(wrapper, packData, callbacks) {
             d3.selectAll(".innerBarWrapper").selectAll(".innerBar")
                 .style("display", "none")
                 //If the circle (i.e. height of one bar) becomes to small do not show the bar chart
-                .filter(function (d) { return Math.round(d.height * k) > 2 & d.ID.lastIndexOf(currentID, 0) === 0; })
+                .filter(function (d) {
+                    // return Math.round(d.height * k) > 2 & d.ID.lastIndexOf(currentID, 0) === 0; 
+                    return Math.round(d.height * k) > 2
+                })
                 .style("display", null)
                 .attr('d', function (d) {
                     let isPeak = this.classList.contains('peak'),
@@ -578,32 +613,42 @@ export function circlePack(wrapper, packData, callbacks) {
             d3.selectAll(".innerBarWrapper").selectAll(".innerText")
                 .style("display", "none")
                 //If the font-size becomes to small do not show it
-                .filter(function (d) { return Math.round(d.fontSize * k) > 4 & d.ID.lastIndexOf(currentID, 0) === 0 })
+                .filter(function (d) { 
+                    // return Math.round(d.fontSize * k) > 4 & d.ID.lastIndexOf(currentID, 0) === 0 
+                    return Math.round(d.fontSize * k) > 4
+                })
                 .style("display", null)
-                .style("font-size", function (d) { return Math.round(d.fontSize * k) + 'px' })
+                .style("font-size", function (d) { 
+                    return Math.round((this.classList.contains('category') ? d.fontSize : d.fontSizePercent) * k) + 'px' 
+                })
                 .attr("dx", function (d) {
-                    return (this.classList.contains('category') ? d.dx : d.dx_p) * k
+                    return (this.classList.contains('category') ? d.dx : this.classList.contains('avg-percent') ? d.dx_ap : d.dx_pp) * k
                 })
                 .attr("x", d => d.totalOffset * k)
                 .attr("y", d => d.barHeight * k)
                 .style('transform', function (d) {
-                    return this.classList.contains('category') ? null : `translateX(${(d.avgWidth + d.peakWidth) * k}px)`
+                    return this.classList.contains('category') || this.classList.contains('avg-percent') ? null : 
+                        `translateX(${(d.avgWidth + d.peakWidth) * k}px)`
                 })
 
             //Rescale and position the values of each bar
             d3.selectAll(".innerBarWrapper").selectAll(".innerValue")
                 .style("display", "none")
                 //If the font-size becomes to small do not show it
-                .filter(function (d) { return Math.round(d.fontSizeValue * k) > 4 & d.ID.lastIndexOf(currentID, 0) === 0; })
+                .filter(function (d) {
+                    // return Math.round(d.fontSizeValue * k) > 4 & d.ID.lastIndexOf(currentID, 0) === 0; 
+                    return Math.round(d.fontSizeValue * k) > 4
+                })
                 .style("display", null)
                 .style("font-size", function (d) { return Math.round(d.fontSizeValue * k) + 'px'; })
                 .attr("x", function (d) { return d.totalOffset * k; })
                 .attr("y", function (d) { return d.barHeight * k; })
                 //Recalculate the left/right side location of the value because the this.getBBox().width has changed
                 .attr("dx", function (d) {
-                    let isPeak = this.classList.contains('peak')
+                    let isPeak = this.classList.contains('peak'),
+                        rect = this.getBBox()
 
-                    d.valueLoc = (isPeak ? ((d.avgWidth + (d.peakWidth / 2)) - d.r * 0.03) : ((d.avgWidth / 2) - d.r * 0.03)) * k
+                    d.valueLoc = (isPeak ? ((d.avgWidth + (d.peakWidth / 2)) - d.r * 0.0025) : ((d.avgWidth / 2) - d.r * 0.0025)) * k
                     return d.valueLoc
                 })
 
@@ -640,7 +685,8 @@ export function circlePack(wrapper, packData, callbacks) {
         d3.selectAll("#nodeCircle").transition().duration(duration)
             .attr("r", function (d) {
                 //Found on http://stackoverflow.com/questions/24293249/access-scale-factor-in-d3s-pack-layout
-                if (d.ID === "1.1.1.1") scaleFactor = d.value / (d.r * d.r * k * k);
+                // if (d.ID === "1.1.1.1") scaleFactor = d.value / (d.r * d.r * k * k);
+                if (d.data.building_name) scaleFactor = d.value / (d.r * d.r * k * k);
                 return d.r * k;
             })
             .call(endall, function () {
@@ -719,11 +765,18 @@ export function circlePack(wrapper, packData, callbacks) {
     }
 
     this.setData = function (data) {
+        barsDrawn = false
+        _packData = data
         drawAll(data.nodes, data.stats)
     }
 
     this.goTo = function (location) {
         searchByName(location)
+    }
+
+    this.reDraw = function () {
+        barsDrawn = false
+        drawAll(_packData.nodes, _packData.stats)
     }
 
     drawAll(packData.nodes, packData.stats)

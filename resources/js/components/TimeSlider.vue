@@ -156,15 +156,15 @@ export default {
             this.$refs.range.style[isStart ? 'left' : 'right'] = 
                 isStart ? `${pos}px` : `${(this.width - pos)}px`
         },
-        callStartChange() { this.$emit('startChanged', this.startValue) },
-        callEndChange() { this.$emit('endChanged', this.endValue) }
+        callStartChange() { this.$emit('startChanged', this.startValue, this.start) },
+        callEndChange() { this.$emit('endChanged', this.endValue, this.end) }
     },
     created() {
         if (this.from) this.start = this.slots.indexOf(this.from)
-        else this.callStartChange()
+        // else this.callStartChange()
 
         if (this.to) this.end = this.slots.indexOf(this.to)
-        else this.callEndChange()
+        // else this.callEndChange()
     },
     mounted() {
         this.init()

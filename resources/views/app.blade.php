@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-grid.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset(mix('css/app.css')) }}" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" async="true"></script>
 </head>
 <body>
     <input type="hidden" id="sensor_api" value="{{ env('SENSOR_API') }}">

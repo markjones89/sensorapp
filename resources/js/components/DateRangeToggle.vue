@@ -31,7 +31,7 @@ export default {
             this.selected = range
 
             if (range === 'today') {
-                from = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0)
                 to = new Date()
             } else if (range === 'week') {
                 let w_f = now.getDate() - now.getDay()

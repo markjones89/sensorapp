@@ -179,7 +179,7 @@ export default {
         async getBuildings() {
             let compId = this.user.company_id
 
-            let { data } = await axios.get(this.api_buildings(compId), this.api_header)
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header())
 
             this.buildings = data
             if (this.bldg_id) {
@@ -195,10 +195,10 @@ export default {
         async getFloors(id) {
             let compId = this.user.company_id
 
-            // let { data } = await axios.get(this.api_floors(compId, id), this.api_header)
+            // let { data } = await axios.get(this.api_floors(compId, id), this.api_header())
             let res = await axios.all([
                 axios.get(api.floor, { params: { bid: id } }),
-                axios.get(this.api_floors(compId, id), this.api_header)
+                axios.get(this.api_floors(compId, id), this.api_header())
             ])
 
             let refs = res[0].data,

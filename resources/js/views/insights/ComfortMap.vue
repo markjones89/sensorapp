@@ -233,7 +233,7 @@ export default {
 
             let res = await axios.all([
                 axios.get(api.floor, { params: { bid: id } }),
-                axios.get(this.api_building_overview(compId, id), this.api_header)
+                axios.get(this.api_building_overview(compId, id), this.api_header())
             ])
 
             let floorRefs = res[0].data,
@@ -274,7 +274,7 @@ export default {
         },
         async getFloorData(fid) {
             let res = await axios.all([
-                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header),
+                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header()),
                 axios.get(api.sensor, { fid: fid })
             ])
 

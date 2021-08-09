@@ -179,7 +179,7 @@ export default {
     methods: {
         async getDependencies(cb) {
             let res = await axios.all([
-                axios.get(this.api_customers, this.api_header),
+                axios.get(this.api_customers, this.api_header()),
                 axios.get('/users/init-dependencies')
             ])
 

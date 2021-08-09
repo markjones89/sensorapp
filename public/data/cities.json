@@ -1827,22 +1827,40 @@
 		{ "country": "France", "code":"FR", "states":[] },
 		{
 			"country": "Germany", "code":"DE", "states":[
-				{ "province": "Baden-Württemberg", "cities": [] },
-				{ "province": "Bavaria(Bayern)", "cities": [] },
-				{ "province": "Berlin", "cities": [] },
-				{ "province": "Brandenburg", "cities": [] },
-				{ "province": "Bremen", "cities": [] },
-				{ "province": "Hamburg", "cities": [] },
-				{ "province": "Hesse(Hessen)", "cities": [] },
-				{ "province": "Lower Saxony(Niedersachsen)", "cities": [] },
-				{ "province": "Mecklenburg-Vorpommern", "cities": [] },
-				{ "province": "North Rhine-Westphalia(Nordrhein-Westfalen)", "cities": [] },
-				{ "province": "Rhineland-Palatinate(Rheinland-Pfalz)", "cities": [] },
-				{ "province": "Saarland", "cities": [] },
-				{ "province": "Saxony(Sachsen)", "cities": [] },
-				{ "province": "Saxony-Anhalt(Sachsen-Anhalt)", "cities": [] },
-				{ "province": "Schleswig-Holstein", "cities": [] },
-				{ "province": "Thuringia(Thüringen)", "cities": [] }
+				{
+					"province": "Baden-Württemberg",
+					"cities": ["Freiburg im Breisgau","Heidelberg","Heilbronn","Karlsruhe","Mannheim","Pforzheim","Reutlingen","Stuttgart","Ulm"]
+				},
+				{
+					"province": "Bavaria",
+					"cities": ["Augsburg","Erlangen","Fürth","Ingolstadt","Munich","Nuremberg","Regensburg","Würzburg"]
+				},
+				{ "province": "Berlin", "cities": ["Berlin"] },
+				{ "province": "Brandenburg", "cities": ["Potsdam"] },
+				{ "province": "Bremen", "cities": ["Bremen","Bremerhaven"] },
+				{ "province": "Hamburg", "cities": ["Hamburg"] },
+				{
+					"province": "Hesse",
+					"cities": ["Darmstadt","Frankfurt","Kassel","Offenbach am Main","Wiesbaden"]
+				},
+				{
+					"province": "Lower Saxony",
+					"cities": ["Braunschweig","Göttingen","Hanover","Hildesheim","Oldenburg","Osnabrück","Salzgitter","Wolfsburg"]
+				},
+				{ "province": "Mecklenburg-Vorpommern", "cities": ["Rostock"] },
+				{
+					"province": "North Rhine-Westphalia",
+					"cities": ["Aachen","Bergisch Gladbach","Bielefeld","Bochum","Bonn","Bottrop","Cologne","Dortmund","Duisburg","Düsseldorf","Essen","Gelsenkirchen","Hagen","Hamm","Herne","Krefeld","Leverkusen","Moers","Mönchengladbach","Mülheim an der Ruhr","Münster","Neuss","Oberhausen","Paderborn","Recklinghausen","Remscheid","Siegen","Solingen","Wuppertal"]
+				},
+				{
+					"province": "Rhineland-Palatinate",
+					"cities": ["Kaiserslautern","Koblenz","Ludwigshafen am Rhein","Mainz","Trier"]
+				},
+				{ "province": "Saarland", "cities": ["Saarbrücken"] },
+				{ "province": "Saxony", "cities": ["Chemnitz","Dresden","Leipzig"] },
+				{ "province": "Saxony-Anhalt", "cities": ["Halle","Magdeburg"] },
+				{ "province": "Schleswig-Holstein", "cities": ["Kiel","Lübeck"] },
+				{ "province": "Thuringia", "cities": ["Erfurt","Jena"] }
 			]
 		},
 		{ "country": "Greece", "code":"GR", "states":[] },
@@ -1972,7 +1990,75 @@
 		{ "country": "Netherlands", "code":"NL", "states":[] },
 		{ "country": "North Macedonia", "code":"MK", "states":[] },
 		{ "country": "Norway", "code":"NO", "states":[] },
-		{ "country": "Poland", "code":"PL", "states":[] },
+		{
+			"country": "Poland", "code":"PL",
+			"states":[
+				{
+					"state": "Greater Poland",
+					"cities": ["Bojanowo","Borek Wielkopolski","Buk","Chocz","Chodzież","Czarnków","Czempiń","Czerniejewo","Dobra","Dobrzyca","Dolsk","Dąbie","Gniezno","Golina","Gostyń","Gołańcz","Grabów nad Prosną","Grodzisk Wielkopolski","Jaraczewo","Jarocin","Jastrowie","Jutrosin","Kalisz","Kleczew","Kobylin","Konin","Kostrzyn","Koło","Kościan","Koźmin Wielkopolski","Krajenka","Krobia","Krotoszyn","Krzywiń","Krzyż Wielkopolski","Książ Wielkopolski","Kórnik","Kępno","Kłecko","Kłodawa","Leszno","Luboń","Lwówek","Margonin","Miejska Górka","Mikstat","Międzychód","Miłosław","Mosina","Murowana Goślina","Nekla","Nowe Skalmierzyce","Nowy Tomyśl","Oborniki","Obrzycko","Odolanów","Okonek","Opalenica","Opatówek","Osieczna","Ostroróg","Ostrzeszów","Ostrów Wielkopolski","Piła","Pleszew","Pniewy","Pobiedziska","Pogorzela","Poniec","Poznań","Przedecz","Puszczykowo","Pyzdry","Rakoniewice","Raszków","Rawicz","Rogoźno","Rychwał","Rydzyna","Sieraków","Skoki","Sompolno","Stawiszyn","Stęszew","Sulmierzyce","Swarzędz","Szamocin","Szamotuły","Słupca","Trzcianka","Trzemeszno","Tuliszków","Turek","Ujście","Wieleń","Wielichowo","Witkowo","Wolsztyn","Wronki","Września","Wyrzysk","Wysoka","Wągrowiec","Zagórów","Zbąszyń","Zduny","Złotów","Łobżenica","Ślesin","Śmigiel","Śrem","Środa Wielkopolska","Żerków"]
+				},
+				{
+					"state": "Holy Cross",
+					"cities": ["Bodzentyn", "Busko-Zdrój", "Chmielnik", "Chęciny", "Daleszyce", "Działoszyce", "Jędrzejów", "Kazimierza Wielka", "Kielce", "Koprzywnica", "Końskie", "Kunów", "Małogoszcz", "Morawica", "Nowa Słupia", "Nowy Korczyn", "Oleśnica", "Opatowiec", "Opatów", "Osiek", "Ostrowiec Świętokrzyski", "Ożarów", "Pacanów", "Pierzchnica", "Pińczów", "Połaniec", "Radoszyce", "Sandomierz", "Skalbmierz", "Skarżysko-Kamienna", "Starachowice", "Staszów", "Stopnica", "Stąporków", "Suchedniów", "Szydłów", "Sędziszów", "Wiślica", "Wąchock", "Włoszczowa", "Zawichost", "Ćmielów", "Łagów"]
+				},
+				{
+					"state": "Kuyavian-Pomeranian",
+					"cities": ["Aleksandrów Kujawski", "Barcin", "Brodnica", "Brześć Kujawski", "Bydgoszcz", "Chełmno", "Chełmża", "Chodecz", "Ciechocinek", "Dobrzyń nad Wisłą", "Gniewkowo", "Golub-Dobrzyń", "Grudziądz", "Inowrocław", "Izbica Kujawska", "Jabłonowo Pomorskie", "Janikowo", "Janowiec Wielkopolski", "Kamień Krajeński", "Kcynia", "Koronowo", "Kowal", "Kowalewo Pomorskie", "Kruszwica", "Lipno", "Lubień Kujawski", "Lubraniec", "Mogilno", "Mrocza", "Nakło nad Notecią", "Nieszawa", "Nowe", "Pakość", "Piotrków Kujawski", "Radziejów", "Radzyń Chełmiński", "Rypin", "Skępe", "Solec Kujawski", "Strzelno", "Szubin", "Sępólno Krajeńskie", "Toruń", "Tuchola", "Więcbork", "Wąbrzeźno", "Włocławek", "Łabiszyn", "Łasin", "Świecie", "Żnin"]
+				},
+				{
+					"state": "Lesser Poland",
+					"cities": ["Alwernia", "Andrychów", "Biecz", "Bobowa", "Bochnia", "Brzesko", "Brzeszcze", "Bukowno", "Chełmek", "Chrzanów", "Ciężkowice", "Czchów", "Dobczyce", "Dąbrowa Tarnowska", "Gorlice", "Grybów", "Jordanów", "Kalwaria Zebrzydowska", "Koszyce", "Kraków", "Krynica-Zdrój", "Krzeszowice", "Kęty", "Libiąż", "Limanowa", "Maków Podhalański", "Miechów", "Mszana Dolna", "Muszyna", "Myślenice", "Niepołomice", "Nowe Brzesko", "Nowy Sącz", "Nowy Targ", "Nowy Wiśnicz", "Olkusz", "Oświęcim", "Piwniczna-Zdrój", "Proszowice", "Rabka-Zdrój", "Radłów", "Ryglice", "Skawina", "Skała", "Stary Sącz", "Sucha Beskidzka", "Sułkowice", "Szczawnica", "Szczucin", "Słomniki", "Tarnów", "Trzebinia", "Tuchów", "Wadowice", "Wieliczka", "Wojnicz", "Wolbrom", "Zakliczyn", "Zakopane", "Zator", "Świątniki Górne", "Żabno"]
+				},
+				{
+					"state": "Łódź",
+					"cities": ["Aleksandrów Łódzki", "Bełchatów", "Biała Rawska", "Brzeziny", "Błaszki", "Drzewica", "Działoszyn", "Głowno", "Kamieńsk", "Koluszki", "Konstantynów Łódzki", "Krośniewice", "Kutno", "Opoczno", "Ozorków", "Pabianice", "Pajęczno", "Piotrków Trybunalski", "Poddębice", "Przedbórz", "Radomsko", "Rawa Mazowiecka", "Rzgów", "Sieradz", "Skierniewice", "Stryków", "Sulejów", "Szadek", "Tomaszów Mazowiecki", "Tuszyn", "Uniejów", "Warta", "Wieluń", "Wieruszów", "Wolbórz", "Zduńska Wola", "Zelów", "Zgierz", "Złoczew", "Łask", "Łowicz", "Łódź", "Łęczyca", "Żychlin"]
+				},
+				{
+					"state": "Lower Silesian",
+					"cities": ["Bardo", "Bielawa", "Bierutów", "Bogatynia", "Boguszów-Gorce", "Bolesławiec", "Bolków", "Brzeg Dolny", "Bystrzyca Kłodzka", "Chocianów", "Chojnów", "Duszniki-Zdrój", "Dzierżoniów", "Gryfów Śląski", "Góra", "Głogów", "Głuszyca", "Jawor", "Jaworzyna Śląska", "Jedlina-Zdrój", "Jelcz-Laskowice", "Jelenia Góra", "Kamienna Góra", "Karpacz", "Kowary", "Kudowa-Zdrój", "Kąty Wrocławskie", "Kłodzko", "Legnica", "Leśna", "Lubawka", "Lubań", "Lubin", "Lubomierz", "Lwówek Śląski", "Lądek-Zdrój", "Mieroszów", "Milicz", "Mirsk", "Międzybórz", "Międzylesie", "Niemcza", "Nowa Ruda", "Nowogrodziec", "Oborniki Śląskie", "Oleśnica", "Olszyna", "Oława", "Piechowice", "Pieszyce", "Pieńsk", "Piława Górna", "Polanica-Zdrój", "Polkowice", "Prochowice", "Prusice", "Przemków", "Radków", "Siechnice", "Sobótka", "Stronie Śląskie", "Strzegom", "Strzelin", "Syców", "Szczawno-Zdrój", "Szczytna", "Szklarska Poręba", "Trzebnica", "Twardogóra", "Wałbrzych", "Wiązów", "Wleń", "Wojcieszów", "Wołów", "Wrocław", "Wąsosz", "Węgliniec", "Zawidów", "Zgorzelec", "Ziębice", "Ząbkowice Śląskie", "Złotoryja", "Złoty Stok", "Ścinawa", "Środa Śląska", "Świdnica", "Świebodzice", "Świeradów-Zdrój", "Świerzawa", "Żarów", "Żmigród"]
+				},
+				{
+					"state": "Lublin",
+					"cities": ["Annopol", "Bełżyce", "Biała Podlaska", "Biłgoraj", "Bychawa", "Chełm", "Dęblin", "Frampol", "Hrubieszów", "Janów Lubelski", "Józefów", "Józefów nad Wisłą", "Kazimierz Dolny", "Kock", "Krasnobród", "Krasnystaw", "Kraśnik", "Lubartów", "Lublin", "Lubycza Królewska", "Międzyrzec Podlaski", "Modliborzyce", "Nałęczów", "Opole Lubelskie", "Ostrów Lubelski", "Parczew", "Piaski", "Poniatowa", "Puławy", "Radzyń Podlaski", "Rejowiec", "Rejowiec Fabryczny", "Ryki", "Siedliszcze", "Stoczek Łukowski", "Szczebrzeszyn", "Tarnogród", "Terespol", "Tomaszów Lubelski", "Tyszowce", "Urzędów", "Włodawa", "Zamość", "Zwierzyniec", "Łaszczów", "Łuków", "Łęczna", "Świdnik"]
+				},
+				{
+					"state": "Lubusz",
+					"cities": ["Babimost", "Bytom Odrzański", "Cybinka", "Czerwieńsk", "Dobiegniew", "Drezdenko", "Gorzów Wielkopolski", "Gozdnica", "Gubin", "Iłowa", "Jasień", "Kargowa", "Kostrzyn nad Odrą", "Kożuchów", "Krosno Odrzańskie", "Lubniewice", "Lubsko", "Małomice", "Międzyrzecz", "Nowa Sól", "Nowe Miasteczko", "Nowogród Bobrzański", "Otyń", "Ośno Lubuskie", "Rzepin", "Skwierzyna", "Strzelce Krajeńskie", "Sulechów", "Sulęcin", "Szlichtyngowa", "Szprotawa", "Sława", "Słubice", "Torzym", "Trzciel", "Witnica", "Wschowa", "Zbąszynek", "Zielona Góra", "Łęknica", "Świebodzin", "Żagań", "Żary"]
+				},
+				{
+					"state": "Masovian",
+					"cities": ["Białobrzegi", "Bieżuń", "Brok", "Brwinów", "Błonie", "Chorzele", "Ciechanów", "Drobin", "Garwolin", "Glinojeck", "Gostynin", "Grodzisk Mazowiecki", "Grójec", "Góra Kalwaria", "Gąbin", "Halinów", "Iłża", "Józefów", "Karczew", "Kałuszyn", "Kobyłka", "Konstancin-Jeziorna", "Kosów Lacki", "Kozienice", "Legionowo", "Lipsko", "Lubowidz", "Maków Mazowiecki", "Marki", "Milanówek", "Mińsk Mazowiecki", "Mogielnica", "Mordy", "Mrozy", "Mszczonów", "Myszyniec", "Mława", "Nasielsk", "Nowe Miasto nad Pilicą", "Nowy Dwór Mazowiecki", "Ostrołęka", "Ostrów Mazowiecka", "Otwock", "Ożarów Mazowiecki", "Piaseczno", "Piastów", "Pilawa", "Pionki", "Podkowa Leśna", "Pruszków", "Przasnysz", "Przysucha", "Pułtusk", "Płock", "Płońsk", "Raciąż", "Radom", "Radzymin", "Różan", "Sanniki", "Serock", "Siedlce", "Sierpc", "Skaryszew", "Sochaczew", "Sokołów Podlaski", "Sulejówek", "Szydłowiec", "Tarczyn", "Tłuszcz", "Warka", "Warsaw", "Wołomin", "Wyszków", "Wyszogród", "Wyśmierzyce", "Węgrów", "Zakroczym", "Zielonka", "Zwoleń", "Ząbki", "Łaskarzew", "Łochów", "Łomianki", "Łosice", "Żelechów", "Żuromin", "Żyrardów"]
+				},
+				{
+					"state": "Opole",
+					"cities": ["Baborów", "Biała Prudnicka", "Brzeg", "Byczyna", "Dobrodzień", "Gogolin", "Gorzów Śląski", "Grodków", "Głogówek", "Głubczyce", "Głuchołazy", "Kietrz", "Kluczbork", "Kolonowskie", "Korfantów", "Krapkowice", "Kędzierzyn-Koźle", "Lewin Brzeski", "Leśnica", "Namysłów", "Niemodlin", "Nysa", "Olesno", "Opole", "Otmuchów", "Ozimek", "Paczków", "Praszka", "Prudnik", "Prószków", "Strzelce Opolskie", "Tułowice", "Ujazd", "Wołczyn", "Zawadzkie", "Zdzieszowice"]
+				},
+				{
+					"state": "Podlaskie",
+					"cities": ["Augustów", "Białystok", "Bielsk Podlaski", "Brańsk", "Choroszcz", "Ciechanowiec", "Czarna Białostocka", "Czyżew", "Drohiczyn", "Dąbrowa Białostocka", "Goniądz", "Grajewo", "Hajnówka", "Jedwabne", "Kleszczele", "Knyszyn", "Kolno", "Krynki", "Lipsk", "Michałowo", "Mońki", "Nowogród", "Rajgród", "Sejny", "Siemiatycze", "Sokółka", "Stawiski", "Suchowola", "Supraśl", "Suraż", "Suwałki", "Szczuczyn", "Szepietowo", "Tykocin", "Wasilków", "Wysokie Mazowieckie", "Zabłudów", "Zambrów", "Łapy", "Łomża"]
+				},
+				{
+					"state": "Pomeranian",
+					"cities": ["Brusy", "Bytów", "Chojnice", "Czarna Woda", "Czarne", "Czersk", "Człuchów", "Debrzno", "Dzierzgoń", "Gdańsk", "Gdynia", "Gniew", "Hel", "Jastarnia", "Kartuzy", "Kościerzyna", "Krynica Morska", "Kwidzyn", "Kępice", "Lębork", "Malbork", "Miastko", "Nowy Dwór Gdański", "Nowy Staw", "Pelplin", "Prabuty", "Pruszcz Gdański", "Puck", "Reda", "Rumia", "Skarszewy", "Skórcz", "Sopot", "Starogard Gdański", "Sztum", "Słupsk", "Tczew", "Ustka", "Wejherowo", "Władysławowo", "Łeba", "Żukowo"]
+				},
+				{
+					"state": "Silesian",
+					"cities": ["Bielsko-Biała", "Bieruń", "Blachownia", "Bytom", "Będzin", "Chorzów", "Cieszyn", "Czechowice-Dziedzice", "Czeladź", "Czerwionka-Leszczyny", "Częstochowa", "Dąbrowa Górnicza", "Gliwice", "Imielin", "Jastrzębie-Zdrój", "Jaworzno", "Kalety", "Katowice", "Knurów", "Koniecpol", "Koziegłowy", "Krzanowice", "Krzepice", "Kuźnia Raciborska", "Kłobuck", "Lubliniec", "Lędziny", "Miasteczko Śląskie", "Mikołów", "Myszków", "Mysłowice", "Ogrodzieniec", "Orzesze", "Piekary Śląskie", "Pilica", "Poręba", "Pszczyna", "Pszów", "Pyskowice", "Racibórz", "Radlin", "Radzionków", "Ruda Śląska", "Rybnik", "Rydułtowy", "Siemianowice Śląskie", "Siewierz", "Skoczów", "Sosnowiec", "Sośnicowice", "Strumień", "Szczekociny", "Szczyrk", "Sławków", "Tarnowskie Góry", "Toszek", "Tychy", "Ustroń", "Wilamowice", "Wisła", "Wodzisław Śląski", "Wojkowice", "Woźniki", "Zabrze", "Zawiercie", "Łaziska Górne", "Łazy", "Świętochłowice", "Żarki", "Żory", "Żywiec"]
+				},
+				{
+					"state": "Subcarpathian",
+					"cities": ["Baranów Sandomierski", "Boguchwała", "Brzostek", "Brzozów", "Błażowa", "Cieszanów", "Dukla", "Dynów", "Dębica", "Głogów Małopolski", "Iwonicz-Zdrój", "Jarosław", "Jasło", "Jedlicze", "Kańczuga", "Kolbuszowa", "Kołaczyce", "Krosno", "Lesko", "Leżajsk", "Lubaczów", "Mielec", "Narol", "Nisko", "Nowa Dęba", "Nowa Sarzyna", "Oleszyce", "Pilzno", "Pruchnik", "Przecław", "Przemyśl", "Przeworsk", "Radomyśl Wielki", "Radymno", "Ropczyce", "Rudnik nad Sanem", "Rymanów", "Rzeszów", "Sanok", "Sieniawa", "Sokołów Małopolski", "Stalowa Wola", "Strzyżów", "Sędziszów Małopolski", "Tarnobrzeg", "Tyczyn", "Ulanów", "Ustrzyki Dolne", "Zagórz", "Zaklików", "Łańcut"]
+				},
+				{
+					"state": "Warmian-Masurian",
+					"cities": ["Barczewo", "Bartoszyce", "Biała Piska", "Biskupiec", "Bisztynek", "Braniewo", "Dobre Miasto", "Działdowo", "Elbląg", "Ełk", "Frombork", "Giżycko", "Gołdap", "Górowo Iławeckie", "Iława", "Jeziorany", "Kisielice", "Korsze", "Kętrzyn", "Lidzbark", "Lidzbark Warmiński", "Lubawa", "Mikołajki", "Miłakowo", "Miłomłyn", "Morąg", "Mrągowo", "Młynary", "Nidzica", "Nowe Miasto Lubawskie", "Olecko", "Olsztyn", "Olsztynek", "Orneta", "Orzysz", "Ostróda", "Pasym", "Pasłęk", "Pieniężno", "Pisz", "Reszel", "Ruciane-Nida", "Ryn", "Susz", "Szczytno", "Sępopol", "Tolkmicko", "Wielbark", "Węgorzewo", "Zalewo"]
+				},
+				{
+					"state": "West Pomeranian",
+					"cities": ["Barlinek", "Barwice", "Białogard", "Biały Bór", "Bobolice", "Borne Sulinowo", "Cedynia", "Chociwel", "Chojna", "Choszczno", "Czaplinek", "Człopa", "Darłowo", "Dobra", "Dobrzany", "Drawno", "Drawsko Pomorskie", "Dziwnów", "Dębno", "Golczewo", "Goleniów", "Gościno", "Gryfice", "Gryfino", "Ińsko", "Kalisz Pomorski", "Kamień Pomorski", "Karlino", "Koszalin", "Kołobrzeg", "Lipiany", "Maszewo", "Mielno", "Mieszkowice", "Mirosławiec", "Międzyzdroje", "Moryń", "Myślibórz", "Nowe Warpno", "Nowogard", "Pełczyce", "Polanów", "Police", "Połczyn-Zdrój", "Pyrzyce", "Płoty", "Recz", "Resko", "Sianów", "Stargard", "Stepnica", "Suchań", "Szczecin", "Szczecinek", "Sławno", "Trzcińsko-Zdrój", "Trzebiatów", "Tuczno", "Tychowo", "Wałcz", "Wolin", "Węgorzyno", "Złocieniec", "Łobez", "Świdwin", "Świnoujście"]
+				}
+			]
+		},
 		{ "country": "Portugal", "code":"PT", "states":[] },
 		{ "country": "Romania", "code":"RO", "states":[] },
 		{
@@ -2070,7 +2156,59 @@
 		{ "country": "Sweden", "code":"SE", "states":[] },
 		{ "country": "Switzerland", "code":"CH", "states":[] },
 		{ "country": "Ukraine", "code":"UA", "states":[] },
-		{ "country": "United Kingdom", "code":"GB", "states":[] },
+		{
+			"country": "United Kingdom", "code":"GB", 
+			"states":[
+				{
+					"state": "East Midlands, England", "type": "Region", 
+					"cities": ["Derby","Leicester","Lincoln","Nottingham"]
+				},
+				{
+					"state": "East, England", "type": "Region",
+					"cities": ["Cambridge","Chelmsford","Ely","Norwich","Peterborough","St Albans"]
+				},
+				{
+					"state": "London", "type": "Region",
+					"cities": ["London","Westminster"]
+				},
+				{
+					"state": "North East, England", "type": "Region",
+					"cities": ["Durham","Newcastle upon Tyne","Sunderland"]
+				},
+				{
+					"state": "North West, England", "type": "Region",
+					"cities": ["Carlisle","Chester","Lancaster","Liverpool","Manchester","Preston","Salford"]
+				},
+				{
+					"state": "Northern Ireland", "type": "Region",
+					"cities": ["Armagh","Belfast","Derry","Lisburn","Newry"]
+				},
+				{
+					"state": "Scotland", "type": "Region",
+					"cities": ["Aberdeen","Dundee","Edinburgh","Glasgow","Inverness","Perth","Stirling"]
+				},
+				{
+					"state": "South East, England", "type": "Region",
+					"cities": ["Brighton & Hove","Canterbury","Chichester","Oxford","Portsmouth","Southampton","Winchester"]
+				},
+				{
+					"state": "South West, England", "type": "Region",
+					"cities": ["Bath","Bristol","Exeter","Gloucester","Plymouth","Salisbury","Truro","Wells"]
+				},
+				{
+					"state": "Wales", "type": "Region",
+					"cities": ["Bangor","Cardiff","Newport","St Asaph","St Davids","Swansea"]
+				},
+				{
+					"state": "West Midlands, England", "type": "Region",
+					"cities": ["Birmingham","Coventry","Hereford","Lichfield","Stoke-on-Trent","Wolverhampton","Worcester"]
+				},
+				{
+					"state": "Yorkshire and the Humber, England", "type": "Region",
+					"cities": ["Bradford","Kingston upon Hull","Leeds","Ripon","Sheffield","Wakefield","York"]
+				}
+			]
+		},
 		{ "country": "Vatican City", "code":"VA", "states": [] }
 	] 
 },

@@ -192,7 +192,7 @@ export default {
     methods: {
         async getData() {
             let res = await axios.all([
-                axios.get(this.api_customers, this.api_header),
+                axios.get(this.api_customers, this.api_header()),
                 axios.get(api)
             ])
 
@@ -227,7 +227,7 @@ export default {
         },
         async addClient() {
             this.toggleSaving(true)
-            let cust = await axios.post(this.api_customers, { name: this.cName }, this.api_header)
+            let cust = await axios.post(this.api_customers, { name: this.cName }, this.api_header())
 
             if (cust.status == 200) {
                 axios.post(api, { ref_id: cust.data.id })
@@ -258,7 +258,7 @@ export default {
         },
         async upClient() {
             this.toggleSaving(true)
-            axios.put(`${this.api_customers}/${this.refId}`, { name: this.cName }, this.api_header)
+            axios.put(`${this.api_customers}/${this.refId}`, { name: this.cName }, this.api_header())
                 .then(x => {
                     this.toggleSaving(false)
                     if (x.status == 200) {

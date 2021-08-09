@@ -144,7 +144,7 @@ export default {
     title: 'Live',
     props: ['bldg_id', 'floor_id'],
     components: { CaretIcon, CaretLeftIcon, FilterDropdown, Loader },
-    data: () =>({
+    data: () => ({
         loaded: false, mapper: null, showPageOpts: false, showEmbed: false,
         liveWS: null, building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
         stats: {
@@ -173,19 +173,11 @@ export default {
         }
     },
     methods: {
-        wsConnect() {
-            this.liveWS = new WebSocket('ws://sigfox.switchfi.co.za:1880/ws/request')
-            this.liveWS.onopen = this.wsOpened
-            this.liveWS.onmessage = this.wsMessaged
-            this.liveWS.onclose = this.wsClosed
-        },
-        wsOpened(e) {
-            console.log('Connected to live data websocket.', e)
-        },
         wsMessaged(e) {
+            console.log('wsMessaged: ', e, this.floor)
             if (!this.floor) return
             
-            let data = JSON.parse(e.data),
+            /* let data = JSON.parse(e.data),
                 payload = JSON.parse(data.payload)
 
             let sid = payload.sensor_id,
@@ -198,20 +190,70 @@ export default {
                 sensor.sensor_state = state
                 this.mapper.setSensorColor(sensor.id, state)
                 this.setStats()
+            } */
+        },
+        wsClosed(res) {
+            // if (e.wasClean) {
+            //     console.log('Connection to live data closed', e.code, e.reason)
+            // } else {
+            //     console.log('Connection to live data died, reconnecting...')
+            //     this.wsConnect()
+            // }
+        },
+        wsClose() {
+            // this.liveWS.close(1000, reason)
+            this.liveWS.disconnect()
+        },
+        windowUnload() { this.wsClose() },
+        wsConnect() {
+            // this.liveWS = new WebSocket('ws://sigfox.switchfi.co.za:1880/ws/request')
+            // this.liveWS.onopen = this.wsOpened
+            // this.liveWS.onmessage = this.wsMessaged
+            // this.liveWS.onclose = this.wsClosed
+            this.liveWS = new Paho.MQTT.Client('mqtt.intuitive.works', 443, `intuitive_app_${ parseInt(Math.random() * 100, 10) }`)
+            this.liveWS.onConnectionLost = (res) => {
+                console.log('wsClosed: ', res)
+                // if (res.errorCode != 0) {
+                //     console.log('wsClosed: ', res.errorMessage)
+                // }
             }
-        },
-        wsClosed(e) {
-            if (e.wasClean) {
-                console.log('Connection to live data closed', e.code, e.reason)
-            } else {
-                console.log('Connection to live data died, reconnecting...')
-                this.wsConnect()
+            this.liveWS.onMessageArrived = (msg) => {
+                if (!this.floor) return
+
+                const data = JSON.parse(msg.payloadString)
+
+                // if (data.occupancy_status == '1') console.log('onMessageArrived', data)
+
+                const sid = data.sensorId
+                const occupancy = data.occupancy_status
+                const state = occupancy == '0' ? 'available' : occupancy == '1' ? 'occupied' : null
+                let sensor = this.floor.sensors.find(s => s.sensor_id === sid)
+
+                if (sensor && state) {
+                    sensor.sensor_state = state
+                    this.mapper.setSensorColor(sensor.id, state)
+                    this.setStats()
+                    console.log('onMessageArrived', sensor)
+                }
             }
+
+            this.liveWS.connect({
+                useSSL: true,
+                userName: 'intuitive-api',
+                password: 'TRuhC3jBFrb3',
+                onSuccess: () => {
+                    console.log('wsConnect.onSuccess')
+                    this.liveWS.subscribe('sensor_data/#', {
+                        // qos: 0,
+                        onSuccess: () => console.info('wsConnect: subscribe.onSuccess'),
+                        onFailure: () => console.log('wsConnect: subscribe.onFailure')
+                    })
+                },
+                onFailure: (e) => {
+                    console.log('wsConnect.onFailure: ', e)
+                }
+            })
         },
-        wsClose(reason) {
-            this.liveWS.close(1000, reason)
-        },
-        windowUnload() { this.wsClose('Page closed') },
         backTo() { this.$router.back() },
         async filterSelect(value, label) {
             this.showFilter = false
@@ -236,7 +278,7 @@ export default {
 
             let res = await axios.all([
                 axios.get(api.floor, { params: { bid: id } }),
-                axios.get(this.api_building_overview(compId, id), this.api_header)
+                axios.get(this.api_building_overview(compId, id), this.api_header())
             ])
 
             let floorRefs = res[0].data,
@@ -277,7 +319,7 @@ export default {
         },
         async getFloorData(fid) {
             let res = await axios.all([
-                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header),
+                axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header()),
                 axios.get(api.sensor, { fid: fid })
             ])
 
@@ -321,10 +363,10 @@ export default {
         // addEvent(window, 'resize', this.windowResize)
     },
     destroyed() {
-        this.wsClose('Page closed')
+        this.wsClose()
         removeEvent(window, 'beforeunload', this.windowUnload)
         // removeEvent(window, 'resize', this.windowResize)
-        clearInterval(this.sci_id)
+        // clearInterval(this.sci_id)
     }
 }
 </script>

@@ -1,7 +1,11 @@
-const api_header = state => {
-    return {
+const api_header = state => (cancelToken) => {
+    let axiosOpts = {
         headers: { 'Authorization': `Bearer ${state.authToken}` }
     }
+
+    if (cancelToken) axiosOpts.cancelToken = cancelToken
+
+    return axiosOpts
 }
 
 const api_customers = state => `${state.url}/api/customers`
@@ -25,6 +29,9 @@ const api_sensors = state => (cust, bldg, floor, area) => `${state.url}/api/cust
 const api_sensor = state => (cust, bldg, floor, area, sensor) => `${state.url}/api/customers/${cust}/buildings/${bldg}/floors/${floor}/areas/${area}/sensors/${sensor}`
 
 const api_sensors_by_node = state => (id, label) => `${state.url}/api/node/${id}?label=${label}`
+
+// charts, graphs, stats
+const api_customer_summary = state => `${state.url}/api/summary`
 
 export default {
     /** API request header (plus auth token) */
@@ -50,5 +57,7 @@ export default {
     /** Sensor API (GET, PUT, DELETE) */
     api_sensor,
     /** Sensors API url by node */
-    api_sensors_by_node
+    api_sensors_by_node,
+    /** Customer API (home page circle pack) */
+    api_customer_summary
 }

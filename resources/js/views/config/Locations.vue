@@ -46,7 +46,7 @@
                     </select>
                 </div>
                 <div class="input-field">
-                    <label>State/Province</label>
+                    <label>Region/Province/State</label>
                     <select v-model="entry.state">
                         <option v-for="s in states" :key="s">{{ s }}</option>
                     </select>
@@ -279,7 +279,7 @@ export default {
             if (!compId) return
 
             try {
-                let { data } = await axios.get(this.api_buildings(compId), this.api_header)
+                let { data } = await axios.get(this.api_buildings(compId), this.api_header())
 
                 data.forEach(d => {
                     let cache = this.buildings.find(x => x.id == d.id)
@@ -386,7 +386,7 @@ export default {
             let _entry = this.getEntry()
 
             this.toggleSaving(true)
-            let res = await axios.post(this.api_buildings(this.companyId), _entry, this.api_header)
+            let res = await axios.post(this.api_buildings(this.companyId), _entry, this.api_header())
 
             if (res.status == 200) {
                 _entry.id = res.data.child_id
@@ -432,7 +432,7 @@ export default {
                 _id = this.entry.id
 
             this.toggleSaving(true)
-            let res = await axios.put(this.api_building(this.companyId, _id), _entry, this.api_header)
+            let res = await axios.put(this.api_building(this.companyId, _id), _entry, this.api_header())
 
             if (res.status == 200) {
                 let l = this.locations.find(x => x.id == _id)
@@ -523,7 +523,7 @@ export default {
     async created() {
         if (this.user.isSuper) {
             if (this.clients.length == 0) {
-                let { data } = await axios.get(this.api_customers, this.api_header)
+                let { data } = await axios.get(this.api_customers, this.api_header())
             
                 this.setClients(data)
             }

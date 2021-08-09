@@ -178,7 +178,7 @@ export default {
         async getBuildings() {
             let compId = this.user.company_id
 
-            let { data } = await axios.get(this.api_buildings(compId), this.api_header)
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header())
 
             this.buildings = data
 
@@ -200,7 +200,7 @@ export default {
         async getFloors(id) {
             let compId = this.user.company_id
 
-            let { data } = await axios.get(this.api_floors(compId, id), this.api_header)
+            let { data } = await axios.get(this.api_floors(compId, id), this.api_header())
 
             let sorted = data.sort((a, b) => {
                 if (a.number > b.number) return 1

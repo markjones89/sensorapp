@@ -144,7 +144,7 @@ export default {
         async getBuildings() {
             let compId = this.user.company_id
 
-            let { data } = await axios.get(this.api_buildings(compId), this.api_header)
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header())
 
             this.buildings = data
             if (this.bldg_id) {
@@ -166,7 +166,7 @@ export default {
         async getFloors(id) {
             let compId = this.user.company_id
 
-            let { data } = await axios.get(this.api_floors(compId, id), this.api_header)
+            let { data } = await axios.get(this.api_floors(compId, id), this.api_header())
 
             data.forEach(f => f.ordinal_no = toOrdinal(f.number))
 
