@@ -15,7 +15,7 @@ class UpdateUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // change company_id from int to string (sensor backend customer ID)
-            $table->longText('company_id')->change();
+            $table->dropForeign(['company_id']);
         });
     }
 
