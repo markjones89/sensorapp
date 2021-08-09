@@ -15,6 +15,7 @@ class UpdateCustCostsTable extends Migration
     {
         Schema::table('cust_costs', function (Blueprint $table) {
             $table->dropForeign(['company_id']);
+            $table->dropIndex(['company_id']);
         });
     }
 

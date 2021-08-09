@@ -16,6 +16,7 @@ class DropCompanyIdUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             // change company_id from int to string (sensor backend customer ID)
             $table->dropForeign(['company_id']);
+            $table->dropIndex(['company_id']);
         });
     }
 
