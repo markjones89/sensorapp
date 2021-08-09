@@ -355,7 +355,8 @@ export default {
             let _ = this,
                 idx = _.floors.findIndex(f => f.id === id)
 
-            _.$duDialog(null, `Remove <strong>${_.floors[idx].ordinal_no} Floor</strong>?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove <strong>${_.floors[idx].ordinal_no} Floor</strong>?`, {
+                buttons: _.$duDialog.OK_CANCEL,
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {
@@ -521,7 +522,8 @@ export default {
             let _ = this,
                 idx = _.floor.areas.findIndex(f => f.id === id)
 
-            _.$duDialog(null, `Remove <strong>${_.floor.areas.group_id}</strong>?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove <strong>${_.floor.areas.group_id}</strong>?`, {
+                buttons: _.$duDialog.OK_CANCEL,
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {

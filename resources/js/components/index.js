@@ -1,6 +1,5 @@
 export { default as Checkbox } from './Checkbox.vue'
 export { default as CircleProgress } from './CircleProgress.vue'
-export { default as DatePicker } from './DatePicker.vue'
 export { default as DateRangeToggle } from './DateRangeToggle.vue'
 export { default as FilterDropdown } from './FilterDropdown.vue'
 export { default as LocationItem } from './LocationItem.vue'

@@ -23,6 +23,30 @@
 
 /*! (c) 2020 Andrea Giammarchi */
 
+/*!Don't remove this!
+ * Material-Toast plugin v2.0
+ * https://github.com/dmuy/Material-Toast
+ * 
+ * Author: Dionlee Uy
+ * Email: dionleeuy@gmail.com
+ */
+
+/*!Don't remove this!
+ * duDatePicker v2.0 plugin (Vanilla JS)
+ * https://github.com/dmuy/duDatepicker
+ *
+ * Author: Dionlee Uy
+ * Email: dionleeuy@gmail.com
+ */
+
+/*!Don't remove this!
+ * duDialog v1.1 plugin
+ * https://github.com/dmuy/duDialog
+ *
+ * Author: Dionlee Uy
+ * Email: dionleeuy@gmail.com
+ */
+
 /**
  * @license
  * Lodash <https://lodash.com/>

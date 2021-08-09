@@ -30,6 +30,8 @@ h1, h2, h3, h4 { font-weight: 400; }
 
 svg { pointer-events: none; }
 
+[data-hidden="true"] { display: none !important; }
+
 /* margins */
 .ml-12 { margin-left: 12px; }
 .mr-12 { margin-right: 12px; }

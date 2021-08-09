@@ -3,14 +3,13 @@
         <span class="graph-range-btn" 
             v-for="r in range" :key="r.value" @click="selectRange(r.value)"
             :class="{ 'btn--active': selected === r.value }">{{ r.label }}</span>
-        <date-picker theme="dark" range="true" maxDate="today" :showPicker="showDatePicker" :visible="false" @dateSelect="customRange" @hidden="pickerHidden" />
+        <!-- <date-picker theme="dark" range="true" maxDate="today" :showPicker="showDatePicker" :visible="false" @dateSelect="customRange" @hidden="pickerHidden" /> -->
+        <du-datepicker ref="datepicker" :options="{ maxDate: 'today', range: true }" data-hidden="true" :dateChanged="customRange"/>
     </div>
 </template>
 <script>
-import DatePicker from './DatePicker'
 export default {
     props: ['active'],
-    components: { DatePicker },
     data() {
         return {
             range: [
@@ -48,7 +47,8 @@ export default {
             }
 
             if (range === 'custom') {
-                this.showDatePicker = true
+                // this.showDatePicker = true
+                this.$refs.datepicker.show()
             } else {
                 this.$emit('select', range, from, to)
             }

@@ -252,7 +252,8 @@ export default {
                 idx = _.costs.findIndex(c => c.hid === id),
                 c = _.costs[idx]
 
-            _.$duDialog(null, `Remove cost settings for ${c.country} ${c.city}?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove cost settings for ${c.country} ${c.city}?`, {
+                buttons: _.$duDialog.OK_CANCEL,
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {

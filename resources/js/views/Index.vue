@@ -3,13 +3,13 @@
         <div class="graph-header">
             <date-range-toggle @select="rangeSelect" active="today" />
             <div class="graph-filters">
-                <span class="graph-filter" @click="showFilter = !showFilter">
+                <!-- <span class="graph-filter" @click="showFilter = !showFilter">
                     Filter By
                     <span class="caret">
                         <caret-icon />
                     </span>
                     <filter-dropdown :filters="filters" :multiple="true" :show="showFilter" v-model="filter" @onSelect="filterSelect" />
-                </span>
+                </span> -->
                 <span class="graph-filter" @click="showLocFilter = !showLocFilter">
                     {{ locationFilter ? locationFilter : 'Select Location' }}
                     <span class="caret">
@@ -75,14 +75,14 @@
                                 <span @click="toPeak">User to workspace ratio</span>
                                 <span class="stat-figure" @click="toPeak">
                                     <!-- 1.5 to 1 -->
-                                    {{ statsDisplay.user_to_work_space_ratio }}
+                                    {{ statsDisplay.user_to_workspace_ratio }}
                                 </span>
                             </span>
                             <span class="chart-stat">
                                 <span @click="toWFH">Work from home</span>
                                 <span class="stat-figure" @click="toWFH">
                                     <!-- 42% -->
-                                    {{ `${statsDisplay.work_from_home}%` }}
+                                    {{ `${statsDisplay.work_from_home.toFixed(2)}%` }}
                                 </span>
                             </span>
                         </div>
@@ -155,13 +155,13 @@ export default {
             node_type: 'Customer',
             node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
         },
-        overallStats: null,
+        summary: null,
         statsDisplay: {
             opportunity_cost: 0,
             peak_workspace_util: 0,
             average_workspace_util: 0,
             peak_meeting_room: 0,
-            user_to_work_space_ratio: 0,
+            user_to_workspace_ratio: 0,
             work_from_home: 0
         }
     }),
@@ -235,21 +235,20 @@ export default {
             this.statsDisplay.peak_workspace_util = stats.peak_workspace_util
             this.statsDisplay.average_workspace_util = stats.average_workspace_util
             this.statsDisplay.peak_meeting_room = stats.peak_meeting_room_occupancy || 0
-            this.statsDisplay.user_to_work_space_ratio = stats.user_to_work_space_ratio
+            this.statsDisplay.user_to_workspace_ratio = stats.user_to_workspace_ratio || stats.user_to_work_space_ratio
             this.statsDisplay.work_from_home = stats.work_from_home
         },
         async renderChart() {
-            console.log('renderChart')
             this.dataLoaded = false
             let _data = {},
                 categories = [
-                    { name: 'Workspaces in use', avg: 'average_workspace_util', peak: 'peak_workspace_util' }, 
-                    { name: 'Free workspaces', avg: '', peak: 'unused_desk_area_at_peak' }, 
-                    { name: 'Meeting Rooms in Use', avg: '', peak: 'peak_meeting_room_occupancy' }, 
-                    { name: 'Free Meeting Rooms', avg: '', peak: 'unused_meeting_room_area_at_peak' }, 
-                    { name: 'Workspaces used <20%', avg: '', peak: 'peak_workspace_util' }, 
-                    { name: 'Occupancy Count', avg: '', peak: '' }, 
-                    { name: 'Work from home %', avg: '', peak: '' }
+                    { name: 'Workspaces in use', avg: 'average_workspace', avgPercent: 'average_workspace_util', peak: 'peak_workspace', peakPercent: 'peak_workspace_util' },
+                    { name: 'Free workspaces', avg: 'average_free_workspace', avgPercent: 'average_free_workspace_util', peak: 'peak_free_workspace', peakPercent: 'peak_free_workspace_util' }, 
+                    { name: 'Meeting Rooms in Use', avg: '', avgPercent: '', peak: 'peak_meeting_room', peakPercent: 'peak_meeting_room_occupancy' }, 
+                    // { name: 'Free Meeting Rooms', avg: '', avgPercent: '', peak: '', peakPercent: '' }, 
+                    // { name: 'Workspaces used <20%', avg: '', avgPercent: '', peak: '', peakPercent: '' }, 
+                    // { name: 'Occupancy Count', avg: '', avgPercent: '', peak: '', avgPercent: '' }, 
+                    { name: 'Work from home %', avg: '', avgPercent: '', peak: '', peakPercent: '' }
                 ],
                 keys = ['building_country', 'building_city'],
                 grouped = [],
@@ -258,13 +257,14 @@ export default {
             this.axiosSrc = axios.CancelToken.source()
             let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
             
+            this.summary = data;
             this.dataLoaded = true
             if (!data.building_summary) {
                 this.dataError = data
                 return
             }
             else if (data.building_summary && data.building_summary.length == 0) {
-                this.dataError = "No summary details"
+                this.dataError = "No results"
                 return
             }
             else {
@@ -272,24 +272,18 @@ export default {
                 let nodes = { ID: '', name: data.customer, children: [] }
                 let stats = []
                 
-                this.overallStats = {
-                    opportunity_cost: data.opportunity_cost,
-                    peak_workspace_util: data.peak_workspace_util,
-                    average_workspace_util: data.average_workspace_util,
-                    peak_meeting_room: data.peak_meeting_room_occupancy,
-                    user_to_work_space_ratio: data.user_to_work_space_ratio,
-                    work_from_home: data.work_from_home
-                }
                 this.setStatsDisplay(data)
                 this.locations = [...new Set(data.building_summary.map(x => x.building_country).sort())]
 
                 data.building_summary.forEach(a => {
                     // stats
                     categories.forEach(c => {
-                        let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name, average: '', peak: '' }
+                        let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name }
 
                         stat.average = c.avg == '' ? 0 : a[c.avg]
+                        stat.avgPercent = c.avgPercent == '' ? 0 : a[c.avgPercent]
                         stat.peak = c.peak == '' ? 0 : a[c.peak]
+                        stat.peakPercent = c.peakPercent == '' ? 0 : a[c.peakPercent]
 
                         stats.push(stat)
                     })
@@ -309,6 +303,9 @@ export default {
                                 let type = k === 'building_country' ? '' : '_City'
 
                                 l.ID = `${a[k].replace(/\s/g,'')}${type}`
+
+                                if (k === 'building_country') l.building_country = true
+                                else if (k === 'building_city') l.building_city = true
 
                                 r._.push(l)
                             }
@@ -335,7 +332,35 @@ export default {
                             zoomed: (node) => {
                                 // console.log('circlePack.zoomed', node.data)
                                 if (node.data.building_name) this.setStatsDisplay(node.data)
-                                else this.setStatsDisplay(this.overallStats)
+                                else if (node.data.building_country) {
+                                    let bldgSummary = this.summary.building_summary,
+                                        buildings = bldgSummary.filter(x => x.building_country == node.data.name),
+                                        count = buildings.length,
+                                        countryStats = {
+                                            opportunity_cost: buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0),
+                                            peak_workspace_util: buildings.map(x => x.peak_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                            average_workspace_util: buildings.map(x => x.average_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                            peak_meeting_room: buildings.map(x => x.peak_meeting_room_occupancy).reduce((a, b) => a + b, 0) / count,
+                                            user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
+                                            work_from_home: buildings.map(x => x.work_from_home).reduce((a, b) => a + b, 0) / count
+                                        }
+                                    this.setStatsDisplay(countryStats)
+                                }
+                                else if (node.data.building_city) {
+                                    let bldgSummary = this.summary.building_summary,
+                                        buildings = bldgSummary.filter(x => x.building_city == node.data.name),
+                                        count = buildings.length,
+                                        cityStats = {
+                                            opportunity_cost: buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0),
+                                            peak_workspace_util: buildings.map(x => x.peak_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                            average_workspace_util: buildings.map(x => x.average_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                            peak_meeting_room: buildings.map(x => x.peak_meeting_room_occupancy).reduce((a, b) => a + b, 0) / count,
+                                            user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
+                                            work_from_home: buildings.map(x => x.work_from_home).reduce((a, b) => a + b, 0) / count
+                                        }
+                                    this.setStatsDisplay(cityStats)
+                                }
+                                else this.setStatsDisplay(this.summary)
                             },
                             moreInfo: (data) => {
                                 this.$router.push({ name: 'time' })
@@ -439,7 +464,7 @@ export default {
             color: #4A4A4A;
             text-anchor: end;
 
-            &.percent {
+            &.peak-percent {
                 text-anchor: start;
             }
         }

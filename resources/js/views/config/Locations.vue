@@ -464,7 +464,8 @@ export default {
             let _ = this,
                 idx = _.locations.findIndex(l => l.id === id)
 
-            _.$duDialog(null, `Remove <strong>${_.locations[idx].name}</strong>?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove <strong>${_.locations[idx].name}</strong>?`, {
+                buttons: _.$duDialog.OK_CANCEL,
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {

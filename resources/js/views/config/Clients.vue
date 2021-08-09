@@ -278,7 +278,8 @@ export default {
         async delClient(id) {
             let _ = this, idx = _.clients.findIndex(c => c.hid === id)
 
-            _.$duDialog(null, `Remove ${_.clients[idx].name} from clients?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove ${_.clients[idx].name} from clients?`, {
+                buttons: _.$duDialog.OK_CANCEL,
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {

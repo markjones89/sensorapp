@@ -7,11 +7,13 @@ import title from './mixins/pageTitle'
 Vue.mixin(title)
 
 // plugins
-import mdtoast from './plugins/mdtoast'
-import duDialog from './plugins/duDialog'
+import mdtoast from '@dmuy/toast/vue-toast'
+import duDialog from '@dmuy/dialog/vue-dialog'
+import duDatepicker from '@dmuy/datepicker/vue-datepicker'
 
 Vue.use(mdtoast)
 Vue.use(duDialog)
+Vue.use(duDatepicker, { theme: 'dark', auto: true })
 
 import App from './views/App.vue'
 import { store } from './store'

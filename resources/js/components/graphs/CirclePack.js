@@ -194,7 +194,7 @@ export function circlePack(wrapper, packData, callbacks) {
                                 d.dx = -(current.r * 0.15)
                                 return d.dx
                             })
-                            .attr("dy", "1.5em")
+                            .attr("dy", "1.35em")
                             .style("font-size", function (d) {
                                 //Calculate best font-size
                                 d.fontSize = current.r / 18
@@ -241,31 +241,31 @@ export function circlePack(wrapper, packData, callbacks) {
                         barWrapperInner.append("text")
                             .attr("class", "innerText avg-percent")
                             .attr("dx", function (d) { 
-                                d.dx_ap = -current.r * 0.025
+                                d.dx_ap = -current.r * 0.015
                                 return d.dx_ap
                             })
                             .attr("dy", "1.8em")
                             .style("font-size", function (d) {
-                                d.fontSizePercent = current.r / 22
+                                d.fontSizePercent = current.r / 24
                                 return Math.round(d.fontSizePercent) + "px"
                             })
                             // .style('transform', d => `translateX(-${(d.avgWidth + d.peakWidth)}px)`)
-                            .text('5%') // average percent data
+                            .text(d => `${Math.round(d.avgPercent)}%`) // average percent data
 
                         //Draw percent text on the right side
                         barWrapperInner.append("text")
                             .attr("class", "innerText peak-percent")
                             .attr("dx", function (d) { 
-                                d.dx_pp = current.r * 0.125
+                                d.dx_pp = current.r * 0.02
                                 return d.dx_pp
                             })
                             .attr("dy", "1.8em")
                             .style("font-size", function (d) {
-                                d.fontSizePercent = current.r / 22
+                                d.fontSizePercent = current.r / 24
                                 return Math.round(d.fontSizePercent) + "px"
                             })
                             .style('transform', d => `translateX(${(d.avgWidth + d.peakWidth)}px)`)
-                            .text('10%') // peak percent data
+                            .text(d => `${Math.round(d.peakPercent)}%`) // peak percent data
                     }//if
                 });//each barWrapperOuter 
         }

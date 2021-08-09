@@ -375,7 +375,8 @@ export default {
                 _idx = _.floor.sensors.findIndex(s => s.id === _id),
                 _sensor = _.floor.sensors[_idx]
 
-            _.$duDialog(null, `Remove sensor <strong>${_sensor.sensor_id}</strong>?`, _.$duDialog.OK_CANCEL, {
+            _.$duDialog(null, `Remove sensor <strong>${_sensor.sensor_id}</strong>?`, {
+                buttons: _.$duDialog.OK_CANCEL,
                 okText: 'Remove',
                 callbacks: {
                     okClick: function (e) {
