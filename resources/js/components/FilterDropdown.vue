@@ -18,6 +18,70 @@
         </div>
     </transition>
 </template>
+
+<script>
+import Checkbox from './Checkbox'
+
+export default {
+    // props: ['filters', 'chosen', 'multiple', 'maxItems', 'show'],
+    props: {
+        filters: Array,
+        chosen: [String, Number, Boolean],
+        multiple: {
+            type: Boolean, default: false
+        },
+        maxItems: {
+            type: Number, default: 5
+        },
+        position: {
+            type: String, default: 'bottom'
+        },
+        show: Boolean
+    },
+    components: { Checkbox },
+    data() {
+        return {
+            selectedItems: [], selected: null
+        }
+    },
+    watch: {
+        show: function(show) {
+            if (show && !this.multiple && this.selected) {
+                setTimeout(() => {
+                    let _selected = this.$refs.wrapper.querySelector('.selected--item')
+                    this.$refs.wrapper.scrollTop = _selected.offsetTop
+                }, 0)
+            }
+        }
+    },
+    computed: {
+        height() {
+            let max = this.maxItems// || 5
+            if (!this.multiple && this.filters.length > max) return `${max * 36}px`
+            return 'auto'
+        }
+    },
+    methods: {
+        onSelect(evt, value, label) {
+            if (this.multiple) {
+                this.$emit('onSelect', this.selectedItems)
+            } else {
+                this.selected = value
+                this.$emit('onSelect', value, label)
+            }
+        }
+    },
+    created() {
+        if (this.multiple && this.chosen) {
+            this.selectedItems = Array.from(this.chosen)
+        } else if (this.chosen) {
+            this.selected = this.chosen
+        }
+    }
+}
+</script>
+
+
 <style lang="scss">
 .filter-dropdown {
     position: absolute;
@@ -31,6 +95,7 @@
     white-space: nowrap;
     background-color: #393846;
     border-radius: 20px;
+    border: 1px solid #282737;
     overflow: hidden;
     z-index: 1;
 
@@ -104,64 +169,3 @@
     }
 }
 </style>
-<script>
-import Checkbox from './Checkbox'
-
-export default {
-    // props: ['filters', 'chosen', 'multiple', 'maxItems', 'show'],
-    props: {
-        filters: Array,
-        chosen: [String, Number, Boolean],
-        multiple: {
-            type: Boolean, default: false
-        },
-        maxItems: {
-            type: Number, default: 5
-        },
-        position: {
-            type: String, default: 'bottom'
-        },
-        show: Boolean
-    },
-    components: { Checkbox },
-    data() {
-        return {
-            selectedItems: [], selected: null
-        }
-    },
-    watch: {
-        show: function(show) {
-            if (show && !this.multiple && this.selected) {
-                setTimeout(() => {
-                    let _selected = this.$refs.wrapper.querySelector('.selected--item')
-                    this.$refs.wrapper.scrollTop = _selected.offsetTop
-                }, 0)
-            }
-        }
-    },
-    computed: {
-        height() {
-            let max = this.maxItems// || 5
-            if (!this.multiple && this.filters.length > max) return `${max * 36}px`
-            return 'auto'
-        }
-    },
-    methods: {
-        onSelect(evt, value, label) {
-            if (this.multiple) {
-                this.$emit('onSelect', this.selectedItems)
-            } else {
-                this.selected = value
-                this.$emit('onSelect', value, label)
-            }
-        }
-    },
-    created() {
-        if (this.multiple && this.chosen) {
-            this.selectedItems = Array.from(this.chosen)
-        } else if (this.chosen) {
-            this.selected = this.chosen
-        }
-    }
-}
-</script>

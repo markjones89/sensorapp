@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <date-range-toggle @select="rangeSelect" active="today" />
+            <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <div class="graph-filters">
                 <!-- <span class="graph-filter" @click="showFilter = !showFilter">
                     Filter By
@@ -15,7 +15,7 @@
                     <span class="caret">
                         <caret-icon />
                     </span>
-                    <filter-dropdown :filters="locations" :show="showLocFilter" @onSelect="locFilter" />
+                    <filter-dropdown :filters="locations" :chosen="locationFilter" :show="showLocFilter" @onSelect="locFilter" />
                 </span>
                 <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">Cost Analysis</a>
             </div>
@@ -90,7 +90,7 @@
                 </template>
                 <div v-else class="error-display" style="height: 60vh">
                     <p>{{ dataError }}</p>
-                    <a href="javascript:;" class="btn btn-primary" @click="renderChart" style="align-self:center;">Retry</a>
+                    <a href="javascript:;" class="btn btn-primary" @click="renderChart(true)" style="align-self:center;">Retry</a>
                 </div>
             </div>
             <div v-else style="height: 60vh">
@@ -100,11 +100,11 @@
                 <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
                     @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
                 <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
-                    {{ minuteFilter ? minuteFilter : 'Select' }}
+                    {{ minuteFilterLbl ? minuteFilterLbl : 'Select' }}
                     <span class="caret">
                         <caret-icon />
                     </span>
-                    <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
+                    <filter-dropdown :filters="minuteFilters" :chosen="minuteFilter" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
                 </span>
             </div>
         </div>
@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 import { addEvent, removeEvent } from "../helpers"
 import { DateRangeToggle, FilterDropdown, Loader, Modal, TimeSlider } from "../components"
 import { circlePack } from '../components/graphs/CirclePack'
@@ -141,13 +141,13 @@ export default {
             { value: 'LPS', label: 'Low Performing Spaces' },
             { value: 'SC', label: 'Spare Capacity' }
         ], 
-        locations: ['United States', 'Japan', 'Australia', 'Philippines', 'UK', 'South Korea', 'China', 'India'],
-        filter: [], locationFilter: null,
-        minuteFilter: '10 minutes',
+        locations: [],
+        filter: [], //locationFilter: null,
+        minuteFilterLbl: '60 minutes', minuteFilter: 60,
         showPageOpts: false, showEmbed: false, showFilter: false, showLocFilter: false, showMinuteFilter: false,
         dataLoaded: false, dataError: null, axiosSrc: null,
         dataFilters: {
-            trigger: 10,
+            trigger: 6,
             start_hour: 8,
             stop_hour: 16,
             start_date: '',
@@ -155,7 +155,7 @@ export default {
             node_type: 'Customer',
             node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
         },
-        summary: null,
+        // summary: null,
         statsDisplay: {
             opportunity_cost: 0,
             peak_workspace_util: 0,
@@ -169,14 +169,21 @@ export default {
         ...mapState({
             user: state => state.user,
             company: state => state.user.company,
-            settings: state => state.user.company ? state.user.company.settings : null
+            settings: state => state.user.company ? state.user.company.settings : null,
+            summary: state => state.homepage.summary,
+            rangeFilter: state => state.homepage.rangeFilter,
+            locationFilter: state => state.homepage.locationFilter,
+            startTimeFilter: state => state.homepage.startTime,
+            endTimeFilter: state => state.homepage.endTime,
+            periodFilter: state => state.homepage.periodFilter
         }),
         ...mapGetters({
             api_header: 'backend/api_header',
             api_customer_summary: 'backend/api_customer_summary'
         }),
         minuteFilters() {
-            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            // var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            let minutes = [60]
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
         },
@@ -187,12 +194,20 @@ export default {
         }
     },
     methods: {
+        ...mapMutations({
+            setSummary: 'homepage/setSummary',
+            setRange: 'homepage/setRange',
+            setLocation: 'homepage/setLocation',
+            setTime: 'homepage/setTime',
+            setMinute: 'homepage/setMinute'
+        }),
         rangeSelect(range, from, to) {
             // console.log('rangeSelect', range, from, to)
+            this.setRange(range)
             this.dataFilters.start_date = from.toISOString()
             this.dataFilters.stop_date = to.toISOString()
-            this.axiosSrc.cancel('Date range selected')
-            this.renderChart()
+            if (this.axiosSrc) this.axiosSrc.cancel('Date range selected')
+            this.renderChart(true)
         },
         filterSelect(filters) {
             this.showFilter = false
@@ -201,18 +216,21 @@ export default {
         locFilter(loc) {
             if (!this.dataLoaded) return
             this.showLocFilter = false
-            this.locationFilter = loc
+            // this.locationFilter = loc
+            this.setLocation(loc)
             this.circlePack.goTo(loc)
         },
+        // period filter
         filterMinute(minute) {
             var min = this.minuteFilters.find(m => m.value == minute);
 
-            this.showMinuteFilter = false;
-            this.minuteFilter = min.label;
-            this.dataFilters.trigger = minute
+            this.showMinuteFilter = false
+            this.minuteFilterLbl = min.label
+            this.minuteFilter = minute
+            // this.dataFilters.trigger = minute
 
-            this.axiosSrc.cancel('Minute filter updated')
-            this.renderChart()
+            // if (this.axiosSrc) this.axiosSrc.cancel('Minute filter updated')
+            // this.renderChart(true)
         },
         pageOptsHandler(e) {
             let _ = this
@@ -236,153 +254,156 @@ export default {
             this.statsDisplay.average_workspace_util = stats.average_workspace_util
             this.statsDisplay.peak_meeting_room = stats.peak_meeting_room_occupancy || 0
             this.statsDisplay.user_to_workspace_ratio = stats.user_to_workspace_ratio || stats.user_to_work_space_ratio
-            this.statsDisplay.work_from_home = stats.work_from_home
+            this.statsDisplay.work_from_home = stats.work_from_home_average_percentage || stats.work_from_home
         },
-        async renderChart() {
-            this.dataLoaded = false
+        async renderChart(refresh = false) {
             let _data = {},
                 categories = [
                     { name: 'Workspaces in use', avg: 'average_workspace', avgPercent: 'average_workspace_util', peak: 'peak_workspace', peakPercent: 'peak_workspace_util' },
                     { name: 'Free workspaces', avg: 'average_free_workspace', avgPercent: 'average_free_workspace_util', peak: 'peak_free_workspace', peakPercent: 'peak_free_workspace_util' }, 
-                    { name: 'Meeting Rooms in Use', avg: '', avgPercent: '', peak: 'peak_meeting_room', peakPercent: 'peak_meeting_room_occupancy' }, 
-                    // { name: 'Free Meeting Rooms', avg: '', avgPercent: '', peak: '', peakPercent: '' }, 
-                    // { name: 'Workspaces used <20%', avg: '', avgPercent: '', peak: '', peakPercent: '' }, 
-                    // { name: 'Occupancy Count', avg: '', avgPercent: '', peak: '', avgPercent: '' }, 
-                    { name: 'Work from home %', avg: '', avgPercent: '', peak: '', peakPercent: '' }
+                    { name: 'Meeting Rooms in Use', avg: 'average_meeting_room', avgPercent: 'average_meeting_room_occupancy', peak: 'peak_meeting_room', peakPercent: 'peak_meeting_room_occupancy' }, 
+                    { name: 'Free Meeting Rooms', avg: 'average_free_meeting_room', avgPercent: '', peak: 'peak_free_meeting_room', peakPercent: '' }, 
+                    { name: 'Workspaces used <20%', avg: 'average_low_perform', avgPercent: 'average_low_perforn_percentage', peak: 'peak_low_perform', peakPercent: 'peak_low_perform_percentage' }, 
+                    { name: 'Occupancy Count', avg: '', avgPercent: '', peak: '', peakPercent: '' }, 
+                    { name: 'Work from home %', avg: 'work_from_home_average', avgPercent: 'work_from_home_average_percentage', peak: 'work_from_home_peak', peakPercent: 'work_from_home_peak_percentage' }
                 ],
                 keys = ['building_country', 'building_city'],
                 grouped = [],
                 temp = { _: grouped }
             
-            this.axiosSrc = axios.CancelToken.source()
-            let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
+            this.dataLoaded = false
+            if (this.summary == null || refresh) {
+                this.axiosSrc = axios.CancelToken.source()
+                let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
+
+                if (!data.building_summary) {
+                    this.dataError = data
+                    return
+                }
+                else if (data.building_summary && data.building_summary.length == 0) {
+                    this.dataError = "No results"
+                    return
+                }
+                else {
+                    // this.summary = data;
+                    this.setSummary(data)
+                    this.setLocation(data.customer)
+                }
+            }
             
-            this.summary = data;
             this.dataLoaded = true
-            if (!data.building_summary) {
-                this.dataError = data
-                return
-            }
-            else if (data.building_summary && data.building_summary.length == 0) {
-                this.dataError = "No results"
-                return
-            }
-            else {
-                this.dataError = null
-                let nodes = { ID: '', name: data.customer, children: [] }
-                let stats = []
-                
-                this.setStatsDisplay(data)
-                this.locations = [...new Set(data.building_summary.map(x => x.building_country).sort())]
+            this.dataError = null
+            let nodes = { ID: '', name: this.summary.customer, children: [] }
+            let stats = []
+            
+            this.setStatsDisplay(this.summary)
+            this.locations = [this.summary.customer, ...new Set(this.summary.building_summary.map(x => x.building_country).sort())]
 
-                data.building_summary.forEach(a => {
-                    // stats
-                    categories.forEach(c => {
-                        let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name }
+            this.summary.building_summary.forEach(a => {
+                // stats
+                categories.forEach(c => {
+                    let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name }
 
-                        stat.average = c.avg == '' ? 0 : a[c.avg]
-                        stat.avgPercent = c.avgPercent == '' ? 0 : a[c.avgPercent]
-                        stat.peak = c.peak == '' ? 0 : a[c.peak]
-                        stat.peakPercent = c.peakPercent == '' ? 0 : a[c.peakPercent]
+                    stat.average = c.avg == '' ? 0 : a[c.avg]
+                    stat.avgPercent = c.avgPercent == '' ? 0 : a[c.avgPercent]
+                    stat.peak = c.peak == '' ? 0 : a[c.peak]
+                    stat.peakPercent = c.peakPercent == '' ? 0 : a[c.peakPercent]
 
-                        stats.push(stat)
-                    })
-
-                    // nodes
-                    a.ID = a.building_name.replace(/\s/g,'')
-                    a.name = a.building_name
-                    a.value = a.opportunity_cost
-
-                    keys.reduce((r, k) => {
-                        if (!r[a[k]]) {
-
-                            r[a[k]] = { _: [] }
-                            
-                            if (a[k]) {
-                                let l = { ['name']: a[k], ['children']: r[a[k]]._ }
-                                let type = k === 'building_country' ? '' : '_City'
-
-                                l.ID = `${a[k].replace(/\s/g,'')}${type}`
-
-                                if (k === 'building_country') l.building_country = true
-                                else if (k === 'building_city') l.building_city = true
-
-                                r._.push(l)
-                            }
-                        }
-                        return r[a[k]]
-                    }, temp)._.push(a)
+                    stats.push(stat)
                 })
 
-                nodes.children = grouped
-                /* let res = await axios.all([
-                    axios.get('/data/circle-pack-category.json'),
-                    axios.get('/data/circle-pack.json')
-                ]) */
+                // nodes
+                a.ID = a.building_name.replace(/\s/g,'')
+                a.name = a.building_name
+                a.value = a.opportunity_cost
 
-                _data.stats = stats //res[0].data
-                _data.nodes = nodes //res[1].data
+                keys.reduce((r, k) => {
+                    if (!r[a[k]]) {
 
-                // console.log('renderChart', _data, this.locations)
-                setTimeout(() => {
-                    // if (this.circlePack) {
-                    //     this.circlePack.setData(_data)
-                    // } else {
-                        this.circlePack = new circlePack('#circle-pack', _data, {
-                            zoomed: (node) => {
-                                // console.log('circlePack.zoomed', node.data)
-                                if (node.data.building_name) this.setStatsDisplay(node.data)
-                                else if (node.data.building_country) {
-                                    let bldgSummary = this.summary.building_summary,
-                                        buildings = bldgSummary.filter(x => x.building_country == node.data.name),
-                                        count = buildings.length,
-                                        countryStats = {
-                                            opportunity_cost: buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0),
-                                            peak_workspace_util: buildings.map(x => x.peak_workspace_util).reduce((a, b) => a + b, 0) / count,
-                                            average_workspace_util: buildings.map(x => x.average_workspace_util).reduce((a, b) => a + b, 0) / count,
-                                            peak_meeting_room: buildings.map(x => x.peak_meeting_room_occupancy).reduce((a, b) => a + b, 0) / count,
-                                            user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
-                                            work_from_home: buildings.map(x => x.work_from_home).reduce((a, b) => a + b, 0) / count
-                                        }
-                                    this.setStatsDisplay(countryStats)
+                        r[a[k]] = { _: [] }
+                        
+                        if (a[k]) {
+                            let l = { ['name']: a[k], ['children']: r[a[k]]._ }
+                            let type = k === 'building_country' ? '' : '_City'
+
+                            l.ID = `${a[k].replace(/\s/g,'')}${type}`
+
+                            if (k === 'building_country') l.building_country = true
+                            else if (k === 'building_city') l.building_city = true
+
+                            r._.push(l)
+                        }
+                    }
+                    return r[a[k]]
+                }, temp)._.push(a)
+            })
+
+            nodes.children = grouped
+            /* let res = await axios.all([
+                axios.get('/data/circle-pack-category.json'),
+                axios.get('/data/circle-pack.json')
+            ]) */
+
+            _data.stats = stats //res[0].data
+            _data.nodes = nodes //res[1].data
+            _data.location = this.locationFilter
+
+            setTimeout(() => {
+                this.circlePack = new circlePack('#circle-pack', _data, {
+                    zoomed: (node) => {
+                        // console.log('circlePack.zoomed', node.data)
+                        if (node.data.building_name) this.setStatsDisplay(node.data)
+                        else if (node.data.building_country) {
+                            let bldgSummary = this.summary.building_summary,
+                                buildings = bldgSummary.filter(x => x.building_country == node.data.name),
+                                count = buildings.length,
+                                countryStats = {
+                                    opportunity_cost: buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0),
+                                    peak_workspace_util: buildings.map(x => x.peak_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                    average_workspace_util: buildings.map(x => x.average_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                    peak_meeting_room: buildings.map(x => x.peak_meeting_room_occupancy).reduce((a, b) => a + b, 0) / count,
+                                    user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
+                                    work_from_home: buildings.map(x => x.work_from_home_average_percentage).reduce((a, b) => a + b, 0) / count
                                 }
-                                else if (node.data.building_city) {
-                                    let bldgSummary = this.summary.building_summary,
-                                        buildings = bldgSummary.filter(x => x.building_city == node.data.name),
-                                        count = buildings.length,
-                                        cityStats = {
-                                            opportunity_cost: buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0),
-                                            peak_workspace_util: buildings.map(x => x.peak_workspace_util).reduce((a, b) => a + b, 0) / count,
-                                            average_workspace_util: buildings.map(x => x.average_workspace_util).reduce((a, b) => a + b, 0) / count,
-                                            peak_meeting_room: buildings.map(x => x.peak_meeting_room_occupancy).reduce((a, b) => a + b, 0) / count,
-                                            user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
-                                            work_from_home: buildings.map(x => x.work_from_home).reduce((a, b) => a + b, 0) / count
-                                        }
-                                    this.setStatsDisplay(cityStats)
+                            console.log('zoomed.countryStats', countryStats)
+                            this.setStatsDisplay(countryStats)
+                        }
+                        else if (node.data.building_city) {
+                            let bldgSummary = this.summary.building_summary,
+                                buildings = bldgSummary.filter(x => x.building_city == node.data.name),
+                                count = buildings.length,
+                                cityStats = {
+                                    opportunity_cost: buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0),
+                                    peak_workspace_util: buildings.map(x => x.peak_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                    average_workspace_util: buildings.map(x => x.average_workspace_util).reduce((a, b) => a + b, 0) / count,
+                                    peak_meeting_room: buildings.map(x => x.peak_meeting_room_occupancy).reduce((a, b) => a + b, 0) / count,
+                                    user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
+                                    work_from_home: buildings.map(x => x.work_from_home_average_percentage).reduce((a, b) => a + b, 0) / count
                                 }
-                                else this.setStatsDisplay(this.summary)
-                            },
-                            moreInfo: (data) => {
-                                this.$router.push({ name: 'time' })
-                            }
-                        })
-                    // }
-                }, 100)
-            }
+                            console.log('zoomed.cityStats', cityStats)
+                            this.setStatsDisplay(cityStats)
+                        }
+                        else this.setStatsDisplay(this.summary)
+                    },
+                    moreInfo: (data) => {
+                        this.$router.push({ name: 'time' })
+                    }
+                })
+            }, 100)
         },
         timeStartChange(time, hour) {
             // console.log('timeStartChange', hour, time)
             this.dataFilters.start_hour = hour
             
-            this.axiosSrc.cancel('Start time updated')
-            this.renderChart()
+            if (this.axiosSrc) this.axiosSrc.cancel('Start time updated')
+            this.renderChart(true)
         },
         timeEndChange(time, hour) {
             // console.log('timeEndChange', hour, time)
             this.dataFilters.stop_hour = hour
             
-            this.axiosSrc.cancel('End time updated')
-            this.renderChart()
+            if (this.axiosSrc) this.axiosSrc.cancel('End time updated')
+            this.renderChart(true)
         },
         toPeak() { this.$router.push({ name: 'peak' }) },
         toWFH() { this.$router.push({ name: 'wfh' }) },
@@ -396,9 +417,9 @@ export default {
         this.dataFilters.start_date = start.toISOString()
         this.dataFilters.stop_date = end.toISOString()
 
-        // console.log('created', this.company)
-
         if (this.company && this.company.ref_id) this.dataFilters.node_id = this.company.ref_id
+
+        if (this.rangeFilter == null) this.setRange('today')
     },
     mounted() {
         addEvent(window, 'resize', this.handlePackRedraw)
@@ -409,6 +430,10 @@ export default {
     destroyed() {
         removeEvent(window, 'resize', this.handlePackRedraw)
         removeEvent(document, ['mousedown', 'touchend', 'keydown'], this.pageOptsHandler)
+
+        if (this.circlePack) this.circlePack.cleanUp()
+
+        if (this.axiosSrc) this.axiosSrc.cancel('Component destroyed')
     }
 }
 </script>
@@ -436,7 +461,7 @@ export default {
 }
 .circle-packs {
     pointer-events: all;
-    border-radius: 50%;
+    // border-radius: 50%;
 
     .plotWrapper {
         .node {

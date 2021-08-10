@@ -232,7 +232,7 @@ export default {
         async addSettings() {
             this.toggleSaving(true)
             axios.post(api, {
-                company: this.user.cid,
+                company: this.user.company.hid,
                 start_time: this.entry.start_time,
                 end_time: this.entry.end_time,
                 work_days: this.entry.work_days.join(',')

@@ -24,6 +24,36 @@ export function circlePack(wrapper, packData, callbacks) {
         .domain([0, 1])
         .range(['#3DCFA3', '#ed762c']);
 
+    //Hide the tooltip when the mouse moves away
+    function removeTooltip() { d3.select('body .cp-tooltip').remove() }
+
+    //Show the tooltip on the hovered over slice
+    function showTooltip(d) {
+        let target = d3.event.target,
+            rect = target.getBoundingClientRect(),
+            offset = { 
+                top: rect.top + window.scrollY, 
+                left: rect.left + window.scrollX, 
+            },
+            focusChildren = focus.children ? focus.children.map(c => c.data.name) : [],
+            parentChildren = focus.parent && focus.parent.children ? focus.parent.children.map(c => c.data.name) : [],
+            shouldTooltip = d !== focus && d !== focus.parent 
+                && focusChildren.indexOf(d.data.name) < 0 && parentChildren.indexOf(d.data.name) < 0
+
+        if (!shouldTooltip) return
+
+        d3.select('body').append('div').attr('class', 'cp-tooltip')
+            .text(`${d.data.name} - ${moneyFormat(d.value)}`)
+            .style('left', function() {
+                let _w = this.getBoundingClientRect().width
+                return `${offset.left - ((_w - rect.width) / 2)}px`
+            })
+            .style('top', function() {
+                let _h = this.getBoundingClientRect().height
+                return `${offset.top - _h - 6}px`
+            })
+    }
+
     function drawAll(nodes, stats) {
         ////////////////////////////////////////////////////////////// 
         ////////////////// Create Set-up variables  ////////////////// 
@@ -290,37 +320,8 @@ export function circlePack(wrapper, packData, callbacks) {
             focus0 = root
             k0 = 1
             d3.select("#loadText").remove()
-            zoomTo(root)
-        }
-
-        //Hide the tooltip when the mouse moves away
-        function removeTooltip() { d3.select('body .cp-tooltip').remove() }
-
-        //Show the tooltip on the hovered over slice
-        function showTooltip(d) {
-            let target = d3.event.target,
-                rect = target.getBoundingClientRect(),
-                offset = { 
-                    top: rect.top + window.scrollY, 
-                    left: rect.left + window.scrollX, 
-                },
-                focusChildren = focus.children ? focus.children.map(c => c.data.name) : [],
-                parentChildren = focus.parent && focus.parent.children ? focus.parent.children.map(c => c.data.name) : [],
-                shouldTooltip = d !== focus && d !== focus.parent 
-                    && focusChildren.indexOf(d.data.name) < 0 && parentChildren.indexOf(d.data.name) < 0
-
-            if (!shouldTooltip) return
-
-            d3.select('body').append('div').attr('class', 'cp-tooltip')
-                .text(`${d.data.name} - ${moneyFormat(d.value)}`)
-                .style('left', function() {
-                    let _w = this.getBoundingClientRect().width
-                    return `${offset.left - ((_w - rect.width) / 2)}px`
-                })
-                .style('top', function() {
-                    let _h = this.getBoundingClientRect().height
-                    return `${offset.top - _h - 6}px`
-                })
+            if (_packData.location) searchByName(_packData.location)
+            else zoomTo(root)
         }
 
         ////////////////////////////////////////////////////////////// 
@@ -496,6 +497,8 @@ export function circlePack(wrapper, packData, callbacks) {
         focus = d;
         let v = [focus.x, focus.y, focus.r * 2],
             k = diameter / v[2];
+
+        removeTooltip()
 
         //Remove the tspans of all the titles
         d3.selectAll(".innerCircleTitle").selectAll("tspan").remove();
@@ -777,6 +780,10 @@ export function circlePack(wrapper, packData, callbacks) {
     this.reDraw = function () {
         barsDrawn = false
         drawAll(_packData.nodes, _packData.stats)
+    }
+
+    this.cleanUp = function () {
+        removeTooltip()
     }
 
     drawAll(packData.nodes, packData.stats)
