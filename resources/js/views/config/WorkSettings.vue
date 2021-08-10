@@ -213,6 +213,8 @@ export default {
                 this.entry.end_time = data.ws.end_time
                 this.entry.work_days = data.ws.work_days.split(',')
             } else {
+                this.entry.start_time = '8:00 am'
+                this.entry.end_time = '5:00 pm'
                 this.entry.work_days = days.map(d => { return d.substr(0, 3) })
             }
         },
