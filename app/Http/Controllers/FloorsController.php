@@ -74,10 +74,19 @@ class FloorsController extends Controller
     }
 
     public function update(Request $request, $id) {
-        $fid = Hashids::decode($id)[0];
-        $floor = Floor::find($fid);
+        // $fid = Hashids::decode($id)[0];
+        // $floor = Floor::find($fid);
+        $floor = Floor::where('ref_id', $id)->first();
 
-        $floor->occupancy_limit = $request->occupancy_limit;
+        if ($floor) {
+            $floor->occupancy_limit = $request->occupancy_limit;
+        } else {
+            $floor = new Floor;
+            $floor->building_id = $request->bid;
+            $floor->ref_id = $id;
+            $floor->occupancy_limit = $request->occupancy_limit;
+        }
+        
         $floor->save();
 
         return response(['r' => true, 'm' => 'Floor updated']);
@@ -130,6 +139,7 @@ class FloorsController extends Controller
                     $floor->building_id = $request->bid;
                     $floor->ref_id = $fid;
                     $floor->occupancy_limit = $request->occupancy_limit;
+                    $floor->floor_plan = $filename;
                 }
                 $floor->save();
 

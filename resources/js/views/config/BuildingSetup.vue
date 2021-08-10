@@ -192,7 +192,8 @@ export default {
             api_areas: 'backend/api_areas',
             api_area: 'backend/api_area',
         }),
-        floors() { return this.$store.getters['locations/getFloors'](this.bldg_id) },
+        // floors() { return this.$store.getters['locations/getFloors'](this.bldg_id) },
+        floors() { return this.buildings.find(x => x.id == this.bldg_id).floors },
         baseUrl() { return getBaseUrl() },
         floorList() {
             return this.floors.sort((a, b) => {
@@ -251,7 +252,7 @@ export default {
                 delete f.children
             })
 
-            console.log('getFloors', floors)
+            // console.log('getFloors', floors)
             this.setFloors({ bid: this.bldg_id, floors })
             this.loaded = true
         },
@@ -311,6 +312,8 @@ export default {
         triggerEdit(id) {
             let f = this.floors.find(f => f.id === id)
 
+            // console.log('triggerEdit', id, f)
+
             this.entry.id = id
             this.entry.fNo = f.number
             this.entry.size_sqm = f.size_sqm
@@ -342,13 +345,18 @@ export default {
                 f.building = floor.building
                 f.occupancy_limit = this.entry.occupancy_limit
 
-                axios.put(`${api.floors}/${_id}`, { occupancy_limit: this.entry.occupancy_limit })
-                    .then(x => {
-                        this.toggleSaving(false)
-                        let res = x.data
+                axios.put(`${api.floors}/${_id}`, {
+                    bid: this.bldg_id,
+                    occupancy_limit: this.entry.occupancy_limit 
+                }).then(x => {
+                    this.toggleSaving(false)
+                    let res = x.data
 
-                        if (res.r) this.toggleEntry(false)
-                    })
+                    if (res.r) {
+                        this.setFloors({ bid: this.bldg_id, floors: this.floors })
+                        this.toggleEntry(false)
+                    }
+                })
             } else this.toggleSaving(false)
         },
         async delFloor(id) {
@@ -390,6 +398,8 @@ export default {
                         if (res.r) {
                             f.floor_plan = res.floor_plan
                             f.floor_plan_url = `${_.baseUrl}/plans/${f.floor_plan}`
+
+                            _.setFloors({ bid: _.bldg_id, floors: _.floors })
                         }
                     } else {
                         console.error(res)

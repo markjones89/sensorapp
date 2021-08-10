@@ -2,7 +2,7 @@
     <div class="content">
         <div class="graph-header">
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
-            <div class="graph-filters">
+            <div class="graph-filters" v-if="dataLoaded">
                 <!-- <span class="graph-filter" @click="showFilter = !showFilter">
                     Filter By
                     <span class="caret">
@@ -278,10 +278,12 @@ export default {
 
                 if (!data.building_summary) {
                     this.dataError = data
+                    this.dataLoaded = true
                     return
                 }
                 else if (data.building_summary && data.building_summary.length == 0) {
                     this.dataError = "No results"
+                    this.dataLoaded = true
                     return
                 }
                 else {

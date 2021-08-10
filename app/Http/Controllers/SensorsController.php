@@ -71,15 +71,27 @@ class SensorsController extends Controller
     // }
 
     public function updatePos(Request $request, $id) {
-        $mid = Hashids::decode($id)[0];
+        // $mid = Hashids::decode($id)[0];
         if (!$request->has('pos_x') || !$request->has('pos_y') || !$request->has('scale')) {
             return response(['r' => false, 'm' => 'Sensor position is required']);
         } else {
-            $map = SensorMap::find($mid);
+            // $map = SensorMap::find($mid);
+            $map = SensorMap::where('ref_id', $id)->first();
 
-            $map->pos_x = $request->pos_x;
-            $map->pos_y = $request->pos_y;
-            $map->scale = $request->scale;
+            if ($map) {
+                $map->pos_x = $request->pos_x;
+                $map->pos_y = $request->pos_y;
+                $map->scale = $request->scale;
+            } else {
+                $map = new SensorMap;
+
+                $map->ref_id = $id;
+                $map->floor_id = $request->floor_id;
+                $map->pos_x = $request->pos_x;
+                $map->pos_y = $request->pos_y;
+                $map->scale = $request->scale;
+            }
+
             $map->save();
 
             return response(['r' => true, 'm' => 'Sensor position updated']);

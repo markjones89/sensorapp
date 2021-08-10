@@ -151,11 +151,13 @@ export default {
     },
     watch: {
         floorSel: function(floor, oldFloor) {
-            if (this.floor) {
+            if (this.floor && this.mapper) {
                 this.getSensors(floor, () => { this.mapper.setData(this.floor) })
             }
         },
-        editSensor: function(isEdit) { this.mapper.setSensorMapping(isEdit) }
+        editSensor: function(isEdit) { 
+            if (this.mapper) this.mapper.setSensorMapping(isEdit)
+        }
     },
     methods: {
         ...mapMutations({
@@ -240,7 +242,7 @@ export default {
                 }
             })
 
-            floor.sensors = sensors
+            floor.sensors = sensors//.filter(x => x.pos_x != null)
             this.floorAreas = floor.areas
 
             return cb && cb()
@@ -269,8 +271,12 @@ export default {
                         _.triggerEdit(sensor.id)
                     },
                     sensorMoved: function(sensor) {
+                        // console.log('sensorMoved', sensor, this.floorSel)
                         axios.put(`${api.sensor}/coord/${sensor.id}`, {
-                            pos_x: sensor.pos_x, pos_y: sensor.pos_y, scale: sensor.scale
+                            floor_id: _.floorSel,
+                            pos_x: sensor.pos_x,
+                            pos_y: sensor.pos_y,
+                            scale: sensor.scale
                         })
                     }
                 }
@@ -416,6 +422,7 @@ export default {
                 _.loaded = true
 
                 if (!_.floor) return
+                setTimeout(() => { _.setupMapper() }, 100)
             } else {
                 _.getFloors(function() {
                     _.loaded = true

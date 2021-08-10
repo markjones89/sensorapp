@@ -3,12 +3,13 @@ import * as d3 from 'd3'
 export function collapsibleTree(wrapper, data) {
     const container = d3.select(wrapper);
     const root = d3.hierarchy(data),
+        moneyFormat = d3.format('$,.2s'),
         width = 900,
         // wrapperRect = container.node().getBoundingClientRect(),
         // width = wrapperRect.width,
         dx = 16,
         dy = width / 6,
-        margin = { top: 10, right: 120, bottom: 10, left: 40 };
+        margin = { top: 10, right: 80, bottom: 10, left: 80 };
 
     const tree = (d3.tree().nodeSize([dx, dy]));
     // const line = (d3.line().x(d => d.y).y(d => d.x));
@@ -86,7 +87,8 @@ export function collapsibleTree(wrapper, data) {
             .attr("x", d => d._children ? -6 : 6)
             .attr("text-anchor", d => d._children ? "end" : "start")
             .attr('fill', '#fff')
-            .text(d => d.data.name)
+            // .text(d => d.data.name)
+            .text(d => `${d.data.name} ${moneyFormat(d.data.value || 0)}`)
             .clone(true).lower()
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 3)
