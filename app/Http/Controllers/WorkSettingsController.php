@@ -66,7 +66,7 @@ class WorkSettingsController extends Controller
 
         $ws->save();
         
-        return response(['r' => true, 'm' => 'Work settings updated']);
+        return response(['r' => true, 'm' => 'Work settings updated', 'data' => $ws]);
     }
 
     public function delete($id) {

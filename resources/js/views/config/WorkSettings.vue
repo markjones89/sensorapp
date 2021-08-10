@@ -205,6 +205,7 @@ export default {
         async getSettings() {
             let { data } = await axios.get(api, { params: { cid: this.user.company.hid } })
 
+            // console.log('getSettings', data.ws)
             this.settings = data.ws
             this.loaded = true
 
@@ -242,6 +243,7 @@ export default {
                 this.toggleSaving(false)
                 let res = x.data
 
+                this.settings = res.data
                 this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
             })
         },
@@ -255,6 +257,7 @@ export default {
                 this.toggleSaving(false)
                 let res = x.data
 
+                this.settings = res.data
                 this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
             })
         },
