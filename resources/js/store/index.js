@@ -13,7 +13,7 @@ Vue.use(Vuex)
 const vuexLocal = new VuexPersistence({
     // storage: window.localStorage
     restoreState: (key, storage) => Cookies.getJSON(key),
-    saveState: (key, state, storage) => Cookies.set(key, state, { expires: 3 })
+    saveState: (key, state, storage) => Cookies.set(key, state, { expires: 3, sameSite: 'strict' })
 })
 
 export const store = new Vuex.Store({

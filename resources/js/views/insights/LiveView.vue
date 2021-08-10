@@ -146,7 +146,8 @@ export default {
     components: { CaretIcon, CaretLeftIcon, FilterDropdown, Loader },
     data: () => ({
         loaded: false, mapper: null, showPageOpts: false, showEmbed: false,
-        liveWS: null, building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
+        liveWS: null, wsConnected: false,
+        building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
         stats: {
             desk_free: 0, desk_occupied: 0,
             rooms_free: 0, rooms_occupied: 0
@@ -212,6 +213,7 @@ export default {
             // this.liveWS.onclose = this.wsClosed
             this.liveWS = new Paho.MQTT.Client('mqtt.intuitive.works', 443, `intuitive_app_${ parseInt(Math.random() * 100, 10) }`)
             this.liveWS.onConnectionLost = (res) => {
+                this.wsConnected = false
                 console.log('wsClosed: ', res)
                 // if (res.errorCode != 0) {
                 //     console.log('wsClosed: ', res.errorMessage)
@@ -242,6 +244,7 @@ export default {
                 userName: 'intuitive-api',
                 password: 'TRuhC3jBFrb3',
                 onSuccess: () => {
+                    this.wsConnected = true
                     console.log('wsConnect.onSuccess')
                     this.liveWS.subscribe('sensor_data/#', {
                         // qos: 0,
@@ -250,6 +253,7 @@ export default {
                     })
                 },
                 onFailure: (e) => {
+                    this.wsConnected = false
                     console.log('wsConnect.onFailure: ', e)
                 }
             })
@@ -363,7 +367,7 @@ export default {
         // addEvent(window, 'resize', this.windowResize)
     },
     destroyed() {
-        this.wsClose()
+        if (this.wsConnected) this.wsClose()
         removeEvent(window, 'beforeunload', this.windowUnload)
         // removeEvent(window, 'resize', this.windowResize)
         // clearInterval(this.sci_id)

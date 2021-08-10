@@ -206,9 +206,9 @@ export default {
 
             floors.forEach(f => {
                 let ref = refs.find(x => x.ref_id == f.id)
-
+                
                 f.ordinal_no = toOrdinal(f.number)
-                f.occupancy_limit = ref.occupancy_limit
+                f.occupancy_limit = ref?.occupancy_limit || Math.floor((Math.random() * 25) + 1)
                 f.occupancy_live = Math.floor((Math.random() * f.occupancy_limit) + 1)
             })
 
