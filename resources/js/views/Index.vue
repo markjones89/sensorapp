@@ -262,7 +262,7 @@ export default {
                     { name: 'Workspaces in use', avg: 'average_workspace', avgPercent: 'average_workspace_util', peak: 'peak_workspace', peakPercent: 'peak_workspace_util' },
                     { name: 'Free workspaces', avg: 'average_free_workspace', avgPercent: 'average_free_workspace_util', peak: 'peak_free_workspace', peakPercent: 'peak_free_workspace_util' }, 
                     { name: 'Meeting Rooms in Use', avg: 'average_meeting_room', avgPercent: 'average_meeting_room_occupancy', peak: 'peak_meeting_room', peakPercent: 'peak_meeting_room_occupancy' }, 
-                    { name: 'Free Meeting Rooms', avg: 'average_free_meeting_room', avgPercent: '', peak: 'peak_free_meeting_room', peakPercent: '' }, 
+                    { name: 'Free Meeting Rooms', avg: 'average_free_meeting_room', avgPercent: 'avarage_free_meeting_room_occupancy', peak: 'peak_free_meeting_room', peakPercent: 'peak_free_meeting_room_occupancy' }, 
                     { name: 'Workspaces used <20%', avg: 'average_low_perform', avgPercent: 'average_low_perforn_percentage', peak: 'peak_low_perform', peakPercent: 'peak_low_perform_percentage' }, 
                     { name: 'Occupancy Count', avg: '', avgPercent: '', peak: '', peakPercent: '' }, 
                     { name: 'Work from home %', avg: 'work_from_home_average', avgPercent: 'work_from_home_average_percentage', peak: 'work_from_home_peak', peakPercent: 'work_from_home_peak_percentage' }
