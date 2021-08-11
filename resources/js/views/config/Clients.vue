@@ -203,6 +203,7 @@ export default {
                 let cust = custs.find(x => x.id == c.ref_id)
 
                 if (cust) {
+                    if (cust.bucket) c.bucket = cust.bucket
                     c.name = cust.name
                     c.upload_info = { uploading: false, progress: 0 }
                     this.clients.push(c)
@@ -258,15 +259,18 @@ export default {
         },
         async upClient() {
             this.toggleSaving(true)
-            axios.put(`${this.api_customers}/${this.refId}`, { name: this.cName }, this.api_header())
+            let c = this.clients.find(c => c.hid == this.cId),
+                _data = { name: this.cName }
+
+            if (c.bucket) _data.bucket = c.bucket
+
+            axios.put(`${this.api_customers}/${this.refId}`, _data, this.api_header())
                 .then(x => {
                     this.toggleSaving(false)
                     if (x.status == 200) {
                         let res = x.data
 
                         if (res.r) {
-                            let c = this.clients.find(c => c.hid == this.cId)
-
                             c.name = this.cName
                             this.toggleEntry(false)
                         }

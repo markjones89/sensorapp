@@ -432,10 +432,13 @@ export default {
                 _id = this.entry.id
 
             this.toggleSaving(true)
+            let l = this.locations.find(x => x.id == _id)
+
+            if (l.measurement) _entry.measurement = l.measurement
+
             let res = await axios.put(this.api_building(this.companyId, _id), _entry, this.api_header())
 
             if (res.status == 200) {
-                let l = this.locations.find(x => x.id == _id)
                 l.name = this.entry.name
                 l.city = this.entry.city
                 l.state = this.entry.state
