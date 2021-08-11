@@ -40,8 +40,8 @@ function mapper(wrapper, data, options) {
 
   var width = maxWidth(),
       height = maxHeight();
-  var floor = data,
-      sensors = floor.sensors || [],
+  var _floor = data,
+      sensors = _floor.sensors || [],
       config = Object(_helpers__WEBPACK_IMPORTED_MODULE_1__["extend"])(config_defaults, options),
       events = config.events,
       offset = {
@@ -185,7 +185,7 @@ function mapper(wrapper, data, options) {
 
 
   function calcOffsets(cb) {
-    getImageDim(floor.floor_plan_url, function (dim) {
+    getImageDim(_floor.floor_plan_url, function (dim) {
       var diff = {
         h: height - dim.height,
         w: width - dim.width
@@ -247,9 +247,9 @@ function mapper(wrapper, data, options) {
     imgLayer.selectAll('image').remove();
     if (mapLayer.__transform) imgLayer.attr('transform', mapLayer.__transform);
 
-    if (floor.floor_plan) {
+    if (_floor.floor_plan) {
       var canClick = config.edit && (state.sensorMapping || state.areaMapping);
-      imgLayer.insert('image', ':first-child').attr('xlink:href', floor.floor_plan_url).attr('height', y(0 + yDMax) - y(0)).attr('width', x(0 + xDMax) - x(0)).style('cursor', function () {
+      imgLayer.insert('image', ':first-child').attr('xlink:href', _floor.floor_plan_url).attr('height', y(0 + yDMax) - y(0)).attr('width', x(0 + xDMax) - x(0)).style('cursor', function () {
         return canClick ? 'crosshair' : 'default';
       }); // .on('click', () => canClick && (floorClick(), d3.event.stopPropagation()))
     }
@@ -311,8 +311,8 @@ function mapper(wrapper, data, options) {
 
 
   this.setData = function (data) {
-    floor = data;
-    sensors = floor.sensors;
+    _floor = data;
+    sensors = _floor.sensors;
     mapLayer.__transform = null;
     this.redraw(true);
   };
@@ -325,7 +325,7 @@ function mapper(wrapper, data, options) {
   this.redraw = function (fresh) {
     var _this2 = this;
 
-    if (!floor.floor_plan) {
+    if (!_floor.floor_plan) {
       imgLayer.selectAll('image').remove();
       sensorLayer.selectAll('.sensor').remove();
       return;
@@ -390,7 +390,9 @@ function mapper(wrapper, data, options) {
   }; // render floor plan
 
 
-  if (floor && floor.floor_plan) {
+  console.log('floor', _floor);
+
+  if (_floor && _floor.floor_plan) {
     calcOffsets(function () {
       _this3.drawFloorPlan();
 

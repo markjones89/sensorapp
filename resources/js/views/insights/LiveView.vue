@@ -48,11 +48,13 @@
                             Desks
                             <div class="stats-wrapper">
                                 <div class="stat-group free">
-                                    <span class="stat">{{ stats.desk_free }}</span>
+                                    <!-- <span class="stat">{{ stats.desk_free }}</span> -->
+                                    <span class="stat">{{ freeDeskSensors }}</span>
                                     <span class="label">Free</span>
                                 </div>
                                 <div class="stat-group occupied">
-                                    <span class="stat">{{ stats.desk_occupied }}</span>
+                                    <!-- <span class="stat">{{ stats.desk_occupied }}</span> -->
+                                    <span class="stat">{{ occupiedDeskSensors }}</span>
                                     <span class="label">Occupied</span>
                                 </div>
                             </div>
@@ -61,11 +63,13 @@
                             Meeting Rooms
                             <div class="stats-wrapper">
                                 <div class="stat-group free">
-                                    <span class="stat">{{ stats.rooms_free }}</span>
+                                    <!-- <span class="stat">{{ stats.rooms_free }}</span> -->
+                                    <span class="stat">{{ freeRoomSensors }}</span>
                                     <span class="label">Free</span>
                                 </div>
                                 <div class="stat-group occupied">
-                                    <span class="stat">{{ stats.rooms_occupied }}</span>
+                                    <!-- <span class="stat">{{ stats.rooms_occupied }}</span> -->
+                                    <span class="stat">{{ occupiedRoomSensors }}</span>
                                     <span class="label">Occupied</span>
                                 </div>
                             </div>
@@ -77,57 +81,7 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
-<style lang="scss" scoped>
-#live-view {
-    flex: 1 auto;
-    display: flex;
-    flex-direction: column;
 
-    #floor-plan {
-        flex: 1 auto;
-        display: flex;
-        justify-content: center;
-    }
-
-    #floor-stats {
-        display: flex;
-        margin-top: 32px;
-        justify-content: space-around;
-    }
-
-    .stat-group {
-        display: inline-flex;
-        flex-direction: column;
-        color: #ffffff;
-        width: 100px;
-        margin-top: 24px;
-        overflow: hidden;
-
-        span { padding: 4px; }
-
-        & + .stat-group { margin-left: 24px; }
-
-        .stat { border-radius: 4px 4px 0 0; }
-
-        &.free .stat { background-color: #3DCFA3; }
-        &.occupied .stat { background-color: #FF5A09; }
-
-        .label {
-            font-size: 12px;
-            line-height: 20px;
-            border-radius: 0 0 4px 4px;
-            background-color: rgba($color: #2B2B2B, $alpha: 0.9);
-        }
-
-        &.free .label {
-            background-color: rgba($color: #3DCFA3, $alpha: 0.1);
-        }
-        &.occupied .label {
-            background-color: rgba($color: #FF5A09, $alpha: 0.1);
-        }
-    }
-}
-</style>
 <script>
 import { addEvent, removeEvent, getBaseUrl, toOrdinal } from '../../helpers'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
@@ -148,10 +102,7 @@ export default {
         loaded: false, mapper: null, showPageOpts: false, showEmbed: false,
         liveWS: null, wsConnected: false,
         building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
-        stats: {
-            desk_free: 0, desk_occupied: 0,
-            rooms_free: 0, rooms_occupied: 0
-        },
+        sensors: [],
         sci_id: null // sensor change interval
     }),
     computed: {
@@ -166,13 +117,12 @@ export default {
         }),
         baseUrl() { return getBaseUrl() },
         floorFilters() { return this.floors.map(f => { return { value: f.id, label: `${f.ordinal_no} Floor` } }) },
-        deskSensors() {
-            return this.floor.sensors.filter(s => s.area && s.area.type_id === 4)
-        },
-        meetingRoomSensors() {
-            // return this.floor.sensors.filter(s => s.area && [2,3].indexOf(s.area.type_id) >= 0)
-            return this.floor.sensors.filter(s => s.parent.indexOf('Meeting Room') >= 0)
-        }
+        freeSensors() { return this.sensors.filter(s => s.sensor_state == 'available') },
+        occupiedSensors() { return this.sensors.filter(s => s.sensor_state == 'occupied') },
+        freeDeskSensors() { return this.freeSensors.filter(s => s.area && s.area.type_id == 4).length },
+        occupiedDeskSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type_id == 4).length },
+        freeRoomSensors() { return this.freeSensors.length },
+        occupiedRoomSensors() { return this.occupiedSensors.length },
     },
     methods: {
         wsConnect() {
@@ -192,12 +142,11 @@ export default {
                 const sid = data.sensorId
                 const occupancy = data.occupancy_status
                 const state = occupancy == '0' ? 'available' : occupancy == '1' ? 'occupied' : null
-                let sensor = this.floor.sensors.find(s => s.sensor_id === sid)
+                let sensor = this.sensors.find(s => s.sensor_id === sid)
 
                 if (sensor && state) {
                     sensor.sensor_state = state
                     this.mapper.setSensorColor(sensor.id, state)
-                    this.setStats()
                     // console.log('onMessageArrived.sensor', sensor)
                 }
             }
@@ -211,13 +160,7 @@ export default {
                     this.wsConnected = true
                     console.log('wsConnect.onSuccess', res)
 
-                    // const callbacks = {
-                    //     // qos: 0,
-                    //     onSuccess: () => console.info('wsConnect: subscribe.onSuccess'),
-                    //     onFailure: () => console.log('wsConnect: subscribe.onFailure')
-                    // }
-
-                    this.floor.sensors.forEach(s => {
+                    this.sensors.forEach(s => {
                         // this.liveWS.subscribe('sensor_data/#', callbacks)
                         this.liveWS.subscribe(`sensor_data/${s.sensor_id}/data`)
                     })
@@ -229,7 +172,6 @@ export default {
             })
         },
         wsClose() {
-            // this.liveWS.close(1000, reason)
             this.liveWS.disconnect()
         },
         windowUnload() { this.wsClose() },
@@ -295,7 +237,7 @@ export default {
             await this.getFloorData(selected_floor)
             
             this.loaded = true
-            setTimeout(() => { this.setFloorMap() }, 0)
+            setTimeout(() => { this.setFloorMap() }, 100)
         },
         async getFloorData(fid) {
             let res = await axios.all([
@@ -314,29 +256,16 @@ export default {
                     s.pos_y = map.pos_y
                     s.scale = map.scale
                 }
+                s.sensor_state = 'available'
             })
 
-            this.floor.sensors = sensors
-            // this.setStats()
+            this.sensors = [...sensors]
+            this.floor.sensors = this.sensors
             this.wsConnect()
         },
-        setFloorMap() {
-            let _ = this
-
-            _.mapper = new floorMapper('#floor-map', _.floor)
-        },
-        setStats() {
-            this.stats.desk_free = this.deskSensors.filter(s => s.sensor_state === 'available').length
-            this.stats.desk_occupied = Math.abs(this.deskSensors.length - this.stats.desk_free)
-
-            this.stats.rooms_free = this.meetingRoomSensors.filter(s => s.sensor_state === 'available').length
-            this.stats.rooms_occupied = Math.abs(this.meetingRoomSensors.length - this.stats.rooms_free)
-        },
-        windowResize() { this.mapper.redraw() }
+        setFloorMap() { this.mapper = new floorMapper('#floor-map', this.floor) },
+        // windowResize() { if(this.mapper) this.mapper.redraw() }
     },
-    // created() {
-    //     this.wsConnect()
-    // },
     mounted() {
         if (this.bldg_id) this.getBuilding(this.bldg_id)
 
@@ -351,3 +280,56 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+#live-view {
+    flex: 1 auto;
+    display: flex;
+    flex-direction: column;
+
+    #floor-plan {
+        flex: 1 auto;
+        display: flex;
+        justify-content: center;
+        min-height: 50vh;
+    }
+
+    #floor-stats {
+        display: flex;
+        margin-top: 32px;
+        justify-content: space-around;
+    }
+
+    .stat-group {
+        display: inline-flex;
+        flex-direction: column;
+        color: #ffffff;
+        width: 100px;
+        margin-top: 24px;
+        overflow: hidden;
+
+        span { padding: 4px; }
+
+        & + .stat-group { margin-left: 24px; }
+
+        .stat { border-radius: 4px 4px 0 0; }
+
+        &.free .stat { background-color: #3DCFA3; }
+        &.occupied .stat { background-color: #FF5A09; }
+
+        .label {
+            font-size: 12px;
+            line-height: 20px;
+            border-radius: 0 0 4px 4px;
+            background-color: rgba($color: #2B2B2B, $alpha: 0.9);
+        }
+
+        &.free .label {
+            background-color: rgba($color: #3DCFA3, $alpha: 0.1);
+        }
+        &.occupied .label {
+            background-color: rgba($color: #FF5A09, $alpha: 0.1);
+        }
+    }
+}
+</style>

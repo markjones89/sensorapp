@@ -15,8 +15,8 @@ function mapper(wrapper, data, options) {
         maxHeight = () => container.node().parentNode.getBoundingClientRect().height || 400
 
     let width = maxWidth(), height = maxHeight()
-    let floor = data,
-        sensors = floor.sensors || [],
+    let _floor = data,
+        sensors = _floor.sensors || [],
         config = extend(config_defaults, options),
         events = config.events,
         offset = { x: 0, y: 0, scale: 0 },
@@ -170,7 +170,7 @@ function mapper(wrapper, data, options) {
      * @param {Function} cb Callback function
      */
     function calcOffsets(cb) {
-        getImageDim(floor.floor_plan_url, dim => {
+        getImageDim(_floor.floor_plan_url, dim => {
             let diff = { h: height - dim.height, w: width - dim.width },
                 scale = diff.h < diff.w ? (height / dim.height) : (width / dim.width),
                 imgWidth = dim.width * scale, imgHeight = dim.height * scale,
@@ -229,12 +229,12 @@ function mapper(wrapper, data, options) {
         
         if (mapLayer.__transform) imgLayer.attr('transform', mapLayer.__transform)
 
-        if (floor.floor_plan) {
+        if (_floor.floor_plan) {
 
             let canClick = config.edit && (state.sensorMapping || state.areaMapping)
 
             imgLayer.insert('image', ':first-child')
-                    .attr('xlink:href', floor.floor_plan_url)
+                    .attr('xlink:href', _floor.floor_plan_url)
                     .attr('height', y(0 + yDMax) - y(0))
                     .attr('width', x(0 + xDMax) - x(0))
                     .style('cursor', () => { return canClick ? 'crosshair' : 'default' })
@@ -318,8 +318,8 @@ function mapper(wrapper, data, options) {
      * @param {Object} data Floor data
      */
     this.setData = function (data) {
-        floor = data
-        sensors = floor.sensors
+        _floor = data
+        sensors = _floor.sensors
         mapLayer.__transform = null
 
         this.redraw(true)
@@ -330,7 +330,7 @@ function mapper(wrapper, data, options) {
      * @param {Boolean} fresh Determines if zoom will be reset
      */
     this.redraw = function (fresh) {
-        if (!floor.floor_plan) {
+        if (!_floor.floor_plan) {
             imgLayer.selectAll('image').remove()
             sensorLayer.selectAll('.sensor').remove()
             return
@@ -390,7 +390,7 @@ function mapper(wrapper, data, options) {
     }
 
     // render floor plan
-    if (floor && floor.floor_plan) {
+    if (_floor && _floor.floor_plan) {
         calcOffsets(() => {
             this.drawFloorPlan()
             this.drawSensors()
