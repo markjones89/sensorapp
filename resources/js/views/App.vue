@@ -16,12 +16,15 @@
     </div>
 </template>
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 import { getBaseUrl } from "../helpers"
 import UserPanel from '../components/partials/UserPanel'
 
 export default {
     components: { UserPanel },
+    data: () => ({
+        backendAuthInterval: null
+    }),
     computed: {
         ...mapState({
             user: state => state.user
@@ -32,6 +35,9 @@ export default {
     methods: {
         ...mapMutations({
             setClient: 'locations/setClient',
+        }),
+        ...mapActions({
+            clearStore: 'clearStore'
         }),
         userOptsHandler(e) {
             let _ = this
@@ -45,24 +51,28 @@ export default {
             }
         },
         toHome() { this.$router.push({ name: 'home' }) },
+        async backendAuth(url) {
+            await this.$store.dispatch('doBackendAuth', { apiUrl: url })
+        },
         logout() {
             axios.get('/logout').then(() => {
                 this.$router.push({ name: 'login' }, () => {
-                    this.$store.dispatch('clearStore')
+                    this.clearStore()
                 })
             })
         }
     },
     async created() {
-        // set backend url
-        this.$store.commit('backend/setAPI', document.getElementById('sensor_api').value)
+        await this.backendAuth(document.getElementById('sensor_api').value)
 
-        // login to backend api
-        let { data } = await axios.post(`${this.$store.state.backend.url}/login`, { username: 'admin', password: 'ydqpZT(]23umu#=y' })
-
-        if (data.token) this.$store.commit('backend/setAuthToken', data.token)
+        this.backendAuthInterval = setInterval(async () => {
+            await this.backendAuth()
+        }, 10 * (60 * 60 * 1000))
 
         if (this.user && this.user.company_id) this.setClient(this.user.company_id)
+    },
+    destroyed() {
+        if (this.backendAuthInterval) clearInterval(this.backendAuthInterval)
     }
 }
 </script>

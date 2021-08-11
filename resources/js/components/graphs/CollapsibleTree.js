@@ -88,7 +88,7 @@ export function collapsibleTree(wrapper, data) {
             .attr("text-anchor", d => d._children ? "end" : "start")
             .attr('fill', '#fff')
             // .text(d => d.data.name)
-            .text(d => `${d.data.name} ${moneyFormat(d.data.value || 0)}`)
+            .text(d => `${d.data.name} ${d.data.number ? ` - ${d.data.value}` : moneyFormat(d.data.value || 0)}`)
             .clone(true).lower()
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 3)

@@ -170,15 +170,20 @@ export default {
             }
 
             let nodes = { ID: '', name: this.summary.customer, children: [] }
-            let summary = this.summary.building_summary
+            let summary = [...this.summary.building_summary]
 
             nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
 
             summary.forEach(a => {
                 // nodes
-                // a.ID = a.building_name.replace(/\s/g,'')
                 a.name = a.building_name
                 a.value = a.opportunity_cost
+
+                // free desks/meeting at peak
+                a.children = [
+                    { name: 'Free Desks at Peak', value: a.peak_free_workspace, number: true },
+                    { name: 'Free Meeting Rooms at Peak', value: a.peak_free_meeting_room, number: true },
+                ]
 
                 keys.reduce((r, k) => {
                     if (!r[a[k]]) {
@@ -187,9 +192,6 @@ export default {
                         
                         if (a[k]) {
                             let l = { ['name']: a[k], ['children']: r[a[k]]._ }
-                            // let type = k === 'building_country' ? '' : '_City'
-
-                            // l.ID = `${a[k].replace(/\s/g,'')}${type}`
 
                             if (k === 'building_country') {
                                 let buildings = summary.filter(x => x[k] == a[k])

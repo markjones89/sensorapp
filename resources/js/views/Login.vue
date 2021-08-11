@@ -57,23 +57,18 @@ export default {
     methods: {
         async login() {
             this.loggingIn = true;
-            axios.post('/authenticate', { email: this.email, password: this.password })
+            this.$store.dispatch('doLogin', { email: this.email, password: this.password })
                 .then(res => {
-                    let data = res.data
-
-                    if (data.r) {
-                        this.$store.commit('setUser', data.user)
-                        this.$store.commit('locations/setClient', data.user.company_id)
+                    if (res.data.r) 
                         this.$router.push(this.$route.query.to || '/')
-                    }
-                    else {
-                        this.loggingIn = false
-                        this.$mdtoast(data.m, { type: 'error', interaction: true, interactionTimeout: 5000 })
-                    }
+                    else 
+                        this.$mdtoast(res.data.m, { type: 'error', interaction: true, interactionTimeout: 5000 })
                 })
                 .catch(e => {
-                    this.loggingIn = false
                     this.$mdtoast('An error occured while trying to login', { type: 'error', interaction: true, interactionTimeout: 5000 })
+                })
+                .finally(() => {
+                    this.loggingIn = false
                 })
         },
         inputKeydown(e) {

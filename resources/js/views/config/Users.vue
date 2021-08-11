@@ -25,9 +25,9 @@
                                 <td>
                                     <span class="user-email">{{ u.email }}</span>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     options here...
-                                </td>
+                                </td> -->
                             </tr>
                         </tbody>
                     </table>

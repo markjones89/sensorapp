@@ -170,62 +170,25 @@ export default {
             return this.floor.sensors.filter(s => s.area && s.area.type_id === 4)
         },
         meetingRoomSensors() {
-            return this.floor.sensors.filter(s => s.area && [2,3].indexOf(s.area.type_id) >= 0)
+            // return this.floor.sensors.filter(s => s.area && [2,3].indexOf(s.area.type_id) >= 0)
+            return this.floor.sensors.filter(s => s.parent.indexOf('Meeting Room') >= 0)
         }
     },
     methods: {
-        wsMessaged(e) {
-            console.log('wsMessaged: ', e, this.floor)
-            if (!this.floor) return
-            
-            /* let data = JSON.parse(e.data),
-                payload = JSON.parse(data.payload)
-
-            let sid = payload.sensor_id,
-                state = payload.sensor_state,
-                timestamp = payload.time
-
-            let sensor = this.floor.sensors.find(s => s.sensor_id === sid)
-
-            if (sensor && state) {
-                sensor.sensor_state = state
-                this.mapper.setSensorColor(sensor.id, state)
-                this.setStats()
-            } */
-        },
-        wsClosed(res) {
-            // if (e.wasClean) {
-            //     console.log('Connection to live data closed', e.code, e.reason)
-            // } else {
-            //     console.log('Connection to live data died, reconnecting...')
-            //     this.wsConnect()
-            // }
-        },
-        wsClose() {
-            // this.liveWS.close(1000, reason)
-            this.liveWS.disconnect()
-        },
-        windowUnload() { this.wsClose() },
         wsConnect() {
-            // this.liveWS = new WebSocket('ws://sigfox.switchfi.co.za:1880/ws/request')
-            // this.liveWS.onopen = this.wsOpened
-            // this.liveWS.onmessage = this.wsMessaged
-            // this.liveWS.onclose = this.wsClosed
             this.liveWS = new Paho.MQTT.Client('mqtt.intuitive.works', 443, `intuitive_app_${ parseInt(Math.random() * 100, 10) }`)
             this.liveWS.onConnectionLost = (res) => {
                 this.wsConnected = false
-                console.log('wsClosed: ', res)
-                // if (res.errorCode != 0) {
-                //     console.log('wsClosed: ', res.errorMessage)
-                // }
+                
+                if (res.errorCode != 0) {
+                    console.log('wsClosed: ', res.errorMessage)
+                    this.wsConnect()
+                }
             }
             this.liveWS.onMessageArrived = (msg) => {
                 if (!this.floor) return
 
                 const data = JSON.parse(msg.payloadString)
-
-                // if (data.occupancy_status == '1') console.log('onMessageArrived', data)
-
                 const sid = data.sensorId
                 const occupancy = data.occupancy_status
                 const state = occupancy == '0' ? 'available' : occupancy == '1' ? 'occupied' : null
@@ -235,21 +198,28 @@ export default {
                     sensor.sensor_state = state
                     this.mapper.setSensorColor(sensor.id, state)
                     this.setStats()
-                    console.log('onMessageArrived', sensor)
+                    // console.log('onMessageArrived.sensor', sensor)
                 }
             }
 
             this.liveWS.connect({
                 useSSL: true,
+                // reconnect: true,
                 userName: 'intuitive-api',
                 password: 'TRuhC3jBFrb3',
-                onSuccess: () => {
+                onSuccess: (res) => {
                     this.wsConnected = true
-                    console.log('wsConnect.onSuccess')
-                    this.liveWS.subscribe('sensor_data/#', {
-                        // qos: 0,
-                        onSuccess: () => console.info('wsConnect: subscribe.onSuccess'),
-                        onFailure: () => console.log('wsConnect: subscribe.onFailure')
+                    console.log('wsConnect.onSuccess', res)
+
+                    // const callbacks = {
+                    //     // qos: 0,
+                    //     onSuccess: () => console.info('wsConnect: subscribe.onSuccess'),
+                    //     onFailure: () => console.log('wsConnect: subscribe.onFailure')
+                    // }
+
+                    this.floor.sensors.forEach(s => {
+                        // this.liveWS.subscribe('sensor_data/#', callbacks)
+                        this.liveWS.subscribe(`sensor_data/${s.sensor_id}/data`)
                     })
                 },
                 onFailure: (e) => {
@@ -258,6 +228,11 @@ export default {
                 }
             })
         },
+        wsClose() {
+            // this.liveWS.close(1000, reason)
+            this.liveWS.disconnect()
+        },
+        windowUnload() { this.wsClose() },
         backTo() { this.$router.back() },
         async filterSelect(value, label) {
             this.showFilter = false
@@ -296,6 +271,7 @@ export default {
                 f.occupancy_limit = ref?.occupancy_limit
                 f.floor_plan = ref?.floor_plan
                 f.floor_plan_url = ref?.floor_plan ? `${this.baseUrl}/plans/${ref.floor_plan}` : null
+                f.areas = f.children
 
                 delete f.children
                 delete f.building
@@ -341,7 +317,8 @@ export default {
             })
 
             this.floor.sensors = sensors
-            this.setStats()
+            // this.setStats()
+            this.wsConnect()
         },
         setFloorMap() {
             let _ = this
@@ -357,9 +334,9 @@ export default {
         },
         windowResize() { this.mapper.redraw() }
     },
-    created() {
-        this.wsConnect()
-    },
+    // created() {
+    //     this.wsConnect()
+    // },
     mounted() {
         if (this.bldg_id) this.getBuilding(this.bldg_id)
 
