@@ -17,11 +17,11 @@
                         </div>
                     </div>
                     <div class="client-info">
-                        <div class="client-opts">
+                        <!-- <div class="client-opts">
                             <a class="client-opt" @click="triggerEdit(c.hid)">Edit</a>
-                            <!-- <a class="client-opt" @click="delClient(c.hid)">Remove</a> -->
-                        </div>
-                    {{ c.name }}
+                            <a class="client-opt" @click="delClient(c.hid)">Remove</a>
+                        </div> -->
+                        {{ c.name }}
                     </div>
                 </div>
                 <input type="file" ref="logoFile" hidden accept="image/*" @change="logoFileChange" />
@@ -46,118 +46,7 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
-<style lang="scss" scoped>
-#client-list {
-    margin-top: 24px;
 
-    #add-btn {
-        margin-top: 24px;
-    }
-}
-.client {
-    display: flex;
-    font-size: 20px;
-    padding: 10px;
-    border-radius: 10px;
-    transition: background-color .24s linear;
-
-    &:hover {
-        background-color: rgba($color: #ffffff, $alpha: 0.025);
-    }
-
-    .client-logo {
-        position: relative;
-        width: 170px;
-        height: 68px;
-        overflow: hidden;
-
-        .logo-upload-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            background-color: #2B2B2B;
-            border-radius: 10px;
-            z-index: 1;
-        }
-
-        .logo-upload-trigger {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100% - 2px);
-            font-size: 14px;
-            cursor: pointer;
-            border: 1px dashed rgba(255, 255, 255, .1);
-            border-radius: 10px;
-        }
-
-        .logo-holder {
-            position: relative;
-            height: 48px;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            overflow: hidden;
-
-            img {
-                height: 100%;
-                width: auto;
-                max-width: 100%;
-                pointer-events: none;
-            }
-
-            .logo-opt {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
-                font-size: 14px;
-                visibility: hidden;
-                opacity: 0;
-                transform: scale(1.25);
-                background-color: rgba($color: #393939, $alpha: 0.8);
-                transition: visibility .24s, opacity .24s, transform .24s;
-            }
-
-            &:hover .logo-opt {
-                visibility: visible;
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-    }
-
-    .client-info {
-        padding-left: 16px;
-    }
-
-    .client-opts {
-        line-height: 13px;
-
-        .client-opt {
-            font-size: 13px;
-            cursor: pointer;
-            user-select: none;
-
-            &:hover { text-decoration: underline; }
-        }
-    }
-}
-#client-entry {
-    width: 400px;
-}
-</style>
 <script>
 import { mapGetters } from 'vuex'
 import { getBaseUrl } from '../../helpers'
@@ -352,3 +241,118 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+#client-list {
+    margin-top: 24px;
+
+    #add-btn {
+        margin-top: 24px;
+    }
+}
+.client {
+    display: flex;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background-color .24s linear;
+
+    &:hover {
+        background-color: rgba($color: #ffffff, $alpha: 0.025);
+    }
+
+    .client-logo {
+        position: relative;
+        width: 170px;
+        height: 68px;
+        overflow: hidden;
+
+        .logo-upload-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            background-color: #2B2B2B;
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .logo-upload-trigger {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100% - 2px);
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px dashed rgba(255, 255, 255, .1);
+            border-radius: 10px;
+        }
+
+        .logo-holder {
+            position: relative;
+            height: 48px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            overflow: hidden;
+
+            img {
+                height: 100%;
+                width: auto;
+                max-width: 100%;
+                pointer-events: none;
+            }
+
+            .logo-opt {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                font-size: 14px;
+                visibility: hidden;
+                opacity: 0;
+                transform: scale(1.25);
+                background-color: rgba($color: #393939, $alpha: 0.8);
+                transition: visibility .24s, opacity .24s, transform .24s;
+            }
+
+            &:hover .logo-opt {
+                visibility: visible;
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        padding-left: 16px;
+    }
+
+    .client-opts {
+        line-height: 13px;
+
+        .client-opt {
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+
+            &:hover { text-decoration: underline; }
+        }
+    }
+}
+#client-entry {
+    width: 400px;
+}
+</style>
