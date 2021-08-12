@@ -390,8 +390,6 @@ function mapper(wrapper, data, options) {
   }; // render floor plan
 
 
-  console.log('floor', _floor);
-
   if (_floor && _floor.floor_plan) {
     calcOffsets(function () {
       _this3.drawFloorPlan();

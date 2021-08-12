@@ -170,7 +170,7 @@ export default {
             }
 
             let nodes = { ID: '', name: this.summary.customer, children: [] }
-            let summary = [...this.summary.building_summary]
+            let summary = JSON.parse(JSON.stringify(this.summary.building_summary))
 
             nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
 
