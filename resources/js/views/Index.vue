@@ -463,7 +463,7 @@ export default {
 }
 .circle-packs {
     pointer-events: all;
-    // border-radius: 50%;
+    border-radius: 10px;
 
     .plotWrapper {
         .node {

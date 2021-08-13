@@ -110,7 +110,7 @@ class UsersController extends Controller
         return response(['r' => false, 'm' => 'User not found']);
     }
 
-    public function updatePass(Request $request, $id) {
+    public function resetPass(Request $request, $id) {
         if ($request->password == '' || !$request->has('password')) {
             return response(['r' => false, 'm' => 'Password is required']);
         } else {
@@ -123,6 +123,28 @@ class UsersController extends Controller
 
                 return response(['r' => true, 'm' => 'Password changed']);
             }
+            return response(['r' => false, 'm' => 'User not found']);
+        }
+    }
+
+    public function changePassword(Request $request, $id) {
+        $uid = Hashids::connection('user')->decode($id)[0];
+        $user = User::find($uid);
+
+        if ($user) {
+            if ($request->password == '' || !$request->has('password')) {
+                return response(['r' => false, 'm' => 'Password is required']);
+            } else if ($request->current == '' || !$request->has('current')) {
+                return response(['r' => false, 'm' => 'Current password is required']);
+            } else if (!Hash::check($request->current, $user->password)) {
+                return response(['r' => false, 'm' => 'Incorrect current password']);
+            } else {
+                $user->password = Hash::make($request->password);
+                $user->save();
+
+                return response(['r' => true, 'm' => 'Password changed']);
+            }
+        } else {
             return response(['r' => false, 'm' => 'User not found']);
         }
     }

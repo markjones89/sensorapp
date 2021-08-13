@@ -92,7 +92,7 @@ export default {
                 this.$mdtoast('Password confirmation doesn\'t match', { type: 'warning', interaction: true, interactionTimeout: 5000 })
             } else {
                 this.state.changing = true
-                let { data } = await axios.put(`${userApi}/change-pass/${this.uid}`, { password: np })
+                let { data } = await axios.put(`${userApi}/reset-pass/${this.uid}`, { password: np })
 
                 this.state.changing = false
                 this.state.resetDone = data.r
