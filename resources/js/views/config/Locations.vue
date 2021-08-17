@@ -386,6 +386,8 @@ export default {
             let _entry = this.getEntry()
 
             this.toggleSaving(true)
+
+            _entry.birthday = (new Date()).toISOString()
             let res = await axios.post(this.api_buildings(this.companyId), _entry, this.api_header())
 
             if (res.status == 200) {
@@ -435,6 +437,7 @@ export default {
             let l = this.locations.find(x => x.id == _id)
 
             if (l.measurement) _entry.measurement = l.measurement
+            if (l.birthday) _entry.birthday = l.birthday
 
             let res = await axios.put(this.api_building(this.companyId, _id), _entry, this.api_header())
 

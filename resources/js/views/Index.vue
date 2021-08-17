@@ -3,13 +3,14 @@
         <div class="graph-header">
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <div class="graph-filters" v-if="dataLoaded">
-                <!-- <span class="graph-filter" @click="showFilter = !showFilter">
+                <span class="graph-filter" @click="showFilter = !showFilter">
                     Filter By
                     <span class="caret">
                         <caret-icon />
                     </span>
-                    <filter-dropdown :filters="filters" :multiple="true" :show="showFilter" v-model="filter" @onSelect="filterSelect" />
-                </span> -->
+                    <!-- <filter-dropdown :filters="filters" :multiple="true" :show="showFilter" v-model="filter" @onSelect="filterSelect" /> -->
+                    <filter-dropdown :filters="filters" :chosen="filter" :show="showFilter" @onSelect="filterSelect" />
+                </span>
                 <span class="graph-filter" @click="showLocFilter = !showLocFilter">
                     {{ locationFilter ? locationFilter : 'Select Location' }}
                     <span class="caret">
@@ -135,14 +136,14 @@ export default {
     components: { CaretIcon, DateRangeToggle, FilterDropdown, Loader, Modal, TimeSlider },
     data: () => ({
         circlePack: null, filters: [
-            { value: 'CUS', label: 'Cost of Unused Spaces' },
-            { value: 'PU', label: 'Peak Usage' },
-            { value: 'AU', label: 'Average Usage' },
-            { value: 'LPS', label: 'Low Performing Spaces' },
-            { value: 'SC', label: 'Spare Capacity' }
+            { value: 'opportunity_cost', label: 'Cost of Unused Spaces' },
+            { value: 'peak_workspace_util', label: 'Peak Usage' },
+            { value: 'average_workspace_util', label: 'Average Usage' },
+            { value: 'average_low_perforn_percentage', label: 'Low Performing Spaces' },
+            { value: 'average_free_workspace_util', label: 'Spare Capacity' }
         ], 
         locations: [],
-        filter: [], //locationFilter: null,
+        filter: 'opportunity_cost', //locationFilter: null,
         minuteFilterLbl: '60 minutes', minuteFilter: 60,
         showPageOpts: false, showEmbed: false, showFilter: false, showLocFilter: false, showMinuteFilter: false,
         dataLoaded: false, dataError: null, axiosSrc: null,
@@ -209,9 +210,13 @@ export default {
             if (this.axiosSrc) this.axiosSrc.cancel('Date range selected')
             this.renderChart(true)
         },
-        filterSelect(filters) {
+        filterSelect(filter) {
             this.showFilter = false
-            // console.log('filters', filters)
+            // console.log('filters', filter)
+            
+            let _data = this.getCircleData(filter)
+
+            if (this.circlePack) this.circlePack.setData(_data)
         },
         locFilter(loc) {
             if (!this.dataLoaded) return
@@ -256,7 +261,7 @@ export default {
             this.statsDisplay.user_to_workspace_ratio = stats.user_to_workspace_ratio || stats.user_to_work_space_ratio
             this.statsDisplay.work_from_home = stats.work_from_home_average_percentage || stats.work_from_home
         },
-        async renderChart(refresh = false) {
+        getCircleData(filter) {
             let _data = {},
                 categories = [
                     { name: 'Workspaces in use', avg: 'average_workspace', avgPercent: 'average_workspace_util', peak: 'peak_workspace', peakPercent: 'peak_workspace_util' },
@@ -270,7 +275,69 @@ export default {
                 keys = ['building_country', 'building_city'],
                 grouped = [],
                 temp = { _: grouped }
-            
+
+            let summary = JSON.parse(JSON.stringify(this.summary))
+            let nodes = { ID: '', name: summary.customer, children: [] }
+            let stats = []
+
+            summary.building_summary.forEach(a => {
+                // stats
+                categories.forEach(c => {
+                    let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name }
+
+                    stat.average = c.avg == '' ? 0 : a[c.avg]
+                    stat.avgPercent = c.avgPercent == '' ? 0 : a[c.avgPercent]
+                    stat.peak = c.peak == '' ? 0 : a[c.peak]
+                    stat.peakPercent = c.peakPercent == '' ? 0 : a[c.peakPercent]
+
+                    stats.push(stat)
+                })
+
+                // nodes
+                a.ID = a.building_name.replace(/\s/g,'')
+                a.name = a.building_name
+                a.value = a.opportunity_cost
+                a.value_stat = a[filter]
+
+                keys.reduce((r, k) => {
+                    if (!r[a[k]]) {
+
+                        r[a[k]] = { _: [] }
+                        
+                        if (a[k]) {
+                            let l = { ['name']: a[k], ['children']: r[a[k]]._ }
+                            let type = k == 'building_country' ? '' : '_City'
+
+                            l.ID = `${a[k].replace(/\s/g,'')}${type}`
+
+                            if (k == 'building_country') l.building_country = true
+                            else if (k == 'building_city') l.building_city = true
+
+                            r._.push(l)
+                        }
+                    }
+                    return r[a[k]]
+                }, temp)._.push(a)
+            })
+
+            nodes.children = grouped
+            /* let res = await axios.all([
+                axios.get('/data/circle-pack-category.json'),
+                axios.get('/data/circle-pack.json')
+            ]) */
+
+            _data.stats = stats //res[0].data
+            _data.nodes = nodes //res[1].data
+            _data.location = this.locationFilter
+
+            if (filter == 'opportunity_cost') _data.moneyValue = true
+            else _data.percentValue = true
+
+            // console.log('getCircleData', _data)
+
+            return _data
+        },
+        async renderChart(refresh = false) {
             this.dataLoaded = false
             if (this.summary == null || refresh) {
                 this.axiosSrc = axios.CancelToken.source()
@@ -295,60 +362,10 @@ export default {
             
             this.dataLoaded = true
             this.dataError = null
-            let nodes = { ID: '', name: this.summary.customer, children: [] }
-            let stats = []
-            
             this.setStatsDisplay(this.summary)
             this.locations = [this.summary.customer, ...new Set(this.summary.building_summary.map(x => x.building_country).sort())]
 
-            this.summary.building_summary.forEach(a => {
-                // stats
-                categories.forEach(c => {
-                    let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name }
-
-                    stat.average = c.avg == '' ? 0 : a[c.avg]
-                    stat.avgPercent = c.avgPercent == '' ? 0 : a[c.avgPercent]
-                    stat.peak = c.peak == '' ? 0 : a[c.peak]
-                    stat.peakPercent = c.peakPercent == '' ? 0 : a[c.peakPercent]
-
-                    stats.push(stat)
-                })
-
-                // nodes
-                a.ID = a.building_name.replace(/\s/g,'')
-                a.name = a.building_name
-                a.value = a.opportunity_cost
-
-                keys.reduce((r, k) => {
-                    if (!r[a[k]]) {
-
-                        r[a[k]] = { _: [] }
-                        
-                        if (a[k]) {
-                            let l = { ['name']: a[k], ['children']: r[a[k]]._ }
-                            let type = k === 'building_country' ? '' : '_City'
-
-                            l.ID = `${a[k].replace(/\s/g,'')}${type}`
-
-                            if (k === 'building_country') l.building_country = true
-                            else if (k === 'building_city') l.building_city = true
-
-                            r._.push(l)
-                        }
-                    }
-                    return r[a[k]]
-                }, temp)._.push(a)
-            })
-
-            nodes.children = grouped
-            /* let res = await axios.all([
-                axios.get('/data/circle-pack-category.json'),
-                axios.get('/data/circle-pack.json')
-            ]) */
-
-            _data.stats = stats //res[0].data
-            _data.nodes = nodes //res[1].data
-            _data.location = this.locationFilter
+            let _data = this.getCircleData(this.filter)
 
             setTimeout(() => {
                 this.circlePack = new circlePack('#circle-pack', _data, {
@@ -367,7 +384,7 @@ export default {
                                     user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
                                     work_from_home: buildings.map(x => x.work_from_home_average_percentage).reduce((a, b) => a + b, 0) / count
                                 }
-                            console.log('zoomed.countryStats', countryStats)
+                            // console.log('zoomed.countryStats', countryStats)
                             this.setStatsDisplay(countryStats)
                         }
                         else if (node.data.building_city) {
@@ -382,7 +399,7 @@ export default {
                                     user_to_workspace_ratio: buildings.map(x => x.user_to_workspace_ratio).reduce((a, b) => a + b, 0) / count,
                                     work_from_home: buildings.map(x => x.work_from_home_average_percentage).reduce((a, b) => a + b, 0) / count
                                 }
-                            console.log('zoomed.cityStats', cityStats)
+                            // console.log('zoomed.cityStats', cityStats)
                             this.setStatsDisplay(cityStats)
                         }
                         else this.setStatsDisplay(this.summary)

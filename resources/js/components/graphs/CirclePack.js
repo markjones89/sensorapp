@@ -7,13 +7,15 @@ export function circlePack(wrapper, packData, callbacks) {
         diameter,
         commaFormat = d3.format(','),
         moneyFormat = d3.format('$,.2s'),
+        // numFormat = d3.format(',s'),
         root,
         // allOccupations = [],
         focus,
         focus0,
         k0,
         scaleFactor,
-        barsDrawn = false;
+        barsDrawn = false,
+        wrapDelim = '|';
         // rotationText = [-14,4,23,-18,-10.5,-20,20,20,46,-30,-25,-20,20,15,-30,-15,-45,12,-15,-16,15,15,5,18,5,15,20,-20,-25];
 
     let circleColor = d3.scaleOrdinal()
@@ -23,6 +25,14 @@ export function circlePack(wrapper, packData, callbacks) {
     let barColor = d3.scaleOrdinal()
         .domain([0, 1])
         .range(['#3DCFA3', '#ed762c']);
+
+    function getStatDisplay(d, tooltip = false) {
+        let isBuilding = !!d.data?.building_name
+        let value = _packData.moneyValue ? moneyFormat(d.data.value_stat) : 
+            _packData.percentValue ? `${Math.round(d.data.value_stat)}%` : d.data.value_stat
+
+        return `${d.data?.name || d.name}${tooltip ? ' - ' : isBuilding ? ` ${wrapDelim} ` : ' '}${value}`
+    }
 
     //Hide the tooltip when the mouse moves away
     function removeTooltip() { d3.select('body .cp-tooltip').remove() }
@@ -43,7 +53,8 @@ export function circlePack(wrapper, packData, callbacks) {
         if (!shouldTooltip) return
 
         d3.select('body').append('div').attr('class', 'cp-tooltip')
-            .text(`${d.data.name} - ${moneyFormat(d.value)}`)
+            // .text(`${d.data.name} - ${_packData.moneyValue ? moneyFormat(d.value) : _packData.percentValue ? `${d.value}%` : d.value}`)
+            .text(getStatDisplay(d, true))
             .style('left', function() {
                 let _w = this.getBoundingClientRect().width
                 return `${offset.left - ((_w - rect.width) / 2)}px`
@@ -84,7 +95,13 @@ export function circlePack(wrapper, packData, callbacks) {
             .size([diameter, diameter])
             .padding(8)
             (d3.hierarchy(data)
-                .sum(d => d.value)
+                .sum(d => {
+                    // calculate stat display
+                    let children = d.children?.map(x => x.value_stat)
+                    if (children) d.value_stat = _packData.percentValue ? d3.mean(children) : d3.sum(children)
+
+                    return d.value
+                })
                 .sort((a, b) => b.value - a.value));
 
         ////////////////////////////////////////////////////////////// 
@@ -397,6 +414,7 @@ export function circlePack(wrapper, packData, callbacks) {
                     name: d.data.name,
                     value: d.value,
                     depth: d.depth,
+                    data: d.data,
                     r: d.r,
                     x: d.x,
                     y: d.y
@@ -432,9 +450,8 @@ export function circlePack(wrapper, packData, callbacks) {
             .attr("startOffset", "50%")
             .attr("xlink:href", function (d, i) { return "#circleArc_" + i; })
             // .text(function (d) { return d.name.replace(/ and /g, ' & '); });
-            .text(d => {
-                return `${d.name} ${moneyFormat(d.value)}`
-            })
+            // .text(d => { return `${d.name} ${_packData.moneyValue ? moneyFormat(d.value) : _packData.percentValue ? `${d.value}%` : d.value}` })
+            .text(d => { return getStatDisplay(d, false) })
 
         ////////////////////////////////////////////////////////////// 
         ////////////////// Draw the Bar charts /////////////////////// 
@@ -558,9 +575,8 @@ export function circlePack(wrapper, packData, callbacks) {
                 .style("display", null)
                 .attr("y", function (d) { return d.titleHeight * k; })
                 .style("font-size", function (d) { return Math.round(d.fontTitleSize * k) + 'px' })
-                // .text(function (d, i) { return `Total ${commaFormat(d.data.value)} (in thousands) | ${d.data.name}` })
-                // .text(function (d, i) { return `${d.data.name} | Total $${commaFormat(d.data.value)}` })
-                .text(function (d, i) { return `${d.data.name} | ${d3.format(moneyFormat)(d.data.value)}` })
+                // .text(function (d, i) { return `${d.data.name} | ${_packData.moneyValue ? moneyFormat(d.value) : _packData.percentValue ? `${d.value}%` : d.value}` })
+                .text(d => { return getStatDisplay(d, false) })
                 .each(function (d) { wrap(this, k * d.textLength); });
             
             d3.selectAll('.innerBarSeriesText')
@@ -743,8 +759,8 @@ export function circlePack(wrapper, packData, callbacks) {
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width | word === "|") {
-                if (word = "|") word = "";
+            if (tspan.node().getComputedTextLength() > width | word === wrapDelim) {
+                if (word = wrapDelim) word = "";
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
