@@ -70,7 +70,7 @@
 </style>
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import { getBaseUrl } from '../../helpers'
+import { getBaseUrl, sum } from '../../helpers'
 import { CaretIcon, CaretLeftIcon } from '../../components/icons'
 import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
 import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
@@ -181,8 +181,8 @@ export default {
 
                 // free desks/meeting at peak
                 a.children = [
-                    { name: 'Free Desks at Peak', value: a.peak_free_workspace, number: true },
-                    { name: 'Free Meeting Rooms at Peak', value: a.peak_free_meeting_room, number: true },
+                    { name: 'Free Desks at Peak', value: a.free_workspace_utils.max, number: true },
+                    { name: 'Free Meeting Rooms at Peak', value: a.free_meeting_room_occupancy.max, number: true },
                 ]
 
                 keys.reduce((r, k) => {
@@ -196,13 +196,13 @@ export default {
                             if (k === 'building_country') {
                                 let buildings = summary.filter(x => x[k] == a[k])
                                 
-                                l.value = buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
+                                l.value = sum(buildings.map(x => x.opportunity_cost))
                                 l.building_country = true
                             }
                             else if (k === 'building_city') {
                                 let buildings = summary.filter(x => x[k] == a[k])
 
-                                l.value = buildings.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
+                                l.value = sum(buildings.map(x => x.opportunity_cost))
                                 l.building_city = true
                             }
 

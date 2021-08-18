@@ -219,3 +219,40 @@ export function extend() {
 
     return extended
 }
+
+/**
+ * Gets the value of the object using string property name
+ * @param {Object} obj Object where to get the value from
+ * @param {string} propStr String property accessor (i.e 'foo.bar' from obj = { foo: { bar: 'hello' } })
+ * @returns 
+ */
+export function getObjValue(obj, propStr) {
+    propStr = propStr.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+    propStr = propStr.replace(/^\./, '');           // strip a leading dot
+    var a = propStr.split('.');
+    for (var i = 0, n = a.length; i < n; ++i) {
+        var k = a[i];
+        if (k in obj) {
+            obj = obj[k];
+        } else {
+            return;
+        }
+    }
+    return obj;
+}
+
+/**
+ * Returns the sum of all numbers in the array
+ * @param {Number[]} arr Array of numbers
+ */
+export function sum(arr) {
+    return arr.reduce((a, b) => a + b, 0)
+}
+
+/**
+ * Returns the average of all numbers in the array
+ * @param {Number[]} arr Array of numbers
+ */
+export function average(arr) {
+    return arr.reduce((a, b) => a + b, 0) / arr.length
+}

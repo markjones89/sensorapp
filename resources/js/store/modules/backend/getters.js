@@ -31,7 +31,7 @@ const api_sensor = state => (cust, bldg, floor, area, sensor) => `${state.url}/a
 const api_sensors_by_node = state => (id, label) => `${state.url}/api/node/${id}?label=${label}`
 
 // charts, graphs, stats
-const api_customer_summary = state => `${state.url}/api/summary`
+const api_customer_summary = state => `${state.url}/api/summary/customer`
 
 export default {
     /** API request header (plus auth token) */
