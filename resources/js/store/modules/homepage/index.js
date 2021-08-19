@@ -5,7 +5,11 @@ export default {
     namespaced: true,
     state: () => ({
         summary: null,
-        rangeFilter: null,
+        rangeFilter: {
+            type: null,
+            start: null,
+            end: null
+        },
         locationFilter: null,
         startTime: null,
         endTime: null,

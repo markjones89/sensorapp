@@ -33,6 +33,8 @@ const api_sensors_by_node = state => (id, label) => `${state.url}/api/node/${id}
 // charts, graphs, stats
 const api_customer_summary = state => `${state.url}/api/summary/customer`
 
+const api_graph_view = state => `${state.url}/api/summary/graph_view`
+
 export default {
     /** API request header (plus auth token) */
     api_header,
@@ -59,5 +61,7 @@ export default {
     /** Sensors API url by node */
     api_sensors_by_node,
     /** Customer API (home page circle pack) */
-    api_customer_summary
+    api_customer_summary,
+    /** Customer API (bar charts - floor summary) */
+    api_graph_view
 }

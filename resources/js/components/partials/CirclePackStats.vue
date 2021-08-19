@@ -244,81 +244,90 @@ export default {
         async renderChart(refresh = false) {
             this.dataLoaded = false
             let dataFromCache = true
-            if (this.summary == null || refresh) {
-                this.axiosSrc = axios.CancelToken.source()
-                let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
+            try {
+                if (this.summary == null || refresh) {
+                    this.axiosSrc = axios.CancelToken.source()
+                    let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
 
-                if (!data.building_summary) {
-                    this.dataError = data
-                    this.dataLoaded = true
-                    return
-                }
-                else if (data.building_summary && data.building_summary.length == 0) {
-                    this.dataError = "No results"
-                    this.dataLoaded = true
-                    return
-                }
-                else {
-                    // this.setSummary(data)
-                    // this.setLocation(data.customer)
-                    this.summary = data
-                    dataFromCache = false
-                }
-            }
-            
-            this.dataLoaded = true
-            this.dataError = null
-            this.$emit('dataLoaded', this.summary, dataFromCache)
-            this.setStatsDisplay(this.summary)
-            // this.locations = [this.summary.customer, ...new Set(this.summary.building_summary.map(x => x.building_country).sort())]
-
-            let _data = this.getCircleData(this.statFilter)
-
-            setTimeout(() => {
-                this.circlePack = new circlePack('#circle-pack', _data, {
-                    zoomed: (node) => {
-                        if (node.data.building_name) {
-                            this.setStatsDisplay(node.data, true)
-                            this.zoomedLocation = {
-                                building: true,
-                                name: node.data.building_name
-                            }
-                        }
-                        else if (node.data.building_country) {
-                            let bldgSummary = this.summary.building_summary,
-                                buildings = bldgSummary.filter(x => x.building_country == node.data.name)
-                                
-                            // console.log('zoomed.countryStats', countryStats)
-                            this.setStatsDisplay(buildings, true)
-                            this.zoomedLocation = {
-                                country: true,
-                                name: node.data.name
-                            }
-                        }
-                        else if (node.data.building_city) {
-                            // let bldgSummary = this.summary.building_summary,
-                            //     buildings = bldgSummary.filter(x => x.building_country == node.data.country && x.building_city == node.data.name)
-                                
-                            // console.log('zoomed.cityStats', cityStats)
-                            this.setStatsDisplay(node.data.children, true)
-                            this.zoomedLocation = {
-                                city: true,
-                                name: node.data.name
-                            }
-                        }
-                        else {
-                            this.setStatsDisplay(this.summary)
-                            this.zoomedLocation = null
-                        }
-                        
-                        this.$emit('circleFocus', this.zoomedLocation)
-                    },
-                    moreInfo: (data) => {
-                        // this.$router.push({ name: 'time' })
-                        this.$emit('goToTime', data)
+                    // if (!data.building_summary) {
+                    //     this.dataError = data
+                    //     this.dataLoaded = true
+                    //     return
+                    // }
+                    // else 
+                    if (data.building_summary && data.building_summary.length == 0) {
+                        this.dataError = "No results"
+                        this.dataLoaded = true
+                        return
                     }
-                })
-            }, 100)
+                    else {
+                        // this.setSummary(data)
+                        // this.setLocation(data.customer)
+                        this.summary = data
+                        dataFromCache = false
+                    }
+                }
+                
+                this.dataLoaded = true
+                this.dataError = null
+                this.$emit('dataLoaded',
+                    JSON.parse(JSON.stringify(this.summary)),
+                    dataFromCache)
+                this.setStatsDisplay(this.summary)
+                // this.locations = [this.summary.customer, ...new Set(this.summary.building_summary.map(x => x.building_country).sort())]
+
+                let _data = this.getCircleData(this.statFilter)
+
+                setTimeout(() => {
+                    this.circlePack = new circlePack('#circle-pack', _data, {
+                        zoomed: (node) => {
+                            if (node.data.building_name) {
+                                this.setStatsDisplay(node.data, true)
+                                this.zoomedLocation = {
+                                    building: true,
+                                    name: node.data.building_name
+                                }
+                            }
+                            else if (node.data.building_country) {
+                                let bldgSummary = this.summary.building_summary,
+                                    buildings = bldgSummary.filter(x => x.building_country == node.data.name)
+                                    
+                                // console.log('zoomed.countryStats', countryStats)
+                                this.setStatsDisplay(buildings, true)
+                                this.zoomedLocation = {
+                                    country: true,
+                                    name: node.data.name
+                                }
+                            }
+                            else if (node.data.building_city) {
+                                // let bldgSummary = this.summary.building_summary,
+                                //     buildings = bldgSummary.filter(x => x.building_country == node.data.country && x.building_city == node.data.name)
+                                    
+                                // console.log('zoomed.cityStats', cityStats)
+                                this.setStatsDisplay(node.data.children, true)
+                                this.zoomedLocation = {
+                                    city: true,
+                                    name: node.data.name
+                                }
+                            }
+                            else {
+                                this.setStatsDisplay(this.summary)
+                                this.zoomedLocation = null
+                            }
+                            
+                            this.$emit('circleFocus', this.zoomedLocation)
+                        },
+                        moreInfo: (data) => {
+                            // this.$router.push({ name: 'time' })
+                            this.$emit('goToTime', data)
+                        }
+                    })
+                }, 100)
+            } catch (error) {
+                // console.error('renderChart', error.response?.data)
+                this.dataError = 'Unable to retrieve data, please try again'
+                this.dataLoaded = true
+            }
         },
         handlePackRedraw () { if (this.circlePack && this.dataLoaded) this.circlePack.reDraw() }
     },

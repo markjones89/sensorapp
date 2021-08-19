@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
+            <date-range-toggle @select="rangeSelect" :active="rangeFilter.type" />
             <div class="graph-filters" v-if="dataLoaded">
                 <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter" @onSelect="filterSelect" />
                 <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter" :chosenAsSelected="true" @onSelect="locFilter" />
@@ -26,7 +26,7 @@
                 :custData="summary" :statFilter="filter" :locFilter="locationFilter" :dataFilters="dataFilters"
                 @dataLoaded="circlePackLoaded" @costClick="toCostAnalysis" @peakClick="toPeak" @wfhClick="toWFH" @goToTime="toTimeChart" />
             <div class="bottom-filters">
-                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                <time-slider :from="timeFilter.start" :to="timeFilter.end"
                     @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
                 <graph-filter :filters="minuteFilters" :chosen="minuteFilter" :chosenAsSelected="true" position="top" @onSelect="filterMinute" />
             </div>
@@ -48,7 +48,7 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import { addEvent, removeEvent } from '@/helpers'
+import { addEvent, removeEvent, toHour } from '@/helpers'
 import { DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
 import { CirclePackStats } from '@/components/partials'
 import { format as d3Format } from 'd3-format'
@@ -72,7 +72,8 @@ export default {
         filter: 'opportunity_cost',
         locations: [],
         minuteFilter: 60,
-        showPageOpts: false, showEmbed: false, showFilter: false, showLocFilter: false, showMinuteFilter: false,
+        timeFilter: { start: null, end: null },
+        showPageOpts: false, showEmbed: false,
         dataLoaded: false,
         dataFilters: {
             trigger: 6,
@@ -114,35 +115,33 @@ export default {
             setRange: 'homepage/setRange',
             setLocation: 'homepage/setLocation',
             setTime: 'homepage/setTime',
-            setMinute: 'homepage/setMinute'
+            setMinute: 'homepage/setMinute',
+            setPeakSummary: 'peakchart/setSummary'
         }),
         circlePackLoaded(data, fromCache) {
             this.dataLoaded = true
             if (!fromCache) {
                 this.setSummary(data)
                 this.setLocation(data.customer)
+                this.setPeakSummary(null)
             }
 
             this.locations = [data.customer, ...new Set(data.building_summary.map(x => x.building_country).sort())]
         },
         rangeSelect(range, from, to) {
-            this.setRange(range)
+            this.dataLoaded = false
+            this.setRange({ type: range, start: from.toISOString(), end: to.toISOString() })
             this.dataFilters.start_date = from.toISOString()
             this.dataFilters.stop_date = to.toISOString()
         },
         filterSelect(filter) {
-            this.showFilter = false
             this.filter = filter
         },
-        locFilter(loc) {
-            if (!this.dataLoaded) return
-            this.showLocFilter = false
-            this.setLocation(loc)
-        },
+        locFilter(loc) { this.setLocation(loc) },
         // period filter
         filterMinute(minute) {
-            this.showMinuteFilter = false
             this.minuteFilter = minute
+            // this.dataLoaded = false
             // this.dataFilters.trigger = minute
         },
         pageOptsHandler(e) {
@@ -161,23 +160,49 @@ export default {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         },
-        timeStartChange(time, hour) { this.dataFilters.start_hour = hour },
-        timeEndChange(time, hour) { this.dataFilters.stop_hour = hour },
-        toPeak() { this.$router.push({ name: 'peak' }) },
+        timeStartChange(time, hour) {
+            this.dataLoaded = false
+            this.dataFilters.start_hour = hour
+            this.setTime({ start: hour, end: this.dataFilters.stop_hour })
+        },
+        timeEndChange(time, hour) {
+            this.dataLoaded = false
+            this.dataFilters.stop_hour = hour
+            this.setTime({ start: this.dataFilters.start_hour, end: hour })
+        },
+        toPeak(location) {
+            // console.log('toPeak', location)
+            let query = location ? JSON.parse(JSON.stringify(location)) : null
+
+            this.$router.push({ name: 'peak', query })
+        },
         toWFH() { this.$router.push({ name: 'wfh' }) },
         toTimeChart() { this.$router.push({ name: 'time' }) }
     },
     created() {
-        let now = new Date(),
-            start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
-
-        this.dataFilters.start_date = start.toISOString()
-        this.dataFilters.stop_date = end.toISOString()
-
         if (this.company && this.company.ref_id) this.dataFilters.node_id = this.company.ref_id
 
-        if (this.rangeFilter == null) this.setRange('today')
+        if (this.rangeFilter.type == null) {
+            let now = new Date(),
+                start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+                end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
+
+            this.dataFilters.start_date = start.toISOString()
+            this.dataFilters.stop_date = end.toISOString()
+            this.setRange({ type: 'today', start: start.toISOString(), end: end.toISOString() })
+        } else {
+            this.dataFilters.start_date = this.rangeFilter.start
+            this.dataFilters.stop_date = this.rangeFilter.end
+        }
+
+        if (this.startTimeFilter) {
+            this.dataFilters.start_hour = this.timeFilter.start = this.startTimeFilter
+            this.dataFilters.stop_hour = this.timeFilter.end = this.endTimeFilter
+        }
+        else if (this.settings) {
+            this.dataFilters.start_hour = this.timeFilter.start = toHour(this.settings.start_time)
+            this.dataFilters.stop_hour = this.timeFilter.end = toHour(this.settings.end_time)
+        }
     },
     mounted() {
         addEvent(document, ['mousedown', 'touchend', 'keydown'], this.pageOptsHandler)

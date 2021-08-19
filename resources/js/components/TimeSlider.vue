@@ -11,78 +11,28 @@
         </div>
     </div>
 </template>
-<style lang="scss">
-$primary: #ed762c;
-$buffer: #32313d;
 
-.time-slider {
-    position: relative;
-    width: 400px;
-    padding: 20px 0;
-
-    .slot-holder {
-        position: relative;
-        height: 4px;
-        border-radius: 2px;
-        background-color: $buffer;
-
-        .slot-selected {
-            position: absolute;
-            top: 0;
-            background-color: $primary;
-            height: 4px;
-            border-radius: 2px;
-            transition: all .14s;
-        }
-
-        .slot-thumb {
-            position: absolute;
-            display: block;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background-color: $primary;
-            cursor: pointer;
-            transition: all .14s;
-
-            .range-label {
-                position: absolute;
-                left: 50%;
-                white-space: nowrap;
-                top: 24px;
-                font-size: 14px;
-                pointer-events: none;
-                transform: translateX(-50%);
-            }
-
-            &:active {
-                background-color: darken($color: $primary, $amount: 5%);
-            }
-        }
-    }
-}
-</style>
 <script>
 
 const MIN_SLOT = 0,
     MAX_SLOT = 23
 
 export default {
-    props: ['from', 'to'],
-    data() {
-        return {
-            slots: [
-                '12:00 am', '1:00 am', '2:00 am', '3:00 am', '4:00 am', '5:00 am', '6:00 am', '7:00 am', '8:00 am', '9:00 am', '10:00 am', '11:00 am', 
-                '12:00 pm', '1:00 pm', '2:00 pm', '3:00 pm', '4:00 pm', '5:00 pm', '6:00 pm', '7:00 pm', '8:00 pm', '9:00 pm', '10:00 pm', '11:00 pm'
-            ],
-            start: 8, end: 17, thumb: null, shiftX: 0,
-            holdValue: {
-                start: 0, end: 0
-            }
-        }
+    // props: ['from', 'to'],
+    props: {
+        from: [String, Number],
+        to: [String, Number]
     },
+    data: () => ({
+        slots: [
+            '12:00 am', '1:00 am', '2:00 am', '3:00 am', '4:00 am', '5:00 am', '6:00 am', '7:00 am', '8:00 am', '9:00 am', '10:00 am', '11:00 am', 
+            '12:00 pm', '1:00 pm', '2:00 pm', '3:00 pm', '4:00 pm', '5:00 pm', '6:00 pm', '7:00 pm', '8:00 pm', '9:00 pm', '10:00 pm', '11:00 pm'
+        ],
+        start: 8, end: 17, thumb: null, shiftX: 0,
+        holdValue: {
+            start: 0, end: 0
+        }
+    }),
     computed: {
         width() { return this.$refs.slider.offsetWidth },
         // step() { return parseInt(this.width / MAX_SLOT) },
@@ -157,13 +107,14 @@ export default {
                 isStart ? `${pos}px` : `${(this.width - pos)}px`
         },
         callStartChange() { this.$emit('startChanged', this.startValue, this.start) },
-        callEndChange() { this.$emit('endChanged', this.endValue, this.end) }
+        callEndChange() { this.$emit('endChanged', this.endValue, this.end) },
+        getHour(timeStr) { return this.slots.indexOf(timeStr) }
     },
     created() {
-        if (this.from) this.start = this.slots.indexOf(this.from)
+        if (this.from) this.start = typeof this.from == 'string' ? this.slots.indexOf(this.from) : this.from
         // else this.callStartChange()
 
-        if (this.to) this.end = this.slots.indexOf(this.to)
+        if (this.to) this.end = typeof this.to == 'string' ? this.slots.indexOf(this.to) : this.to
         // else this.callEndChange()
     },
     mounted() {
@@ -171,3 +122,58 @@ export default {
     }
 }
 </script>
+
+
+<style lang="scss">
+$primary: #ed762c;
+$buffer: #32313d;
+
+.time-slider {
+    position: relative;
+    width: 400px;
+    padding: 20px 0;
+
+    .slot-holder {
+        position: relative;
+        height: 4px;
+        border-radius: 2px;
+        background-color: $buffer;
+
+        .slot-selected {
+            position: absolute;
+            top: 0;
+            background-color: $primary;
+            height: 4px;
+            border-radius: 2px;
+            transition: all .14s;
+        }
+
+        .slot-thumb {
+            position: absolute;
+            display: block;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: $primary;
+            cursor: pointer;
+            transition: all .14s;
+
+            .range-label {
+                position: absolute;
+                left: 50%;
+                white-space: nowrap;
+                top: 24px;
+                font-size: 14px;
+                pointer-events: none;
+                transform: translateX(-50%);
+            }
+
+            &:active {
+                background-color: darken($color: $primary, $amount: 5%);
+            }
+        }
+    }
+}
+</style>

@@ -7,6 +7,8 @@ export default function hierarchyBarChart(wrapper, data, options) {
         callbacks = config.events,
         averaged = average(data)
 
+    container.html('')
+
     let root = d3.hierarchy(averaged)
             // .sum(d => d.value)
             // .sort((a, b) => b.value - a.value)
@@ -43,6 +45,8 @@ export default function hierarchyBarChart(wrapper, data, options) {
         if (ds.value) {
             return ds
         }
+
+        if (!ds.children) return ds
 
         const children = ds.children.map(average)
 
@@ -121,6 +125,8 @@ export default function hierarchyBarChart(wrapper, data, options) {
             return callbacks && callbacks.routeTo.call(d, d.data.route)
         }
 
+        if (callbacks && callbacks.breakBar) callbacks.breakBar.call(d, d.data)
+
         if (!d.children || d3.active(svg.node())) return;
 
         // Rebind the current node to the background.
@@ -185,9 +191,11 @@ export default function hierarchyBarChart(wrapper, data, options) {
 
     function up(svg, d) {
         if (!d.parent || !svg.selectAll(".exit").empty()) {
-            if (callbacks && callbacks.goBack) callbacks.goBack.call(this)
+            // if (callbacks && callbacks.goBack) callbacks.goBack.call(this)
             return
         }
+
+        if (callbacks && callbacks.mergeBar) callbacks.mergeBar.call(d.parent, d.parent.data)
 
         // Rebind the current node to the background.
         svg.select(".background").datum(d.parent);

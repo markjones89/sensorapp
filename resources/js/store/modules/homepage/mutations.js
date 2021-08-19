@@ -3,16 +3,18 @@ const setSummary = (state, summary) => {
 }
 
 const setRange = (state, range) => {
-    state.rangeFilter = range
+    state.rangeFilter.type = range.type
+    state.rangeFilter.start = range.start
+    state.rangeFilter.end = range.end
 }
 
 const setLocation = (state, location) => {
     state.locationFilter = location
 }
 
-const setTime = (state, timeFilter) => {
-    state.startTime = timeFilter.start
-    state.endTime = timeFilter.end
+const setTime = (state, time) => {
+    if (typeof time.start !== 'undefined') state.startTime = time.start
+    if (typeof time.end !== 'undefined') state.endTime = time.end
 }
 
 const setPeriod = (state, minute) => {

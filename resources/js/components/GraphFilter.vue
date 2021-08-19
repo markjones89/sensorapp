@@ -42,10 +42,10 @@ export default {
         selected: null
     }),
     methods: {
-        onSelect(value, label) { 
+        onSelect(value, label, item) { 
             this.selected = value
             this.selectedLabel = label || value
-            this.$emit('onSelect', value, label)
+            this.$emit('onSelect', value, label, item)
         },
         handleClose(e) {
             let _ = this
