@@ -258,3 +258,23 @@ export function toHour(timeStr) {
         '12:00 pm', '1:00 pm', '2:00 pm', '3:00 pm', '4:00 pm', '5:00 pm', '6:00 pm', '7:00 pm', '8:00 pm', '9:00 pm', '10:00 pm', '11:00 pm'
     ].indexOf(timeStr)
 }
+
+/**
+ * Returns ISO string of the date (starting time 00)
+ * @param {Date} date Date object
+ */
+export function toISOStart(date) {
+    let month = `0${date.getMonth() + 1}`.substr(-2, 2),
+        day = `0${date.getDate()}`.substr(-2, 2)
+    return `${date.getFullYear()}-${month}-${day}T00:00:00Z`
+}
+
+/**
+ * Returns ISO string of the date (end time 23)
+ * @param {Date} date Date object
+ */
+export function toISOEnd(date) {
+    let iso = date.toISOString(),
+        dateStr = iso.split('T')[0]
+    return `${dateStr}T23:00:00Z`
+}

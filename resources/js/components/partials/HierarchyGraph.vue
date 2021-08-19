@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 import { Loader } from '@/components'
 import { getObjValue, toOrdinal } from '@/helpers'
 import hierarchyBarChart from '@/components/graphs/HierarchyBar'

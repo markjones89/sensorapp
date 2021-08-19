@@ -48,7 +48,7 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import { addEvent, removeEvent, toHour } from '@/helpers'
+import { addEvent, removeEvent, toHour, toISOStart, toISOEnd } from '@/helpers'
 import { DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
 import { CirclePackStats } from '@/components/partials'
 import { format as d3Format } from 'd3-format'
@@ -131,8 +131,8 @@ export default {
         rangeSelect(range, from, to) {
             this.dataLoaded = false
             this.setRange({ type: range, start: from.toISOString(), end: to.toISOString() })
-            this.dataFilters.start_date = from.toISOString()
-            this.dataFilters.stop_date = to.toISOString()
+            this.dataFilters.start_date = toISOStart(from)//from.toISOString()
+            this.dataFilters.stop_date = toISOEnd(to)//to.toISOString()
         },
         filterSelect(filter) {
             this.filter = filter
@@ -187,9 +187,9 @@ export default {
                 start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
                 end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
 
-            this.dataFilters.start_date = start.toISOString()
-            this.dataFilters.stop_date = end.toISOString()
-            this.setRange({ type: 'today', start: start.toISOString(), end: end.toISOString() })
+            this.dataFilters.start_date = toISOStart(start)
+            this.dataFilters.stop_date = toISOEnd(end)
+            this.setRange({ type: 'today', start: toISOStart(start), end: toISOEnd(end) })
         } else {
             this.dataFilters.start_date = this.rangeFilter.start
             this.dataFilters.stop_date = this.rangeFilter.end

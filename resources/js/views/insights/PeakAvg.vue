@@ -53,7 +53,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import { getBaseUrl, toHour } from '@/helpers'
+import { getBaseUrl, toHour, toISOStart, toISOEnd } from '@/helpers'
 import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from "@/components"
 import { HierarchyGraph } from '@/components/partials'
 import { CaretIcon, CaretLeftIcon } from "@/components/icons"
@@ -127,8 +127,8 @@ export default {
         },
         rangeSelect(range, from, to) {
             this.dataLoaded = false
-            this.dataFilters.start_date = from.toISOString()
-            this.dataFilters.stop_date = to.toISOString()
+            this.dataFilters.start_date = toISOStart(from)
+            this.dataFilters.stop_date = toISOEnd(to)
         },
         chartLoaded(custData, floorSummary, fromCache) {
             if (!fromCache) {
@@ -200,8 +200,8 @@ export default {
                 end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
             
             this.rangeFilter.type = 'today'
-            this.rangeFilter.start = this.dataFilters.start_date = start.toISOString()
-            this.rangeFilter.end = this.dataFilters.stop_date = end.toISOString()
+            this.rangeFilter.start = this.dataFilters.start_date = toISOStart(start)
+            this.rangeFilter.end = this.dataFilters.stop_date = toISOEnd(end)
         }
 
         if (this.cp_start_time) {

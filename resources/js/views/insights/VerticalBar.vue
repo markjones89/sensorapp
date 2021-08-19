@@ -1,14 +1,15 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <date-range-toggle @select="rangeSelect" />
+            <date-range-toggle @select="rangeSelect" :active="rangeFilter.type" />
             <div class="graph-filters">
-                <span class="graph-filter">
+                <!-- <span class="graph-filter">
                     Select Location
                     <span class="caret">
                         <caret-icon />
                     </span>
-                </span>
+                </span> -->
+                <graph-filter placeholder="Select Location" :filters="locations" :chosen="locFilter" :chosenAsSelected="true" @onSelect="selectLocation" />
                 <a href="javascript:;" class="btn btn-primary ml-12" @click="viewCostAnalysis">Cost Analysis</a>
             </div>
             <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
@@ -34,21 +35,11 @@
                 </div>
             </div>
             <!-- graph & legends here -->
-            <div class="chart-header">
-                <span class="chart-title">Building Name, Ground Floor Peak Performance</span>
-                <!-- <span class="chart-subtitle">Click the orange bar for more info or click the blank space to go back</span> -->
-            </div>
-            <div id="bar-chart" class="bar-chart"></div>
+            <vertical-graph :buildingData="building" :rangeFilter="rangeFilter.type" :roomFilter="locFilter" :dataFilters="dataFilters" />
             <div class="bottom-filters">
-                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                <time-slider :from="timeFilter.start" :to="timeFilter.end"
                     @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-                <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
-                    {{ minuteFilter ? minuteFilter : 'Select' }}
-                    <span class="caret">
-                        <caret-icon />
-                    </span>
-                    <filter-dropdown :filters="minuteFilters" position="top" :show="showMinuteFilter" @onSelect="filterMinute" />
-                </span>
+                <graph-filter :filters="minuteFilters" :chosen="minuteFilter" :chosenAsSelected="true" position="top" @onSelect="filterMinute" />
             </div>
         </div>
         <div class="graph-footer">
@@ -62,88 +53,58 @@
         </div>
     </div>
 </template>
-<style lang="scss">
-.bar-chart svg {
-    pointer-events: initial;
-}
-</style>
+
 <script>
 import { mapState } from "vuex";
-import { getBaseUrl } from '../../helpers'
-import { Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "../../components"
-import { CaretIcon, CaretLeftIcon } from "../../components/icons"
-import barChart from '../../components/graphs/BarChart'
-
-function randomNum(limit) {
-    return Math.floor((Math.random() * (limit || 100)) + 1)
-}
-
-function randomData (range) {
-    let data = []
-    if (range === 'today') {
-        let hours = []
-
-        for (let i = 0; i < 24; i++) { hours.push(`${("00" + i).substr(-2,2)}:00`) }
-
-        hours.forEach(h => {
-            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
-
-            data.push({ Hour: h, Peak: peak, Average: avg })
-        })
-    } else if (range === 'week') {
-        let days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-        days.forEach(d => {
-            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
-
-            data.push({ Day: d, Peak: peak, Average: avg })
-        })
-    } else if (range === 'month') {
-        let now = new Date(),
-            days = (new Date(now.getFullYear(), now.getMonth() + 1, 0)).getDate(),
-            dates = [],
-            month = now.toString().substr(4,3)
-
-        for (let i = 1; i <= days; i++) {
-            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
-
-            data.push({ Date: `${month} ${i}`, Peak: peak, Average: avg })
-        }
-    } else if (range === 'year') {
-        let months = ['Jan', 'Feb', 'March', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-        months.forEach(m => {
-            let avg = randomNum(90), peak = avg + randomNum(100 - avg)
-
-            data.push({ Month: m, Peak: peak, Average: avg })
-        })
-    }
-
-    return data
-}
+import { getBaseUrl } from '@/helpers'
+import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
+import { VerticalGraph } from '@/components/partials'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
 
 export default {
     title: 'Bar Chart',
-    components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
-    data() {
-        return {
-            // user: null,
-            showPageOpts: false, showEmbed: false,
-            chart: null,
-            timeFilter: {
-                start: null, end: null
-            },
-            minuteFilter: '10 minutes', showMinuteFilter: false
-        }
+    components: {
+        CaretIcon,
+        CaretLeftIcon,
+        Checkbox,
+        DateRangeToggle,
+        GraphFilter,
+        Modal,
+        TimeSlider,
+        VerticalGraph
     },
+    data: () => ({
+        showPageOpts: false, showEmbed: false,
+        building: null,
+        locations: [], locFilter: null,
+        rangeFilter: { type: 'today', start: null, end: null },
+        timeFilter: { start: null, end: null },
+        minuteFilter: 60,
+        dataFilters: {
+            trigger: 6,
+            start_hour: 8,
+            stop_hour: 16,
+            start_date: '',
+            stop_date: '',
+            node_type: 'Customer',
+            node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
+        }
+    }),
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user,
+            company: state => state.user.company,
+            settings: state => state.user.company ? state.user.company.settings : null,
+            cp_range: state => state.homepage.rangeFilter,
+            cp_start_time: state => state.homepage.startTime,
+            cp_end_time: state => state.homepage.endTime,
+            peakSummary: state => state.peakchart.summary
         }),
         baseUrl() { return getBaseUrl() },
         settings() { return this.user.company ? this.user.company.settings : null },
         minuteFilters() {
-            var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            // var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
+            var minutes = [60];
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
         }
@@ -152,32 +113,51 @@ export default {
         backTo() { this.$router.back() },
         rangeSelect(range, from, to) {
             // console.log('rangeSelect', range, from, to)
-            this.chart.update(randomData(range))
+            // console.log('rangeSelect', this.rangeFilter)
+            this.rangeFilter.type = range
+            this.dataFilters.start_date = from.toISOString()
+            this.dataFilters.stop_date = to.toISOString()
         },
-        viewCostAnalysis() {
-            this.$router.push({ name: 'cost-analysis' })
+        selectLocation(value, label, item) {
+            console.log('selectLocation', value, label, item)
+            this.locFilter = value
         },
+        viewCostAnalysis() { this.$router.push({ name: 'cost-analysis' }) },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
         },
-        renderChart() {
-            this.chart = new barChart('#bar-chart', randomData('today'))
+        timeStartChange(time, hour) {
+            // this.timeFilter.start = time
+            this.dataFilters.start_hour = hour
         },
-        timeStartChange(time) { this.timeFilter.start = time },
-        timeEndChange(time) { this.timeFilter.end = time },
+        timeEndChange(time, hour) {
+            // this.timeFilter.end = time
+            this.dataFilters.stop_hour = hour
+        },
         filterMinute(minute) {
-            var min = this.minuteFilters.find(m => m.value == minute);
-
-            this.showMinuteFilter = false;
-            this.minuteFilter = min.label;
+            this.minuteFilter = minute;
         },
         toLive() {
             this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
         }
     },
-    mounted() {
-        this.renderChart()
+    created() {
+        let query = this.$route.query
+        let hasQuery = query.building && query.floor
+
+        if (this.peakSummary && hasQuery) {
+            let summary = JSON.parse(JSON.stringify(this.peakSummary))
+            let building = summary.find(x => x.building_name == query.building)
+
+            this.building = building
+        }
     }
 }
 </script>
+
+<style lang="scss">
+.bar-chart svg {
+    pointer-events: initial;
+}
+</style>
