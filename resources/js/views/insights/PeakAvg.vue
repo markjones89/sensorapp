@@ -32,7 +32,8 @@
             <hierarchy-graph
                 :custData="summary" :floorData="peakSummary"
                 :locFilter="locationFilter" :dataFilters="dataFilters"
-                @dataLoaded="chartLoaded" />
+                @dataLoaded="chartLoaded"
+                @routeTo="graphRoute" />
             <div class="bottom-filters">
                 <time-slider :from="timeFilter.start" :to="timeFilter.end"
                     @startChanged="timeStartChange" @endChanged="timeEndChange" />
@@ -180,6 +181,10 @@ export default {
         filterMinute(minute) {
             this.minuteFilter = minute
             // this.dataFilters.trigger = minute
+        },
+        graphRoute(route, query) {
+            // console.log('graph', route, query)
+            this.$router.push({ name: route, query })
         },
         viewCostAnalysis() {
             this.$router.push({ name: 'cost-analysis' })

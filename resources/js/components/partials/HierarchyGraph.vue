@@ -117,7 +117,12 @@ export default {
                                 // console.log('areas.forEach', area, c)
                                 return {
                                     name: area.group_id,
-                                    value: getObjValue(area, dataKey) || 0
+                                    value: getObjValue(area, dataKey) || 0,
+                                    route: 'bar-chart',
+                                    routeParams: {
+                                        building: a.building_name,
+                                        floor: floor.name
+                                    }
                                 }
                             })
 
@@ -229,9 +234,9 @@ export default {
                             // goBack: () => {
                             //     this.$router.back()
                             // },
-                            // routeTo: (route) => {
-                            //     this.$router.push({ name: route })
-                            // }
+                            routeTo: (node) => {
+                                this.routeTo(node.route, node.routeParams)
+                            },
                             breakBar: (bar) => {
                                 // console.log('breakBar', bar)
                                 if (bar.title) this.graphTitle = bar.title
@@ -250,6 +255,9 @@ export default {
                 this.dataError = 'Unable to retrieve data, please try again'
                 this.dataLoaded = true
             }
+        },
+        routeTo(route, params) {
+            this.$emit('routeTo', route, params)
         }
     },
     mounted() {

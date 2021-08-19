@@ -91,12 +91,13 @@ export default {
         //     if (this.chart) this.chart.update(randomData(value))
         // },
         roomFilter(value) {
+            this.graphTitle = value
             if (this.chart) this.chart.update(randomData(this.rangeFilter))
         },
         dataFilters: {
             deep: true,
             handler() {
-                console.log('watch.dataFilters', arguments)
+                // console.log('watch.dataFilters', arguments)
                 if (this.chart) this.chart.update(randomData(this.rangeFilter))
             }
         }
@@ -104,6 +105,13 @@ export default {
     methods: {
         renderChart() {
             this.chart = new barChart('#bar-chart', randomData(this.rangeFilter))
+        }
+    },
+    created() {
+        if (this.buildingData) {
+            // console.log('created', this.buildingData)
+            // this.graphTitle = this.buildingData.building_name
+            if (this.roomFilter) this.graphTitle = this.roomFilter
         }
     },
     mounted() {

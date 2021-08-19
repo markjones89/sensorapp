@@ -130,7 +130,7 @@ export default {
         },
         rangeSelect(range, from, to) {
             this.dataLoaded = false
-            this.setRange({ type: range, start: from.toISOString(), end: to.toISOString() })
+            this.setRange({ type: range, start: toISOStart(from), end: toISOEnd(to) })
             this.dataFilters.start_date = toISOStart(from)//from.toISOString()
             this.dataFilters.stop_date = toISOEnd(to)//to.toISOString()
         },

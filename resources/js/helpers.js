@@ -274,7 +274,7 @@ export function toISOStart(date) {
  * @param {Date} date Date object
  */
 export function toISOEnd(date) {
-    let iso = date.toISOString(),
-        dateStr = iso.split('T')[0]
-    return `${dateStr}T23:00:00Z`
+    let month = `0${date.getMonth() + 1}`.substr(-2, 2),
+        day = `0${date.getDate()}`.substr(-2, 2)
+    return `${date.getFullYear()}-${month}-${day}T23:00:00Z`
 }

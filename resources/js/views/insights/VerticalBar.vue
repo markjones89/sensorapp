@@ -56,7 +56,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { getBaseUrl } from '@/helpers'
+import { getBaseUrl, toOrdinal } from '@/helpers'
 import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
 import { VerticalGraph } from '@/components/partials'
 import { CaretIcon, CaretLeftIcon } from '@/components/icons'
@@ -119,7 +119,7 @@ export default {
             this.dataFilters.stop_date = to.toISOString()
         },
         selectLocation(value, label, item) {
-            console.log('selectLocation', value, label, item)
+            // console.log('selectLocation', value, label, item)
             this.locFilter = value
         },
         viewCostAnalysis() { this.$router.push({ name: 'cost-analysis' }) },
@@ -150,7 +150,13 @@ export default {
             let summary = JSON.parse(JSON.stringify(this.peakSummary))
             let building = summary.find(x => x.building_name == query.building)
 
-            this.building = building
+            if (building) {
+                this.building = building
+                this.locations = building.floor_summary.map(f => {
+                    return `${toOrdinal(f.floor)} Floor ${building.building_name}`
+                })
+                this.locFilter = `${query.floor} ${query.building}`
+            }
         }
     }
 }

@@ -122,7 +122,7 @@ export default function hierarchyBarChart(wrapper, data, options) {
 
     function down(svg, d) {
         if (d.data.route) {
-            return callbacks && callbacks.routeTo.call(d, d.data.route)
+            return callbacks && callbacks.routeTo.call(d, d.data)
         }
 
         if (callbacks && callbacks.breakBar) callbacks.breakBar.call(d, d.data)
