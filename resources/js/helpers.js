@@ -260,6 +260,20 @@ export function toHour(timeStr) {
 }
 
 /**
+ * Return the time string based on the given hour
+ * @param {Number} hour Hour value
+ */
+export function hourStr(hour, hourOnly = false, uppercase = false) {
+    let str = hourOnly ?
+    ['12 am', '1 am', '2 am', '3 am', '4 am', '5 am', '6 am', '7 am', '8 am', '9 am', '10 am', '11 am', 
+        '12 pm', '1 pm', '2 pm', '3 pm', '4 pm', '5 pm', '6 pm', '7 pm', '8 pm', '9 pm', '10 pm', '11 pm'][hour] :
+    ['12:00 am', '1:00 am', '2:00 am', '3:00 am', '4:00 am', '5:00 am', '6:00 am', '7:00 am', '8:00 am', '9:00 am', '10:00 am', '11:00 am', 
+        '12:00 pm', '1:00 pm', '2:00 pm', '3:00 pm', '4:00 pm', '5:00 pm', '6:00 pm', '7:00 pm', '8:00 pm', '9:00 pm', '10:00 pm', '11:00 pm'][hour]
+
+    return uppercase ? str.toUpperCase() : str
+}
+
+/**
  * Returns ISO string of the date (starting time 00)
  * @param {Date} date Date object
  */
@@ -277,4 +291,57 @@ export function toISOEnd(date) {
     let month = `0${date.getMonth() + 1}`.substr(-2, 2),
         day = `0${date.getDate()}`.substr(-2, 2)
     return `${date.getFullYear()}-${month}-${day}T23:00:00Z`
+}
+
+/**
+ * Returns the start and end date of the specified year & month (ISO start & end format)
+ * @param {Number} year Year (4-digit)
+ * @param {Number} month Month (0 - 11)
+ */
+export function getMonthRange(year, month) {
+    let startDate = new Date(year, month, 1)
+    let endDate = new Date(year, month + 1, 0)
+
+    return {
+        start : toISOStart(startDate),
+        end: toISOEnd(endDate)
+    }
+}
+
+/**
+ * Returns the month name
+ * @param {Number} month Month number value
+ */
+export function getMonthName(month) {
+    return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][month]
+}
+
+/**
+ * Returns the (whole number) percent value
+ * @param {Float32Array} value Decimal value
+ */
+export function toPercent(value) {
+    let percent = value * 100
+
+    return Math.round(percent)
+}
+
+/**
+ * Returns the (whole number) percent string
+ * @param {Float32Array} value Decimal value
+ */
+export function toPercentStr(value) {
+    let percent = value * 100
+
+    return `${Math.round(percent)}%`
+}
+
+/**
+ * Rounds the specified value
+ * @param {Float} value Value to round
+ * @param {Number} precision Decimal place precision
+ */
+export function roundNum(value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
 }

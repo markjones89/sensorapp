@@ -18,6 +18,10 @@ Route::get('/widgets/{url}', 'AppController@index') //AppController@widget
     ->where(['url' => 'timechart|live'])
     ->name('widget');
 
+Route::get('/report/{url}', 'AppController@index') //AppController@widget
+    ->where(['url' => 'utilisation'])
+    ->name('report');
+
 Route::get('/profile/authenticated', 'AuthController@getAuthenticatedUser');    // for axios call
 
 Route::middleware(['guest'])->group(function(){

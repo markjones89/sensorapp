@@ -21,7 +21,7 @@
     width: 100%;
 
     #login-wrapper {
-        width: 300px;
+        width: 350px;
         margin: 0 auto;
         background-color: #282737;
         padding: 24px;

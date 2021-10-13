@@ -35,6 +35,20 @@ const api_customer_summary = state => `${state.url}/api/summary/customer`
 
 const api_graph_view = state => `${state.url}/api/summary/graph_view`
 
+const api_monthly_workspace_utils_rpt = state => `${state.url}/api/filters/desk_area/workspace_utils_daily`
+
+const api_monthly_room_utils_rpt = state => `${state.url}/api/filters/meeting_room/hourly_room_in_use_stat`
+
+const api_hourly_room_utils_rpt = state => `${state.url}/api/filters/meeting_room/hourly_room_in_use_detail`
+
+const api_room_vs_meeting_size_rpt = state => `${state.url}/api/filters/meeting_room/room_size_vs_meeting_size`
+
+const api_room_util_vs_hours_rpt = state => `${state.url}/api/filters/meeting_room/room_in_use_vs_total_hour`
+
+const api_room_supply_vs_size = state => `${state.url}/api/filters/meeting_room/room_supply_vs_overall_meeting_size`
+
+const api_room_util_vs_efficiency = state => `${state.url}/api/filters/meeting_room/room_utilisation_vs_efficiency`
+
 export default {
     /** API request header (plus auth token) */
     api_header,
@@ -63,5 +77,19 @@ export default {
     /** Customer API (home page circle pack) */
     api_customer_summary,
     /** Customer API (bar charts - floor summary) */
-    api_graph_view
+    api_graph_view,
+    /** Utilisation report (workspace utilisation page 2-4) */
+    api_monthly_workspace_utils_rpt,
+    /** Utilisation report (meeting room utilisation page 5-7) */
+    api_monthly_room_utils_rpt,
+    /** Utilisation report (meeting room utilisation page 8) */
+    api_hourly_room_utils_rpt,
+    /** Utilisation report (room vs meeting size page 9) */
+    api_room_vs_meeting_size_rpt,
+    /** Utilisation report (room supply vs meeting size page 10) */
+    api_room_supply_vs_size,
+    /** Utilisation report (room util vs effeciency page 11-12) */
+    api_room_util_vs_efficiency,
+    /** Utilisation report (room util vs total hours page 13) */
+    api_room_util_vs_hours_rpt
 }

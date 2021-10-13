@@ -23,6 +23,7 @@
     "/js/views/insights/wfh.js": "/js/views/insights/wfh.js",
     "/js/views/login.js": "/js/views/login.js",
     "/js/views/profile.js": "/js/views/profile.js",
+    "/js/views/reports/utilisation.js": "/js/views/reports/utilisation.js",
     "/js/views/reset.js": "/js/views/reset.js",
     "/js/views/verify.js": "/js/views/verify.js",
     "/js/views/widgets/timechart.js": "/js/views/widgets/timechart.js",

@@ -43,18 +43,51 @@
         <div class="graph-footer">
             <div class="left-options">
                 <button class="btn btn-primary btn-small" @click="toLive">Live</button>
-                <button class="btn btn-primary btn-small">Insights</button>
+                <button class="btn btn-primary btn-small"
+                    @click="showReport(true)"
+                    v-if="locationFilter && locationFilter.building">
+                    Report
+                </button>
             </div>
             <div class="right-options">
                 <checkbox label="Save to report" />
             </div>
         </div>
+        <modal :show="filterReport" @close="showReport(false)">
+            <template v-slot:header>
+                <h2>Utilisation Report</h2>
+            </template>
+            <div>
+                <div class="row">
+                    <div class="col">
+                        <div class="input-field">
+                            <label>Year</label>
+                            <input type="number" v-model="rptFilters.year" ref="rptYear">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-field">
+                            <label>Month</label>
+                            <select v-model="rptFilters.month">
+                                <option v-for="(m, i) in monthList" :key="i"
+                                    :value="i">
+                                    {{ m }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <template v-slot:footer>
+                <button class="btn btn-primary" @click="viewReport">View report</button>
+            </template>
+        </modal>
     </div>
 </template>
 
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import { getBaseUrl, toHour, toISOStart, toISOEnd } from '@/helpers'
+import { getBaseUrl, toHour, toISOStart, toISOEnd, getMonthRange } from '@/helpers'
 import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from "@/components"
 import { HierarchyGraph } from '@/components/partials'
 import { CaretIcon, CaretLeftIcon } from "@/components/icons"
@@ -87,6 +120,12 @@ export default {
             stop_date: '',
             node_type: 'Customer',
             node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
+        },
+        filterReport: false,
+        monthList: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        rptFilters: {
+            year: 0,
+            month: 0
         }
     }),
     computed: {
@@ -152,9 +191,12 @@ export default {
                     locations.push({ label: city, value: city, city: true })
 
                     locations.push(...buildings.filter(x => x.building_country == country && x.building_city == city).map(x => {
+                        let bldgInfo = floorSummary.find(i => i.building_name == x.building_name)
+
                         return {
                             label: x.building_name,
                             value: x.building_name,
+                            id: bldgInfo?.building_id,
                             building: true
                         }
                     }).sort())
@@ -191,17 +233,38 @@ export default {
         },
         toLive() {
             this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
+        },
+        showReport(show) {
+            this.filterReport = show
+
+            if (show) {
+                setTimeout(() => { this.$refs.rptYear.focus() }, 0)
+            }
+        },
+        viewReport() {
+            let query = {
+                cid: this.company.ref_id,
+                bid: this.locationFilter.id,
+                y: this.rptFilters.year,
+                m: this.rptFilters.month,
+                sh: this.dataFilters.start_hour,
+                eh: this.dataFilters.stop_hour
+            }
+            let route = this.$router.resolve({ name: 'utilisation-rpt', query })
+
+            window.open(route.href, '_blank')
         }
     },
     created() {
+        let now = new Date()
+
         if (this.cp_range.type) {
             this.rangeFilter = JSON.parse(JSON.stringify(this.cp_range))
             this.dataFilters.start_date = this.rangeFilter.start
             this.dataFilters.stop_date = this.rangeFilter.end
         }
         else {
-            let now = new Date(),
-                start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+            let start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
                 end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
             
             this.rangeFilter.type = 'today'
@@ -227,6 +290,9 @@ export default {
         }
 
         if (this.company && this.company.ref_id) this.dataFilters.node_id = this.company.ref_id
+
+        this.rptFilters.year = now.getFullYear()
+        this.rptFilters.month = now.getMonth()
     },
     mounted() {}
 }
