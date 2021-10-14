@@ -13,7 +13,7 @@
                 </div>
                 <div class="chart-holder" v-else-if="dataLoaded">
                     <apexchart type="bar" height="400" :options="graphOptions" :series="graphSeries"></apexchart>
-                    <p>Footer here...</p>
+                    <p v-if="footerRoom">{{ footerRoom.name }} {{ footerRoom.room_size }} Seater Meeting Room was utilised {{ footerRoom.avgUtil }}% of the time, whilst averaging {{ footerRoom.avgEfficiency }}% efficiency in terms of capacity</p>
                 </div>
             </div>
             <div class="col-3">
@@ -61,7 +61,8 @@ export default {
         insights: {
             avgUtil: 0,
             avgEfficiency: 0
-        }
+        },
+        footerRoom: null
     }),
     computed: {
         ...mapGetters({
@@ -94,7 +95,7 @@ export default {
                     min: 0,
                     max: this.maxData,
                     labels: {
-                        formatter: function (value) { return Math.round(value) + "%" }
+                        formatter: function (value) { return value + "%" }
                     }
                 },
                 xaxis: {
@@ -102,7 +103,7 @@ export default {
                     labels: {
                         // rotate: -45,
                         style: {
-                            fontSize: '10px'
+                            fontSize: '9px'
                         }
                     }
                 }
@@ -113,16 +114,28 @@ export default {
         async getData() {
             try {
                 let { data } = await axios.post(this.api_room_util_vs_efficiency, this.query, this.api_header())
-                let rooms = [...new Set(data.map(x => x.group_id))]
+
+                data.detail.sort((a, b) => a.room_size - b.room_size)
+
+                let rooms = [...new Set(data.detail.map(x => [x.group_id, `${x.room_size} PAX`]))]
                 let utilData = []
                 let efficiencyData = []
 
                 rooms.forEach(r => {
-                    let _data = data.find(x => x.group_id == r)
+                    let _data = data.detail.find(x => x.group_id == r[0])
                     
                     if (_data) {
                         utilData.push(roundNum(_data.meeting_room_occupancy.average_percentage, 1))
                         efficiencyData.push(roundNum(_data.meeting_room_efficiency.average_percentage, 1))
+
+                        if (_data.room_size >= 4 && this.footerRoom == null) {
+                            this.footerRoom = {
+                                name: _data.group_id,
+                                room_size: _data.room_size,
+                                avgUtil: roundNum(_data.meeting_room_occupancy.average_percentage, 1),
+                                avgEfficiency: roundNum(_data.meeting_room_efficiency.average_percentage, 1)
+                            }
+                        }
                     }
                 })
 
@@ -138,8 +151,8 @@ export default {
                     }
                 ]
                 this.maxData = Math.max(Math.ceil(Math.max(...utilData, ...efficiencyData) / 10) * 10, 10)
-                this.insights.avgUtil = roundNum(average(utilData), 1)
-                this.insights.avgEfficiency = roundNum(average(efficiencyData), 1)
+                this.insights.avgUtil = roundNum(data.insight.average_utils, 1)
+                this.insights.avgEfficiency = roundNum(data.insight.average_efficiency, 1)
 
                 this.dataLoaded = true
                 this.dataError = false

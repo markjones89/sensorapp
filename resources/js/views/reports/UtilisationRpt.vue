@@ -53,8 +53,8 @@
                     :api="api_room_vs_meeting_size_rpt"
                     :query="rptApiParams('Building', bid)"
                     :footer="roomSizeVSMeetingSizeFooter"
-                    colKey="meeting_size"
-                    rowKey="room_size"
+                    colKey="meeting_type"
+                    rowKey="room_type"
                     valKey="percentage"
                     @dataLoaded="roomMeetingSizeLoaded" />
                 <m-r-supply-vs-meeting-size :query="rptApiParams('Building', bid)"/>
@@ -79,7 +79,7 @@ import {
     MeetingRoomPerformance
 } from '@/components/partials'
 import { RippleLoader } from '@/components/loader'
-import { toOrdinal, hourStr, getMonthRange, getMonthName, getBaseUrl, roundNum } from '@/helpers'
+import { toOrdinal, hourStr, getMonthRange, getMonthName, getBaseUrl, roundNum, getRoomSize, getMeetingSize, padNum } from '@/helpers'
 import VueApexCharts from 'vue-apexcharts'
 export default {
     title: 'Intuitive Report',
@@ -109,7 +109,7 @@ export default {
         company: null,
         building: null,
         floorWorkUtils: [],
-        roomSizeVSMeetingSizeFooter: 'Footer here...'
+        roomSizeVSMeetingSizeFooter: null
     }),
     computed: {
         ...mapState({
@@ -184,8 +184,19 @@ export default {
         },
         ordinalFloor(floor) { return `${toOrdinal(floor)} Floor` },
         roomMeetingSizeLoaded(data) {
+            data.sort((a, b) => {
+                let aRoomSize = a.room_type.indexOf('(') >= 0 ? padNum(getRoomSize(a.room_type), 3) : a.room_type
+                let aPAX = padNum(getMeetingSize(a.meeting_type), 3)
+                let aSort = `${aRoomSize} | ${aPAX}`
+                let bRoomSize = b.room_type.indexOf('(') >= 0 ? padNum(getRoomSize(b.room_type), 3) : b.room_type
+                let bPAX = padNum(getMeetingSize(b.meeting_type), 3)
+                let bSort = `${bRoomSize} | ${bPAX}`
+
+                return aSort > bSort ? 1 : aSort < bSort ? -1 : 0
+            })
+
             let oneTwoSum = roundNum(data
-                .filter(x => { return x.room_size == 'Overall Meeting Sizes' && ['1 PAX Meeting Sizes', '2 PAX Meeting Sizes'].indexOf(x.meeting_size) >= 0 })
+                .filter(x => { return x.room_type == 'Overall' && ['1 PAX Meeting Sizes', '2 PAX Meeting Sizes'].indexOf(x.meeting_type) >= 0 })
                 .map(x => x.percentage).reduce((a, b) => a + b), 1)
 
             this.roomSizeVSMeetingSizeFooter = `1 and 2 person meetings make up ${oneTwoSum}% of all meeting sizes`

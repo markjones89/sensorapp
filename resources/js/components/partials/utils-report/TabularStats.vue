@@ -25,7 +25,7 @@
                 </tr>
             </tbody>
         </table>
-        <p>{{ footer }}</p>
+        <p v-if="footer" class="table-footer">{{ footer }}</p>
     </div>
 </template>
 
@@ -37,7 +37,7 @@ export default {
     name: 'TabularStats',
     props: {
         title: { type: String, required: true },
-        footer: { type: String, default: 'Footer here...' },
+        footer: { type: String },
         api: { type: String, required: true },
         query: { type: Object, required: true },
         colKey: { type: String, required: true },
@@ -60,6 +60,9 @@ export default {
         async getData() {
             try {
                 let { data } = await axios.post(this.api, this.query, this.api_header())
+
+                this.$emit('dataLoaded', data)
+                
                 let colHeaders = [...new Set(data.map(x => { return x[this.colKey] }))]
                 let rowHeaders = [...new Set(data.map(x => { return x[this.rowKey] }))]
                 let rows = []
@@ -68,14 +71,14 @@ export default {
                     let rowData =  []
                     colHeaders.forEach(c => {
                         let rd = data.find(x => x[this.colKey] == c && x[this.rowKey] == r)
-                        let value = rd[this.valKey]
+                        let value = 0
 
-                        if (rd) {
-                            rowData.push({
-                                key: `${c}:${r}:${value}`,
-                                value: value ? `${roundNum(value, 1)}%` : null
-                            })
-                        }
+                        if (rd) value = rd[this.valKey]
+
+                        rowData.push({
+                            key: `${c}:${r}:${value}`,
+                            value: rd ? `${roundNum(value, 1)}%` : null
+                        })
                     })
 
                     rows.push({
@@ -90,11 +93,10 @@ export default {
                 }
                 this.dataLoaded = true
                 this.dataError = false
-
-                this.$emit('dataLoaded', data)
             } catch (error) {
                 this.dataLoaded = true
                 this.dataError = true
+                console.log('getData.error', error)
             }
         },
         retry() {
@@ -134,6 +136,11 @@ export default {
                 background-color: rgb(246,29,29);
             }
         }
+    }
+
+    .table-footer {
+        width: 90%;
+        margin: 0 auto;
     }
 }
 </style>

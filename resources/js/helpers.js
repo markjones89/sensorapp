@@ -345,3 +345,30 @@ export function roundNum(value, precision) {
     var multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
 }
+
+export function getRoomSize(type) {
+    if (type === "Phone room (1)") return 1
+    else if (type === "1:1 Room (2)") return 2
+    else if (type === "XS (3-5)") return 5
+    else if (type === "Small (6-11)") return 11
+    else if (type === "Medium (11-19)") return 19
+    else if (type === "Large (20+)") return 20
+}
+
+export function getMeetingSize(type) {
+    if (type === "1 PAX Meeting Sizes") return 1
+    else if (type === "2 PAX Meeting Sizes") return 2
+    else if (type === "3-5 PAX Meeting Sizes") return 5
+    else if (type === "6-11 PAX Meeting Sizes") return 11
+    else if (type === "12-19 PAX Meeting Sizes") return 19
+    else if (type === "20+ PAX Meeting Sizes") return 20
+}
+
+/**
+ * Returns padding number string
+ * @param {Number} num Number to pad with zero ('0')
+ * @param {Number} padding Number of zero ('0') padding
+ */
+export function padNum(num, padding) {
+    return (new Array(padding + 1).join('0') + num).substr(-padding, padding)
+}
