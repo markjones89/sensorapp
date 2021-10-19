@@ -45,7 +45,7 @@ export default {
             api_room_util_vs_hours_rpt: 'backend/api_room_util_vs_hours_rpt'
         }),
         graphOptions() {
-            // let ticks = this.maxHour > 20 ? (this.maxHour / 10) : this.maxHour > 10 ? (this.maxHour / 5) : 10
+            let ticks = this.maxHour / 5
             return {
                 chart: {
                     type: 'bar',
@@ -76,7 +76,7 @@ export default {
                     }
                 },
                 yaxis: {
-                    tickAmount: 5,
+                    tickAmount: ticks,
                     min: 0,
                     max: this.maxHour
                 },
@@ -120,7 +120,7 @@ export default {
                         data: seriesData
                     }
                 ]
-                this.maxHour = Math.max(Math.ceil(Math.max(...seriesData) / 10) * 10, 10)
+                this.maxHour = Math.max(Math.ceil(Math.max(...seriesData) / 5) * 5, 10)
                 this.dataLoaded = true
                 this.dataError = false
             } catch (error) {

@@ -77,6 +77,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="input-field">
+                            <label>Covid Limit (%)</label>
+                            <input type="number" v-model="rptFilters.limit">
+                        </div>
+                    </div>
+                </div>
             </div>
             <template v-slot:footer>
                 <button class="btn btn-primary" @click="viewReport">View report</button>
@@ -125,7 +133,8 @@ export default {
         monthList: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
         rptFilters: {
             year: 0,
-            month: 0
+            month: 0,
+            limit: 0
         }
     }),
     computed: {
@@ -248,7 +257,8 @@ export default {
                 y: this.rptFilters.year,
                 m: this.rptFilters.month,
                 sh: this.dataFilters.start_hour,
-                eh: this.dataFilters.stop_hour
+                eh: this.dataFilters.stop_hour,
+                lr: this.rptFilters.limit
             }
             let route = this.$router.resolve({ name: 'utilisation-rpt', query })
 

@@ -372,3 +372,23 @@ export function getMeetingSize(type) {
 export function padNum(num, padding) {
     return (new Array(padding + 1).join('0') + num).substr(-padding, padding)
 }
+
+/**
+ * Returns the date range string
+ * @param {Date} from Starting date
+ * @param {Date} to Ending date
+ */
+export function dateRangeStr(from, to) {
+    if (from.getTime() == to.getTime()) {
+        return `${ getMonthName(from.getMonth()) } ${ from.getDate() }, ${ from.getFullYear() }`
+    }
+    else if (from.getMonth() == to.getMonth() && from.getFullYear() == to.getFullYear()) {
+
+        return [`${ getMonthName(from.getMonth()) } ${ from.getDate() }`, `${ to.getDate() }, ${ to.getFullYear() }`].join('-')
+    }
+    else if (from.getFullYear() == to.getFullYear()) {
+        return [`${ getMonthName(from.getMonth()) } ${ from.getDate() }`, `${ getMonthName(to.getMonth()) } ${ to.getDate() }, ${ to.getFullYear() }`].join('-')
+    }
+    
+    return ''
+}

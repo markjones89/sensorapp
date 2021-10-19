@@ -128,7 +128,7 @@ export default {
             return `${minutes} ${minutes > 1 ? 'minutes' : 'minute'}`
         },
         graphOptions() {
-            let ticks = this.maxPercent > 20 ? (this.maxPercent / 10) : this.maxPercent > 10 ? (this.maxPercent / 5) : 10
+            let ticks = this.maxPercent >= 140 ? (this.maxPercent / 20) : this.maxPercent > 20 ? (this.maxPercent / 10) : this.maxPercent > 10 ? (this.maxPercent / 5) : 10
             return {
                 chart: {
                     height: 350,
@@ -217,9 +217,12 @@ export default {
                 this.insights.non_covid.peak.percent = roundNum(data.non_covid.max_point?.percentage ?? 0, 1)
                 this.insights.non_covid.peak.seats = data.non_covid.max_point?.sensor_count ?? 0
 
-                this.maxPercent = Math.max(Math.ceil(Math.round(data.covid.max_point?.percentage ?? 0) / 10) * 10,
-                    Math.ceil(Math.round(data.non_covid.max_point?.percentage ?? 0) / 10) * 10,
-                    10)
+                // this.maxPercent = Math.max(Math.ceil(Math.round(data.covid.max_point?.percentage ?? 0) / 10) * 10,
+                //     Math.ceil(Math.round(data.non_covid.max_point?.percentage ?? 0) / 10) * 10,
+                //     10)
+                let maxValue = Math.max(this.insights.covid.average.percent, this.insights.covid.peak.percent, this.insights.non_covid.average.percent, this.insights.non_covid.peak.percent)
+                let factor = maxValue >= 140 ? 20 : 10
+                this.maxPercent = Math.ceil(maxValue  / factor) * factor
                 this.dataLoaded = true
                 this.dataError = false
             } catch (error) {

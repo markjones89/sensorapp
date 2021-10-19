@@ -58,6 +58,7 @@ export default {
             api_room_supply_vs_size: 'backend/api_room_supply_vs_size'
         }),
         graphOptions() {
+            let ticks = this.maxData / 10
             return {
                 chart: {
                     type: 'bar',
@@ -98,7 +99,7 @@ export default {
                     }
                 },
                 yaxis: {
-                    tickAmount: 10,
+                    tickAmount: ticks,
                     min: 0,
                     max: this.maxData,
                     labels: {
@@ -158,7 +159,7 @@ export default {
                         data: supplyData
                     }
                 ]
-                this.maxData = Math.max(Math.ceil(Math.max(...sizeData, ...supplyData) / 10) * 10, 10)
+                this.maxData = Math.max(Math.ceil(Math.max(...[...sizeData, ...supplyData]) / 10) * 10, 10)
                 this.oneToSixSupply = roundNum(data.filter(x => {
                     let meetingSize = parseInt(x.size.replace(' PAX Meetings', ''))
                     return meetingSize >= 1 && meetingSize <= 6

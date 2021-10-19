@@ -186,7 +186,8 @@ export default {
                 this.insights.average.rooms = data.average?.room_count ?? 0
                 this.insights.peak.percent = roundNum(data.max?.percentage ?? 0, 1)
                 this.insights.peak.rooms = data.max?.room_count ?? 0
-                this.maxPercent = Math.max(Math.ceil(Math.round(data.max?.percentage ?? 0) / 10) * 10, 10)
+                let maxValue = Math.max(this.insights.average.percent, this.insights.peak.percent)
+                this.maxPercent = Math.max(Math.ceil(maxValue / 10) * 10, 10)
                 this.dataLoaded = true
                 this.dataError = false
             } catch (error) {

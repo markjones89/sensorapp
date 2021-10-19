@@ -123,8 +123,7 @@ export default [
                     month: parseInt(route.query.m),
                     start_hour: parseInt(route.query.sh),
                     stop_hour: parseInt(route.query.eh),
-                    // start_date: route.query.sd,
-                    // stop_date: route.query.ed
+                    limit: parseInt(route.query.lr) / 100
                 }),
                 component: () => import(/* webpackChunkName: "js/views/reports/utilisation" */ '../views/reports/UtilisationRpt.vue')
             }

@@ -31,7 +31,7 @@ export function circlePack(wrapper, packData, callbacks) {
         let value = _packData.moneyValue ? moneyFormat(d.data.value_stat) : 
             _packData.percentValue ? `${Math.round(d.data.value_stat)}%` : d.data.value_stat
 
-        return `${d.data?.name || d.name}${tooltip ? ' - ' : isBuilding ? ` ${wrapDelim} ` : ' '}${value}`
+        return `${d.data?.name || d.name}${tooltip ? ' - ' : isBuilding ? ` ${wrapDelim} ${_packData.subtitle} - ` : ' '}${value}`
     }
 
     //Hide the tooltip when the mouse moves away

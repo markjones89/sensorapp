@@ -29,11 +29,11 @@
                     :overall="true"
                     :floor="floorNumbers"
                     :time="timeRange"
-                    :query="rptApiParams('Building', bid)" />
+                    :query="rptApiParams('Building', bid, true)" />
                 <monthly-workstation-util v-for="f in floors" :key="`WS:${f.id}`"
                     :floor="ordinalFloor(f.number)"
                     :time="timeRange"
-                    :query="rptApiParams('Floor', f.id)" />
+                    :query="rptApiParams('Floor', f.id, true)" />
                 <monthly-meeting-room-util 
                     :overall="true"
                     :floor="floorNumbers"
@@ -101,7 +101,8 @@ export default {
         year: { type: Number, required: true },
         month: { type: Number, required: true },
         start_hour: { type: Number, required: true },
-        stop_hour: { type: Number, required: true }
+        stop_hour: { type: Number, required: true },
+        limit: { type: Number, required: true }
     },
     data: () => ({
         checkAuthInterval: null,
@@ -169,10 +170,9 @@ export default {
             this.dataLoaded = false
             this.getBuildingOverview()
         },
-        rptApiParams(type, id) {
+        rptApiParams(type, id, hasLimit = false) {
             let range = getMonthRange(this.year, this.month)
-
-            return {
+            let obj = {
                 trigger: this.trigger,
                 start_hour: this.start_hour,
                 stop_hour: this.stop_hour,
@@ -181,6 +181,10 @@ export default {
                 node_id: id,
                 node_type: type
             }
+
+            if (hasLimit) obj.limit_ratio = this.limit
+
+            return obj
         },
         ordinalFloor(floor) { return `${toOrdinal(floor)} Floor` },
         roomMeetingSizeLoaded(data) {

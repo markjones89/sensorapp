@@ -70,6 +70,7 @@ export default {
             api_room_util_vs_efficiency: 'backend/api_room_util_vs_efficiency'
         }),
         graphOptions() {
+            let ticks = this.maxPercent > 20 ? (this.maxPercent / 10) : this.maxPercent > 10 ? (this.maxPercent / 5) : 10
             return {
                 chart: {
                     type: 'bar',
@@ -91,9 +92,9 @@ export default {
                 },
                 dataLabels: { enabled: false },
                 yaxis: {
-                    tickAmount: 10,
+                    tickAmount: ticks,
                     min: 0,
-                    max: this.maxData,
+                    max: this.maxPercent,
                     labels: {
                         formatter: function (value) { return value + "%" }
                     }
@@ -101,10 +102,38 @@ export default {
                 xaxis: {
                     categories: this.graphCategories,
                     labels: {
-                        // rotate: -45,
                         style: {
                             fontSize: '9px'
                         }
+                    }
+                },
+                tooltip: {
+                    custom: function({series, seriesIndex, dataPointIndex, w}) {
+                        let value = series[seriesIndex][dataPointIndex]
+                        let seriesName = w.globals.seriesNames[seriesIndex]
+                        let color = w.globals.colors[seriesIndex]
+                        let category = w.globals.labels[dataPointIndex]
+                        let title = category.join(' ')
+                        let pax = parseInt(category[1].replace(' PAX', ''))
+                        let seatsInUse = Math.round(pax * (value / 100))
+
+                        let seatsInUseHTML = seriesName == 'Room Utilisation' ? '' :
+                        `<div class="apexcharts-tooltip-y-group">
+                            <span class="apexcharts-tooltip-text-y-label">Seats in Use: </span>
+                            <span class="apexcharts-tooltip-text-y-value">${seatsInUse} out of ${pax} (${pax}/${(value / 100).toFixed(3)})</span>
+                        </div>`
+
+                        return `<div class="apexcharts-tooltip-title" style="font-size: 12px;">${title}</div>
+                            <div class="apexcharts-tooltip-series-group apexcharts-active" style="display: flex;">
+                                <span class="apexcharts-tooltip-marker" style="background-color: ${color};"></span>
+                                <div class="apexcharts-tooltip-text" style="font-size: 12px;">
+                                    <div class="apexcharts-tooltip-y-group">
+                                        <span class="apexcharts-tooltip-text-y-label">${seriesName}: </span>
+                                        <span class="apexcharts-tooltip-text-y-value">${value}%</span>
+                                    </div>
+                                    ${seatsInUseHTML}
+                                </div>
+                            </div>`
                     }
                 }
             }
@@ -142,22 +171,22 @@ export default {
                 this.graphCategories = rooms
                 this.graphSeries = [
                     {
-                        name: 'Room Utilisation',
-                        data: utilData
-                    },
-                    {
                         name: 'Efficiency when in Use',
                         data: efficiencyData
+                    },
+                    {
+                        name: 'Room Utilisation',
+                        data: utilData
                     }
                 ]
-                this.maxData = Math.max(Math.ceil(Math.max(...utilData, ...efficiencyData) / 10) * 10, 10)
+                let maxValue = Math.max(...[...utilData, ...efficiencyData, 10])
+                let factor = maxValue >= 140 ? 20 : 10
+                this.maxPercent = Math.ceil(maxValue / factor) * factor
                 this.insights.avgUtil = roundNum(data.insight.average_utils, 1)
                 this.insights.avgEfficiency = roundNum(data.insight.average_efficiency, 1)
 
                 this.dataLoaded = true
                 this.dataError = false
-
-                console.log('getData', data, this.graphSeries)
             } catch (error) {
                 console.log('getData.error', error)
                 this.dataLoaded = true

@@ -1,24 +1,26 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <date-range-toggle @select="rangeSelect" :active="rangeFilter.type" />
-            <div class="graph-filters" v-if="dataLoaded">
-                <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter" @onSelect="filterSelect" />
-                <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter" :chosenAsSelected="true" @onSelect="locFilter" />
-                <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">Cost Analysis</a>
-            </div>
-            <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </span>
-            <transition name="fadeUp">
-                <div class="page-opt-panel" v-if="showPageOpts">
-                    <ul>
-                        <li><a @click="toggleEmbed(true)">Embed</a></li>
-                    </ul>
+            <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
+            <template v-if="dataLoaded">
+                <div class="graph-filters" v-if="dataLoaded">
+                    <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter.value" :chosenAsSelected="true" @onSelect="filterSelect" />
+                    <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter" :chosenAsSelected="true" @onSelect="locFilter" />
+                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">{{ filter.btnLabel }}</a>
                 </div>
-            </transition>
+                <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </span>
+                <transition name="fadeUp">
+                    <div class="page-opt-panel" v-if="showPageOpts">
+                        <ul>
+                            <li><a @click="toggleEmbed(true)">Embed</a></li>
+                        </ul>
+                    </div>
+                </transition>
+            </template>
         </div>
         <div class="graph-content">
             <!-- graph & legends here -->
@@ -63,13 +65,13 @@ export default {
     },
     data: () => ({
         filters: [
-            { value: 'opportunity_cost', label: 'Cost of Unused Spaces' },
-            { value: 'workspace_utils.max_percentage', label: 'Peak Usage' },
-            { value: 'workspace_utils.average_percentage', label: 'Average Usage' },
-            { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces' },
-            { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity' }
+            { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
+            { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
+            { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
+            { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
+            { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
         ], 
-        filter: 'opportunity_cost',
+        filter: { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
         locations: [],
         minuteFilter: 60,
         timeFilter: { start: null, end: null },
@@ -134,8 +136,9 @@ export default {
             this.dataFilters.start_date = toISOStart(from)//from.toISOString()
             this.dataFilters.stop_date = toISOEnd(to)//to.toISOString()
         },
-        filterSelect(filter) {
-            this.filter = filter
+        filterSelect(value, label, obj) {
+            // this.filter = value
+            this.filter = obj
         },
         locFilter(loc) { this.setLocation(loc) },
         // period filter
