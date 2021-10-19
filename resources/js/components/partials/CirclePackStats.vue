@@ -162,13 +162,14 @@ export default {
                         user_to_workspace_ratio: average(data.map(x => x.user_to_workspace_ratio)),
                         work_from_home: average(data.map(x => x.work_from_home.average_percentage))
                     }
-                } else {
+                }
+                else {
                     let firstValue = getObjValue(data, this.statFilter.value)
                     stats.first = {
                         label: this.statFilter.boxLabel,
                         value: this.isFilterPercent ? `${roundNum(firstValue, 1)}%` : d3Format('$,.2s')(firstValue)
                     }
-                    stats.opportunity_cost = sum(data.map(x => x.opportunity_cost))
+                    stats.opportunity_cost = data.opportunity_cost
                     stats.peak_workspace_util = data.workspace_utils.max_percentage
                     stats.average_workspace_util = data.workspace_utils.average_percentage
                     stats.peak_meeting_room = data.meeting_room_occupancy.max_percentage

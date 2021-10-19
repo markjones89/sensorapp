@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <date-range-toggle @select="rangeSelect" :active="rangeFilter.type" />
+            <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <div class="graph-filters" v-if="dataLoaded">
                 <graph-filter placeholder="Select Location" :filters="locations" :chosen="selectedLocation" :chosenAsSelected="true" @onSelect="locFilter" />
                 <a href="javascript:;" class="btn btn-primary ml-12" @click="viewCostAnalysis">Cost Analysis</a>
@@ -134,7 +134,7 @@ export default {
         rptFilters: {
             year: 0,
             month: 0,
-            limit: 0
+            limit: 50
         }
     }),
     computed: {
@@ -166,6 +166,7 @@ export default {
     },
     methods: {
         ...mapMutations({
+            setRange: 'homepage/setRange',
             setSummary: 'homepage/setSummary',
             setPeakSummary: 'peakchart/setSummary'
         }),
@@ -176,6 +177,7 @@ export default {
         },
         rangeSelect(range, from, to) {
             this.dataLoaded = false
+            this.setRange({ type: range, start: toISOStart(from), end: toISOEnd(to) })
             this.dataFilters.start_date = toISOStart(from)
             this.dataFilters.stop_date = toISOEnd(to)
         },
@@ -272,6 +274,14 @@ export default {
             this.rangeFilter = JSON.parse(JSON.stringify(this.cp_range))
             this.dataFilters.start_date = this.rangeFilter.start
             this.dataFilters.stop_date = this.rangeFilter.end
+
+            let start = this.rangeFilter.start
+            let from = new Date(start.substring(0, start.indexOf('T')))
+            let year = from.getFullYear()
+            let month = from.getMonth()
+            this.rptFilters.year = year
+            this.rptFilters.month = month
+            this.rptFilters.limit = year >= 2020 && month >= 2 ? 50 : 100
         }
         else {
             let start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
@@ -280,6 +290,16 @@ export default {
             this.rangeFilter.type = 'today'
             this.rangeFilter.start = this.dataFilters.start_date = toISOStart(start)
             this.rangeFilter.end = this.dataFilters.stop_date = toISOEnd(end)
+
+            let year = now.getFullYear()
+            let month = now.getMonth()
+            this.rptFilters.year = now.getFullYear()
+            this.rptFilters.month = now.getMonth()
+            this.rptFilters.year = year
+            this.rptFilters.month = month
+            this.rptFilters.limit = year >= 2020 && month >= 2 ? 50 : 100
+
+            this.setRange({ type: 'today', start: toISOStart(start), end: toISOEnd(end) })
         }
 
         if (this.cp_start_time) {
@@ -300,9 +320,6 @@ export default {
         }
 
         if (this.company && this.company.ref_id) this.dataFilters.node_id = this.company.ref_id
-
-        this.rptFilters.year = now.getFullYear()
-        this.rptFilters.month = now.getMonth()
     },
     mounted() {}
 }

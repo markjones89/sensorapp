@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <div class="graph-header">
-            <date-range-toggle @select="rangeSelect" :active="rangeFilter.type" />
+            <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <div class="graph-filters">
                 <!-- <span class="graph-filter">
                     Select Location
