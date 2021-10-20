@@ -21,8 +21,9 @@ export default [
                 component: () => import(/* webpackChunkName: "js/views/reset" */ '../views/Reset.vue')
             },
             {
-                path: 'cost-analysis', name: 'cost-analysis', meta: { needsAuth: true },
-                component: () => import(/* webpackChunkName: "js/views/insights/cost-analysis" */ '../views/insights/CostAnalysis.vue')
+                path: 'expandable-summary', name: 'tree-summary', meta: { needsAuth: true },
+                props: (route) => ({ data_filter: route.query.df }),
+                component: () => import(/* webpackChunkName: "js/views/insights/tree-summary" */ '../views/insights/TreeSummary.vue')
             },
             {
                 path: 'time', name: 'time', meta: { needsAuth: true },

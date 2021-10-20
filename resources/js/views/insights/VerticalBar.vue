@@ -10,7 +10,7 @@
                     </span>
                 </span> -->
                 <graph-filter placeholder="Select Location" :filters="locations" :chosen="locFilter" :chosenAsSelected="true" @onSelect="selectLocation" />
-                <a href="javascript:;" class="btn btn-primary ml-12" @click="viewCostAnalysis">Cost Analysis</a>
+                <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
             </div>
             <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                 <span class="dot"></span>
@@ -95,6 +95,7 @@ export default {
             user: state => state.user,
             company: state => state.user.company,
             settings: state => state.user.company ? state.user.company.settings : null,
+            filter: state => state.homepage.filter,
             cp_range: state => state.homepage.rangeFilter,
             cp_start_time: state => state.homepage.startTime,
             cp_end_time: state => state.homepage.endTime,
@@ -122,7 +123,7 @@ export default {
             // console.log('selectLocation', value, label, item)
             this.locFilter = value
         },
-        viewCostAnalysis() { this.$router.push({ name: 'cost-analysis' }) },
+        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show

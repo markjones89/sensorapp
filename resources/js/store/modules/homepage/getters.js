@@ -3,6 +3,9 @@ const getSummary = state => state.summary
 // range filter
 const getRange = state => state.rangeFilter
 
+// data display filter
+const getFilter = state => state.filter
+
 // location filter
 const getLocation = state => state.locationFilter
 
@@ -20,6 +23,7 @@ const getPeriod = state => state.periodFilter
 export default {
     getSummary,
     getRange,
+    getFilter,
     getLocation,
     getTime,
     getPeriod

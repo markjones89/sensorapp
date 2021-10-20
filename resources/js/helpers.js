@@ -365,12 +365,12 @@ export function getMeetingSize(type) {
 }
 
 /**
- * Returns padding number string
+ * Returns number string padded with zero (0)
  * @param {Number} num Number to pad with zero ('0')
- * @param {Number} padding Number of zero ('0') padding
+ * @param {Number} length Length of string after padding
  */
-export function padNum(num, padding) {
-    return (new Array(padding + 1).join('0') + num).substr(-padding, padding)
+export function padNum(num, length) {
+    return (new Array(length + 1).join('0') + num).substr(-length, length)
 }
 
 /**
@@ -391,4 +391,10 @@ export function dateRangeStr(from, to) {
     }
     
     return ''
+}
+
+export function clearEl(selector) {
+    let elem = document.querySelector(selector)
+
+    Array.prototype.slice.call(elem.children).forEach(child =>{ elem.removeChild(child) })
 }

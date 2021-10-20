@@ -8,6 +8,10 @@ const setRange = (state, range) => {
     state.rangeFilter.end = range.end
 }
 
+const setFilter = (state, filter) => {
+    state.filter = filter
+}
+
 const setLocation = (state, location) => {
     state.locationFilter = location
 }
@@ -24,6 +28,7 @@ const setPeriod = (state, minute) => {
 export default {
     setSummary,
     setRange,
+    setFilter,
     setLocation,
     setTime,
     setPeriod

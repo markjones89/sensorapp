@@ -11,7 +11,7 @@
                         </span>
                         <filter-dropdown :filters="buildingFilters" :show="showFilter" @onSelect="filterSelect" />
                     </span>
-                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">Cost Analysis</a>
+                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                     <span class="dot"></span>
@@ -119,9 +119,9 @@
 </style>
 <script>
 import { mapGetters, mapState } from "vuex";
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
-import { BuildingSvg, HouseSvg } from '../../components/svg'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
+import { BuildingSvg, HouseSvg } from '@/components/svg'
 
 const api = {
     building: '/api/locations',
@@ -153,7 +153,8 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user,
+            filter: state => state.homepage.filter
         }),
         ...mapGetters({
             api_header: 'backend/api_header',
@@ -219,9 +220,7 @@ export default {
             this.wfhStat = randomNum()
             this.bldgStat = 100 - this.wfhStat
         },
-        toCostAnalysis() {
-            this.$router.push({ name: 'cost-analysis' })
-        },
+        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         rangeSelect(range, from, to) {},
         timeStartChange(time) { this.timeFilter.start = time },
         timeEndChange(time) { this.timeFilter.end = time },

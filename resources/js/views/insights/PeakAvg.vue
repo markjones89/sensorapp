@@ -4,7 +4,7 @@
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <div class="graph-filters" v-if="dataLoaded">
                 <graph-filter placeholder="Select Location" :filters="locations" :chosen="selectedLocation" :chosenAsSelected="true" @onSelect="locFilter" />
-                <a href="javascript:;" class="btn btn-primary ml-12" @click="viewCostAnalysis">Cost Analysis</a>
+                <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
             </div>
             <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                 <span class="dot"></span>
@@ -143,6 +143,7 @@ export default {
             company: state => state.user.company,
             settings: state => state.user.company ? state.user.company.settings : null,
             summary: state => state.homepage.summary,
+            filter: state => state.homepage.filter,
             cp_range: state => state.homepage.rangeFilter,
             // cp_location: state => state.homepage.locationFilter,
             cp_start_time: state => state.homepage.startTime,
@@ -239,9 +240,7 @@ export default {
             // console.log('graph', route, query)
             this.$router.push({ name: route, query })
         },
-        viewCostAnalysis() {
-            this.$router.push({ name: 'cost-analysis' })
-        },
+        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         toLive() {
             this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
         },

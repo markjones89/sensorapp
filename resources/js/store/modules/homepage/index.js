@@ -10,6 +10,7 @@ export default {
             start: null,
             end: null
         },
+        filter: { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
         locationFilter: null,
         startTime: null,
         endTime: null,

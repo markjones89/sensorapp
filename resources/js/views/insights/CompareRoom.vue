@@ -10,7 +10,7 @@
                     </span>
                     <filter-dropdown :filters="buildings" :show="showFilter" @onSelect="filterSelect" />
                 </span>
-                <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">Cost Analysis</a>
+                <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
             </div>
             <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                 <span class="dot"></span>
@@ -247,7 +247,8 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user,
+            filter: state => state.homepage.filter
         }),
         settings() { return this.user.company ? this.user.company.settings : null },
         sizeFilters() {
@@ -264,9 +265,7 @@ export default {
     methods: {
         backTo() { this.$router.back() },
         filterSelect(value) {},
-        toCostAnalysis() {
-            this.$router.push({ name: 'cost-analysis' })
-        },
+        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         rangeSelect(range, from, to) {
             //TODO: get data based on date range
             this.generateRandomData()

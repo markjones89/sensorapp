@@ -1,5 +1,5 @@
 import { Heat } from '@hpcc-js/chart'
-import { extend } from '../../helpers'
+import { extend } from '@/helpers'
 
 export default function heatMap(wrapper, data, options) {
     const config_defaults = {

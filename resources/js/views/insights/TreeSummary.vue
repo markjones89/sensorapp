@@ -25,11 +25,12 @@
         </div>
         <div class="graph-content">
             <div class="chart-header">
-                <span class="chart-title">Cost Analysis</span>
+                <span class="chart-title">{{ dataFilter.btnLabel }}</span>
+                <span class="chart-subtitle">{{ statDateRange }}</span>
             </div>
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <template v-if="loaded">
-                <div id="cost-tree" v-if="!dataError"></div>
+                <div id="tree-summary" v-if="!dataError"></div>
                 <div v-else class="error-display" style="height: 40vh">
                     <p>{{ dataError }}</p>
                     <a href="javascript:;" class="btn btn-primary" @click="renderTree(true)" style="align-self:center;">Retry</a>
@@ -38,11 +39,8 @@
             <div v-else style="height: 40vh">
                 <loader :show="!loaded" type="ripple"/>
             </div>
-            <!-- <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
-                    @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
-                <div class="clearfix"></div> -->
             <div class="bottom-filters">
-                <time-slider :from="settings ? settings.start_time : null" :to="settings ? settings.end_time : null"
+                <time-slider :from="timeFilter.start" :to="timeFilter.end"
                     @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
                 <span class="graph-filter" @click="showMinuteFilter = !showMinuteFilter">
                     {{ minuteFilterLbl ? minuteFilterLbl : 'Select' }}
@@ -62,7 +60,7 @@
     </div>
 </template>
 <style lang="scss" scoped>
-#cost-tree {
+#tree-summary {
     margin: 24px auto;
     max-width: 100%;
     width: 1024px;
@@ -70,14 +68,22 @@
 </style>
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import { getBaseUrl, sum } from '../../helpers'
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
-import { collapsibleTree } from '../../components/graphs/CollapsibleTree'
+import { getBaseUrl, sum, toHour, toISOStart, toISOEnd, getObjValue, dateRangeStr, average, clearEl } from '@/helpers'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
+import { collapsibleTree } from '@/components/graphs/CollapsibleTree'
 export default {
-    title: 'Cost Analysis',
+    props: ['data_filter'],
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider },
+    title: 'Summary',
     data: () => ({
+        filters: [
+            { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
+            { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
+            { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
+            { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
+            { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
+        ],
         loaded: false, showPageOpts: false, showEmbed: false,
         timeFilter: {
             start: null, end: null
@@ -100,8 +106,8 @@ export default {
             company: state => state.user.company,
             summary: state => state.homepage.summary,
             rangeFilter: state => state.homepage.rangeFilter,
-            // startTimeFilter: state => state.homepage.startTime,
-            // endTimeFilter: state => state.homepage.endTime,
+            startTimeFilter: state => state.homepage.startTime,
+            endTimeFilter: state => state.homepage.endTime,
             // periodFilter: state => state.homepage.periodFilter
         }),
         ...mapGetters({
@@ -115,20 +121,36 @@ export default {
             var minutes = [60]
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
+        },
+        dataFilter() { return this.filters.find(x => x.value == (this.data_filter || 'opportunity_cost')) },
+        statDateRange() {
+            let start = this.dataFilters.start_date
+            let end = this.dataFilters.stop_date
+            let from = new Date(start.substring(0, start.indexOf('T')))
+            let to = new Date(end.substring(0, end.indexOf('T')))
+
+            return dateRangeStr(from, to)
         }
     },
     methods: {
         ...mapMutations({
             setSummary: 'homepage/setSummary',
-            setRange: 'homepage/setRange'
+            setRange: 'homepage/setRange',
+            setTime: 'homepage/setTime',
         }),
         backTo() { this.$router.back() },
         rangeSelect(range, from, to) {
-            // console.log('rangeSelect', range, from, to)
-            this.setRange(range)
-            this.dataFilters.start_date = from.toISOString()
-            this.dataFilters.stop_date = to.toISOString()
+            let isoStart = toISOStart(from)
+            let isoEnd = toISOEnd(to)
+
+            console.log('rangeSelect', range, isoStart, isoEnd)
+
+            this.setRange({ type: range, start: isoStart, end: isoEnd })
+            this.dataFilters.start_date = isoStart
+            this.dataFilters.stop_date = isoEnd
+
             if (this.axiosSrc) this.axiosSrc.cancel('Date range selected')
+            clearEl('#tree-summary')
             this.renderTree(true)
         },
         toggleEmbed(show) {
@@ -136,15 +158,11 @@ export default {
             this.showEmbed = show
         },
         async renderTree(refresh = false) {
-            /* fetch(`${this.baseUrl}/data/flare-2.json`)
-                .then(response => response.json())
-                .then(data => {
-                    this.loaded = true
-                    collapsibleTree('#cost-tree', data)
-                }) */
             let keys = ['building_country', 'building_city'],
                 grouped = [],
-                temp = { _: grouped }
+                temp = { _: grouped },
+                dataKey = this.dataFilter.value,
+                moneyValue = dataKey == 'opportunity_cost'
 
             this.loaded = false
 
@@ -164,7 +182,6 @@ export default {
                 }
                 else {
                     this.dataError = null
-                    // this.summary = data;
                     this.setSummary(data)
                 }
             }
@@ -172,12 +189,14 @@ export default {
             let nodes = { ID: '', name: this.summary.customer, children: [] }
             let summary = JSON.parse(JSON.stringify(this.summary.building_summary))
 
-            nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
+            // nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
+            nodes.value = (moneyValue ? sum : average)(summary.map(x => getObjValue(x, dataKey)))
 
             summary.forEach(a => {
                 // nodes
                 a.name = a.building_name
-                a.value = a.opportunity_cost
+                // a.value = a.opportunity_cost
+                a.value = getObjValue(a, dataKey)
 
                 // free desks/meeting at peak
                 a.children = [
@@ -196,13 +215,15 @@ export default {
                             if (k === 'building_country') {
                                 let buildings = summary.filter(x => x[k] == a[k])
                                 
-                                l.value = sum(buildings.map(x => x.opportunity_cost))
+                                // l.value = sum(buildings.map(x => x.opportunity_cost))
+                                l.value = (moneyValue ? sum : average)(buildings.map(x => getObjValue(x, dataKey)))
                                 l.building_country = true
                             }
                             else if (k === 'building_city') {
                                 let buildings = summary.filter(x => x[k] == a[k])
 
-                                l.value = sum(buildings.map(x => x.opportunity_cost))
+                                // l.value = sum(buildings.map(x => x.opportunity_cost))
+                                l.value = (moneyValue ? sum : average)(buildings.map(x => getObjValue(x, dataKey)))
                                 l.building_city = true
                             }
 
@@ -217,18 +238,24 @@ export default {
 
             this.loaded = true
 
-            setTimeout(() => { collapsibleTree('#cost-tree', nodes) }, 100)
+            setTimeout(() => { collapsibleTree('#tree-summary', nodes, moneyValue) }, 100)
         },
-        timeStartChange(time) {
+        timeStartChange(time, hour) {
             this.dataFilters.start_hour = hour
-            this.timeFilter.start = time
+            // this.timeFilter.start = time
+            this.setTime({ start: hour, end: this.dataFilters.stop_hour })
+
             if (this.axiosSrc) this.axiosSrc.cancel('Start time updated')
+            clearEl('#tree-summary')
             this.renderTree(true)
         },
-        timeEndChange(time) {
+        timeEndChange(time, hour) {
             this.dataFilters.stop_hour = hour
-            this.timeFilter.end = time
+            // this.timeFilter.end = time
+            this.setTime({ start: this.dataFilters.start_hour, end: hour })
+
             if (this.axiosSrc) this.axiosSrc.cancel('End time updated')
+            clearEl('#tree-summary')
             this.renderTree(true)
         },
         filterMinute(minute) {
@@ -239,17 +266,33 @@ export default {
         }
     },
     created() {
-        // console.log('created', this.rangeFilter)
-        let now = new Date(),
-            start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-            end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
-
-        this.dataFilters.start_date = start.toISOString()
-        this.dataFilters.stop_date = end.toISOString()
-
-        if (this.rangeFilter == null) this.setRange('today')
-
         if (this.company && this.company.ref_id) this.dataFilters.node_id = this.company.ref_id
+
+        if (this.rangeFilter.type == null) {
+            let now = new Date(),
+                start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+                end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23),
+                isoStart = toISOStart(start),
+                isoEnd = toISOEnd(end)
+
+            this.dataFilters.start_date = isoStart
+            this.dataFilters.stop_date = isoEnd
+            this.setRange({ type: 'today', start: isoStart, end: isoEnd })
+            console.log('setRange', 'today', isoStart, isoEnd)
+        }
+        else {
+            this.dataFilters.start_date = this.rangeFilter.start
+            this.dataFilters.stop_date = this.rangeFilter.end
+        }
+
+        if (this.startTimeFilter) {
+            this.dataFilters.start_hour = this.timeFilter.start = this.startTimeFilter
+            this.dataFilters.stop_hour = this.timeFilter.end = this.endTimeFilter
+        }
+        else if (this.settings) {
+            this.dataFilters.start_hour = this.timeFilter.start = toHour(this.settings.start_time)
+            this.dataFilters.stop_hour = this.timeFilter.end = toHour(this.settings.end_time)
+        }
     },
     mounted() {
         this.renderTree()

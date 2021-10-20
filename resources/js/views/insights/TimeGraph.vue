@@ -16,7 +16,7 @@
                             <caret-icon />
                         </span>
                     </span>
-                    <a href="javascript:;" class="btn btn-primary ml-12" @click="viewCostAnalysis">Cost Analysis</a>
+                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                     <span class="dot"></span>
@@ -66,41 +66,14 @@
         </div>
     </div>
 </template>
-<style lang="scss">
-.time-chart {
-    pointer-events: initial;
-}
-.chart_XYAxis .axis {
-    fill: #ffffff;
 
-    .tick text {
-        fill: rgba(255,255,255,.5);
-    }
-
-    .tick line,
-    path.domain {
-        stroke: rgba(255,255,255,.5);
-    }
-}
-</style>
-<style lang="scss" scoped>
-#heat-map {
-    flex: 1 auto;
-    width: 950px;
-    // height: 450px;
-    margin: 0 auto;
-}
-#time-chart {
-    flex: 1 auto;
-}
-</style>
 <script>
 import { mapState } from "vuex";
-import { getBaseUrl } from '../../helpers'
-import { Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "../../components"
-import { CaretIcon, CaretLeftIcon } from "../../components/icons"
-import { timeGraph } from '../../components/graphs/TimeGraph'
-import heatMap from '../../components/graphs/HeatMap'
+import { getBaseUrl } from '@/helpers'
+import { Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider } from "@/components"
+import { CaretIcon, CaretLeftIcon } from "@/components/icons"
+import { timeGraph } from '@/components/graphs/TimeGraph'
+import heatMap from '@/components/graphs/HeatMap'
 export default {
     title: 'Time Chart',
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
@@ -117,7 +90,8 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user,
+            filter: state => state.homepage.filter
         }),
         baseUrl() { return getBaseUrl() },
         settings() { return this.user.company ? this.user.company.settings : null },
@@ -156,9 +130,7 @@ export default {
             this.showMinuteFilter = false;
             this.minuteFilter = min.label;
         },
-        viewCostAnalysis() {
-            this.$router.push({ name: 'cost-analysis' })
-        },
+        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         toLive() {
             this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
         },
@@ -189,3 +161,31 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.time-chart {
+    pointer-events: initial;
+}
+.chart_XYAxis .axis {
+    fill: #ffffff;
+
+    .tick text {
+        fill: rgba(255,255,255,.5);
+    }
+
+    .tick line,
+    path.domain {
+        stroke: rgba(255,255,255,.5);
+    }
+}
+</style>
+<style lang="scss" scoped>
+#heat-map {
+    width: 900px;
+    height: 450px;
+    margin: 32px auto;
+}
+#time-chart {
+    flex: 1 auto;
+}
+</style>

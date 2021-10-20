@@ -86,11 +86,11 @@ export function timeGraph(chart, dataUrl, options) {
 
     var dataKeys = ['wfhp', 'cs', 'pwu', 'pmru', 'pmre'],
         dataKeysInfo = {
-            wfhp: { id: 'wfhp', name: 'Work from home peak', color: '7EAADD', highlightColor: 'c6d1dd' },
-            cs: { id: 'cs', name: 'Cost Saving', color: '33537A', highlightColor: '446fa4' },
-            pwu: { id: 'pwu', name: 'Peak Workspace Utilisation', color: 'F5A623', highlightColor: 'f5cc89' },
-            pmru: { id: 'pmru', name: 'Peak Meeting Room Utilisation', color: '8F31AE', highlightColor: 'b662d2' },
-            pmre: { id: 'pmre', name: 'Peak Meeting Room Efficiency', color: '3D3F56', highlightColor: '6a6d95' }
+            wfhp: { id: 'wfhp', name: 'Work from home peak', color: 'fffd8f', highlightColor: 'fffec6' },
+            cs: { id: 'cs', name: 'Cost Saving', color: 'e0713e', highlightColor: 'efb89e' },
+            pwu: { id: 'pwu', name: 'Peak Workspace Utilisation', color: 'a93469', highlightColor: 'dd90b3' },
+            pmru: { id: 'pmru', name: 'Peak Meeting Room Utilisation', color: '60269e', highlightColor: 'ae80e0' },
+            pmre: { id: 'pmre', name: 'Peak Meeting Room Efficiency', color: '3439d3', highlightColor: '999ce9' }
         }
 
     //BASE DRAWING

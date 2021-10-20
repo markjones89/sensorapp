@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 
-export function collapsibleTree(wrapper, data) {
+export function collapsibleTree(wrapper, data, moneyValue) {
     const container = d3.select(wrapper);
     const root = d3.hierarchy(data),
         moneyFormat = d3.format('$,.2s'),
@@ -88,7 +88,7 @@ export function collapsibleTree(wrapper, data) {
             .attr("text-anchor", d => d._children ? "end" : "start")
             .attr('fill', '#fff')
             // .text(d => d.data.name)
-            .text(d => `${d.data.name} ${d.data.number ? ` - ${d.data.value}` : moneyFormat(d.data.value || 0)}`)
+            .text(d => `${d.data.name} ${d.data.number ? ` - ${d.data.value}` : moneyValue ? moneyFormat(d.data.value || 0) : `${Math.round(d.data.value)}%`}`)
             .clone(true).lower()
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 3)

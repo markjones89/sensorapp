@@ -4,10 +4,11 @@
             v-for="r in range" :key="r.value" @click="selectRange(r.value)"
             :class="{ 'btn--active': selected === r.value }">{{ r.label }}</span>
         <!-- <date-picker theme="dark" range="true" maxDate="today" :showPicker="showDatePicker" :visible="false" @dateSelect="customRange" @hidden="pickerHidden" /> -->
-        <du-datepicker ref="datepicker" :options="datepickerOpts" data-hidden="true" :dateChanged="customRange"/>
+        <du-datepicker ref="datepicker" v-model="customRangeValue" :options="datepickerOpts" data-hidden="true" :dateChanged="customRange"/>
     </div>
 </template>
 <script>
+import { padNum } from '@/helpers'
 export default {
     props: ['active'],
     data: () => ({
@@ -21,7 +22,8 @@ export default {
         selected: null, dateRange: null, showDatePicker: false,
         datepickerOpts: {
             maxDate: 'today', range: true, value: null
-        }
+        },
+        customRangeValue: null
     }),
     methods: {
         selectRange(range) {
@@ -61,17 +63,15 @@ export default {
     },
     created() {
         if (this.active) {
-            // this.selected = this.active
             this.selected = this.active.type
 
             if (this.selected == 'custom') {
-                let formatOpts = { day: '2-digit', month: '2-digit', year: 'numeric' }
-                let start = this.active.start
-                let end = this.active.end
-                let df = (new Date(start.substring(0, start.indexOf('T')))).toLocaleDateString('en-US', formatOpts)
-                let dt = (new Date(end.substring(0, end.indexOf('T')))).toLocaleDateString('en-US', formatOpts)
+                let startDate = new Date(this.active.start.substring(0, this.active.start.indexOf('T')))
+                let endDate = new Date(this.active.end.substring(0, this.active.end.indexOf('T')))
+                let df = `${ padNum(startDate.getMonth() + 1, 2) }/${ padNum(startDate.getDate(), 2) }/${ startDate.getFullYear() }`
+                let dt = `${ padNum(endDate.getMonth() + 1, 2) }/${ padNum(endDate.getDate(), 2) }/${ endDate.getFullYear() }`
 
-                this.datepickerOpts.value = [df, dt].join('-')
+                this.customRangeValue = [df, dt].join('-')
             }
         }
     }

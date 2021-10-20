@@ -6,7 +6,7 @@
                 <div class="graph-filters" v-if="dataLoaded">
                     <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter.value" :chosenAsSelected="true" @onSelect="filterSelect" />
                     <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter" :chosenAsSelected="true" @onSelect="locFilter" />
-                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toCostAnalysis">{{ filter.btnLabel }}</a>
+                    <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                     <span class="dot"></span>
@@ -26,7 +26,7 @@
             <!-- graph & legends here -->
             <circle-pack-stats
                 :custData="summary" :statFilter="filter" :locFilter="locationFilter" :dataFilters="dataFilters"
-                @dataLoaded="circlePackLoaded" @costClick="toCostAnalysis" @peakClick="toPeak" @wfhClick="toWFH" @goToTime="toTimeChart" />
+                @dataLoaded="circlePackLoaded" @costClick="toTreeSummary" @peakClick="toPeak" @wfhClick="toWFH" @goToTime="toTimeChart" />
             <div class="bottom-filters">
                 <time-slider :from="timeFilter.start" :to="timeFilter.end"
                     @startChanged="timeStartChange" @endChanged="timeEndChange"></time-slider>
@@ -71,7 +71,7 @@ export default {
             { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
             { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
         ], 
-        filter: { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
+        // filter: { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
         locations: [],
         minuteFilter: 60,
         timeFilter: { start: null, end: null },
@@ -94,6 +94,7 @@ export default {
             settings: state => state.user.company ? state.user.company.settings : null,
             summary: state => state.homepage.summary,
             rangeFilter: state => state.homepage.rangeFilter,
+            filter: state => state.homepage.filter,
             locationFilter: state => state.homepage.locationFilter,
             startTimeFilter: state => state.homepage.startTime,
             endTimeFilter: state => state.homepage.endTime,
@@ -115,6 +116,7 @@ export default {
         ...mapMutations({
             setSummary: 'homepage/setSummary',
             setRange: 'homepage/setRange',
+            setFilter: 'homepage/setFilter',
             setLocation: 'homepage/setLocation',
             setTime: 'homepage/setTime',
             setMinute: 'homepage/setMinute',
@@ -137,8 +139,8 @@ export default {
             this.dataFilters.stop_date = toISOEnd(to)//to.toISOString()
         },
         filterSelect(value, label, obj) {
-            // this.filter = value
-            this.filter = obj
+            // this.filter = obj
+            this.setFilter(obj)
         },
         locFilter(loc) { this.setLocation(loc) },
         // period filter
@@ -158,7 +160,7 @@ export default {
                 if (e.keyCode === 27) _.showPageOpts = false
             }
         },
-        toCostAnalysis() { this.$router.push({ name: 'cost-analysis' }) },
+        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
