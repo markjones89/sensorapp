@@ -29,9 +29,9 @@
                 </div>
             </div>
             <!-- graph & legends here -->
-            <hierarchy-graph
+            <hierarchy-graph ref="hierarchyChart"
                 :custData="summary" :floorData="peakSummary"
-                :locFilter="locationFilter" :dataFilters="dataFilters"
+                :dataFilters="dataFilters"
                 @dataLoaded="chartLoaded"
                 @routeTo="graphRoute" />
             <div class="bottom-filters">
@@ -95,7 +95,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import { getBaseUrl, toHour, toISOStart, toISOEnd, getMonthRange } from '@/helpers'
+import { getBaseUrl, toHour, toISOStart, toISOEnd, getMonthRange, extractLocations } from '@/helpers'
 import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from "@/components"
 import { HierarchyGraph } from '@/components/partials'
 import { CaretIcon, CaretLeftIcon } from "@/components/icons"
@@ -117,7 +117,7 @@ export default {
         showPageOpts: false, showEmbed: false,
         rangeFilter: { type: 'today', start: null, end: null },
         timeFilter: { start: null, end: null },
-        locations: [], locationFilter: null,
+        locations: [], // locationFilter: null,
         minuteFilter: 60,
         dataLoaded: false,
         dataFilters: {
@@ -144,8 +144,8 @@ export default {
             settings: state => state.user.company ? state.user.company.settings : null,
             summary: state => state.homepage.summary,
             filter: state => state.homepage.filter,
+            locationFilter: state => state.homepage.locationFilter,
             cp_range: state => state.homepage.rangeFilter,
-            // cp_location: state => state.homepage.locationFilter,
             cp_start_time: state => state.homepage.startTime,
             cp_end_time: state => state.homepage.endTime,
             peakSummary: state => state.peakchart.summary
@@ -169,7 +169,8 @@ export default {
         ...mapMutations({
             setRange: 'homepage/setRange',
             setSummary: 'homepage/setSummary',
-            setPeakSummary: 'peakchart/setSummary'
+            setPeakSummary: 'peakchart/setSummary',
+            setLocation: 'homepage/setLocation'
         }),
         backTo() { this.$router.back() },
         toggleEmbed(show) {
@@ -190,39 +191,16 @@ export default {
             }
 
             // list locations (for dropdown)
-            let summary = JSON.parse(JSON.stringify(this.summary))
-            let buildings = summary.building_summary
-            let locations = [{ label: summary.customer, value: summary.customer }]
-            let countries = [...new Set(buildings.map(x => x.building_country).sort())]
-
-            countries.forEach(country => {
-                locations.push({ label: country, value: country, country: true })
-                let cities = [...new Set(buildings.filter(x => x.building_country == country).map(x => x.building_city).sort())]
-
-                cities.forEach(city => {
-                    locations.push({ label: city, value: city, city: true })
-
-                    locations.push(...buildings.filter(x => x.building_country == country && x.building_city == city).map(x => {
-                        let bldgInfo = floorSummary.find(i => i.building_name == x.building_name)
-
-                        return {
-                            label: x.building_name,
-                            value: x.building_name,
-                            id: bldgInfo?.building_id,
-                            building: true
-                        }
-                    }).sort())
-                })
-            })
+            let locations = extractLocations(this.summary)
             
-            if (this.locationFilter == null) this.locationFilter = locations[0]
+            if (this.locationFilter == null) this.setLocation(locations[0])
             
             this.locations = locations
             this.dataLoaded = true
         },
         locFilter(value, label, loc) {
-            // console.log('locFilter', value, label, loc)
-            this.locationFilter = loc
+            this.setLocation(loc)
+            if (this.$refs.hierarchyChart) this.$refs.hierarchyChart.renderChart()
         },
         timeStartChange(time, hour) {
             this.dataLoaded = false
@@ -254,7 +232,7 @@ export default {
         viewReport() {
             let query = {
                 cid: this.company.ref_id,
-                bid: this.locationFilter.id,
+                bid: this.locationFilter.value,
                 y: this.rptFilters.year,
                 m: this.rptFilters.month,
                 sh: this.dataFilters.start_hour,
@@ -308,14 +286,6 @@ export default {
         else if (this.settings) {
             this.dataFilters.start_hour = this.timeFilter.start = toHour(this.settings.start_time)
             this.dataFilters.stop_hour = this.timeFilter.end = toHour(this.settings.end_time)
-        }
-
-        // if (this.cp_location) this.locationFilter = this.cp_location
-        if (this.$route.query.name) {
-            let query = JSON.parse(JSON.stringify(this.$route.query))
-
-            query.value = query.name
-            this.locationFilter = query
         }
 
         if (this.company && this.company.ref_id) this.dataFilters.node_id = this.company.ref_id

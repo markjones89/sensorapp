@@ -41,6 +41,18 @@ export default {
         selectedLabel: '',
         selected: null
     }),
+    watch: {
+        chosen: function(value) {
+            if (value) {
+                let selected = this.filters.find(x => typeof x == 'object' ? x.value == value : x == value)
+
+                if (typeof selected == 'object') this.selectedLabel = selected.label
+                else this.selectedLabel = selected
+                
+                this.selected = value
+            }
+        }
+    },
     methods: {
         onSelect(value, label, item) { 
             this.selected = value

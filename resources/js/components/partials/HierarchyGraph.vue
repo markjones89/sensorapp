@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 import { Loader } from '@/components'
 import { getObjValue, toOrdinal } from '@/helpers'
 import hierarchyBarChart from '@/components/graphs/HierarchyBar'
@@ -26,7 +26,6 @@ export default {
     props: {
         custData: { type: Object },
         floorData: { type: Array },
-        locFilter: { type: Object },
         dataFilters: { type: Object }
     },
     components: {
@@ -43,12 +42,12 @@ export default {
             api_header: 'backend/api_header',
             api_customer_summary: 'backend/api_customer_summary',
             api_graph_view: 'backend/api_graph_view'
+        }),
+        ...mapState({
+            locFilter: state => state.homepage.locationFilter
         })
     },
     watch: {
-        locFilter(value) {
-            this.renderChart()
-        },
         dataFilters: {
             deep: true,
             handler() {
@@ -79,23 +78,25 @@ export default {
                 children: []
             }
             let buildings = summary.building_summary
-
-            // console.log('getChartData.locFilter', this.locFilter)
             
             if (this.locFilter && this.locFilter.value != summary.customer) {
-                let location = this.locFilter.value,
-                    filter = this.locFilter.country ? 'building_country' :
-                        this.locFilter.city ? 'building_city' :
-                        this.locFilter.building ? 'building_name' : null
+                let location = this.locFilter.value
 
-                nodes.title = location
+                nodes.title = this.locFilter.label
                 nodes.name = location
-                graphTitle = location
+                // graphTitle = location
+                graphTitle = this.locFilter.label
+
+                console.log('getChartData', this.locFilter, nodes)
 
                 if (this.locFilter.country) {
                     groupKeys = ['building_city']
                 }
-                if (filter) buildings = summary.building_summary.filter(x => x[filter] == location)
+                // if (filter) buildings = summary.building_summary.filter(x => x[filter] == location)
+
+                if (this.locFilter.country) buildings = summary.building_summary.filter(x => x.building_country.replace(/\s/g,'') == location)
+                else if (this.locFilter.city) buildings = summary.building_summary.filter(x => `${x.building_country}_${x.building_city}_City`.replace(/\s/g,'') == location)
+                else if (this.locFilter.building) buildings = summary.building_summary.filter(x => x.building_id == location)
             }
             else groupKeys = ['building_country', 'building_city']
 
@@ -104,7 +105,6 @@ export default {
 
                 if (floorSummary) {
                     return floorSummary.floor_summary.map(f => {
-                        // console.log('floors.forEach', f, c)
                         let floor = {
                             name: `${toOrdinal(f.floor)} Floor`,
                             floor: f.floor,
@@ -114,7 +114,6 @@ export default {
 
                         if (f.area_summary)
                             floor.children = f.area_summary.map(area => {
-                                // console.log('areas.forEach', area, c)
                                 return {
                                     name: area.group_id,
                                     value: getObjValue(area, dataKey) || 0,
@@ -141,15 +140,16 @@ export default {
                 c.subtitle = c.name
                 
                 if (this.locFilter?.building) {
-                    let building = buildings.find(x => x.building_name == this.locFilter.value)
+                    let building = buildings.find(x => x.building_id == this.locFilter.value)
                     let floors = formatFloorSummary(building, dataKey)
 
                     if (floors) c.children = floors
-                } else {
+                }
+                else {
                     buildings.forEach(a => {
-                        // console.log('buildings.forEach', a, c)
                         let bldg = {
                             // ID: a.building_name.replace(/\s/g,''),
+                            ID: a.building_id,
                             name: a.building_name,
                             title: a.building_name
                             // value: getObjValue(a, dataKey, null)
@@ -190,7 +190,7 @@ export default {
 
             nodes.children = categories
 
-            // console.log('getChartData', nodes)
+            console.log('getChartData.nodes', nodes)
 
             return nodes
         },
@@ -226,7 +226,7 @@ export default {
                     dataFromCache)
 
                 // format data for chart
-                let _data = this.getChartData(doRequest)
+                let _data = this.getChartData()
 
                 setTimeout(() => {
                     hierarchyBarChart('#peak-chart', _data, {
@@ -238,12 +238,10 @@ export default {
                                 this.routeTo(node.route, node.routeParams)
                             },
                             breakBar: (bar) => {
-                                // console.log('breakBar', bar)
                                 if (bar.title) this.graphTitle = bar.title
                                 if (bar.subtitle) this.subtitle = bar.subtitle
                             },
                             mergeBar: (bar) => {
-                                // console.log('mergeBar', bar)
                                 if (bar.title) this.graphTitle = bar.title
                                 if (bar.subtitle) this.subtitle = bar.subtitle
                             }
@@ -251,7 +249,7 @@ export default {
                     })
                 }, 100)
             } catch (error) {
-                // console.error('renderChart', error, error.response?.data)
+                console.error('renderChart', error, error.response?.data)
                 this.dataError = 'Unable to retrieve data, please try again'
                 this.dataLoaded = true
             }

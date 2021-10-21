@@ -74,12 +74,11 @@ import { Loader } from '@/components'
 import { circlePack } from '@/components/graphs/CirclePack'
 import { addEvent, removeEvent, sum, average, getObjValue, roundNum, dateRangeStr } from '@/helpers'
 import { format as d3Format } from 'd3-format'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 export default {
     props: {
         custData: { type: Object },
         statFilter: { type: Object },
-        locFilter: { type: String },
         dataFilters: { type: Object }
     },
     components: {
@@ -113,9 +112,6 @@ export default {
                 this.circlePack.setData(_data)
             }
         },
-        locFilter: function (value) {
-            if (this.circlePack) this.circlePack.goTo(value)
-        },
         dataFilters: {
             deep: true,
             handler(value) {
@@ -129,6 +125,9 @@ export default {
             api_header: 'backend/api_header',
             api_customer_summary: 'backend/api_customer_summary'
         }),
+        ...mapState({
+            locationFilter: state => state.homepage.locationFilter
+        }),
         opportunityCost() { return d3Format('$,.2s')(this.statsDisplay.opportunity_cost) },
         statDateRange() {
             let start = this.dataFilters.start_date
@@ -140,9 +139,12 @@ export default {
         }
     },
     methods: {
+        ...mapMutations({
+            setLocation: 'homepage/setLocation'
+        }),
         costClick() { this.$emit('costClick') },
-        peakClick() { this.$emit('peakClick', this.zoomedLocation ) },
-        wfhClick() { this.$emit('wfhClick', this.zoomedLocation) },
+        peakClick() { this.$emit('peakClick', this.locationFilter ) },
+        wfhClick() { this.$emit('wfhClick', this.locationFilter) },
         setStatsDisplay(data, isBuilding = false) {
             let stats = {}
 
@@ -208,13 +210,13 @@ export default {
                 temp = { _: grouped }
 
             let summary = JSON.parse(JSON.stringify(this.summary))
-            let nodes = { ID: '', name: summary.customer, children: [] }
+            let nodes = { ID: summary.customer, name: summary.customer, children: [] }
             let stats = []
 
             summary.building_summary.forEach(a => {
                 // stats
                 categories.forEach(c => {
-                    let stat = { ID: a.building_name.replace(/\s/g,''), category: c.name }
+                    let stat = { ID: a.building_id, category: c.name }
 
                     stat.average = c.key == '' ? 0 : a[c.key].average
                     stat.avgPercent = c.key == '' ? 0 : a[c.key].average_percentage
@@ -226,11 +228,9 @@ export default {
 
                 // nodes
                 let value = getObjValue(a, filter.value)
-                a.ID = a.building_name.replace(/\s/g,'')
+                a.ID = a.building_id
                 a.name = a.building_name
-                // a.value = a.opportunity_cost
                 a.value = value > 0 ? value : 1
-                // a.value_stat = getObjValue(a, filter)
                 a.value_stat = value
 
                 keys.reduce((r, k) => {
@@ -262,7 +262,7 @@ export default {
 
             _data.stats = stats
             _data.nodes = nodes
-            _data.location = this.locFilter
+            _data.location = JSON.parse(JSON.stringify(this.locationFilter))
             _data.subtitle = this.statFilter.boxLabel
 
             if (filter.value == 'opportunity_cost') _data.moneyValue = true
@@ -303,42 +303,40 @@ export default {
                 setTimeout(() => {
                     this.circlePack = new circlePack('#circle-pack', _data, {
                         zoomed: (node) => {
+                            let focused = {}
                             if (node.data.building_name) {
                                 this.setStatsDisplay(node.data, true)
-                                this.zoomedLocation = {
+                                focused = {
                                     building: true,
-                                    name: node.data.building_name
+                                    label: node.data.building_name,
+                                    value: node.data.ID
                                 }
                             }
                             else if (node.data.building_country) {
                                 let bldgSummary = this.summary.building_summary,
                                     buildings = bldgSummary.filter(x => x.building_country == node.data.name)
-                                    
-                                // console.log('zoomed.countryStats', countryStats)
+
                                 this.setStatsDisplay(buildings, true)
-                                this.zoomedLocation = {
+                                focused = {
                                     country: true,
-                                    name: node.data.name
+                                    label: node.data.name,
+                                    value: node.data.ID
                                 }
                             }
                             else if (node.data.building_city) {
-                                // let bldgSummary = this.summary.building_summary,
-                                //     buildings = bldgSummary.filter(x => x.building_country == node.data.country && x.building_city == node.data.name)
-                                    
-                                // console.log('zoomed.cityStats', cityStats)
                                 this.setStatsDisplay(node.data.children, true)
-                                this.zoomedLocation = {
+                                focused = {
                                     city: true,
-                                    name: node.data.name
+                                    label: node.data.name,
+                                    value: node.data.ID
                                 }
                             }
                             else {
-                                // this.setStatsDisplay(this.summary)
                                 this.setStatsDisplay(this.summary.building_summary, true)
-                                this.zoomedLocation = null
+                                focused = { label: this.summary.customer, value: this.summary.customer }
                             }
                             
-                            this.$emit('circleFocus', this.zoomedLocation)
+                            this.setLocation(focused)
                         },
                         moreInfo: (data) => {
                             // this.$router.push({ name: 'time' })
@@ -352,7 +350,10 @@ export default {
                 this.dataLoaded = true
             }
         },
-        handlePackRedraw () { if (this.circlePack && this.dataLoaded) this.circlePack.reDraw() }
+        handlePackRedraw () { if (this.circlePack && this.dataLoaded) this.circlePack.reDraw() },
+        zoomTo(location, fromDropdown = false) {
+            if (this.circlePack) this.circlePack.zoomLocation(location, fromDropdown)
+        }
     },
     mounted() {
         addEvent(window, 'resize', this.handlePackRedraw)

@@ -15,7 +15,8 @@ export function circlePack(wrapper, packData, callbacks) {
         k0,
         scaleFactor,
         barsDrawn = false,
-        wrapDelim = '|';
+        wrapDelim = '|',
+        zoomFromCircle = false
         // rotationText = [-14,4,23,-18,-10.5,-20,20,20,46,-30,-25,-20,20,15,-30,-15,-45,12,-15,-16,15,15,5,18,5,15,20,-20,-25];
 
     let circleColor = d3.scaleOrdinal()
@@ -66,9 +67,7 @@ export function circlePack(wrapper, packData, callbacks) {
     }
 
     function drawAll(nodes, stats) {
-        ////////////////////////////////////////////////////////////// 
-        ////////////////// Create Set-up variables  ////////////////// 
-        ////////////////////////////////////////////////////////////// 
+        ////////////////// Create Set-up variables  //////////////////
 
         let wrapperWidth = Math.max(_wrapper.node().clientWidth, 350),
             width = wrapperWidth / 1.5,
@@ -76,9 +75,7 @@ export function circlePack(wrapper, packData, callbacks) {
 
         let mobileSize = (window.innerWidth < 768 ? true : false);
 
-        ////////////////////////////////////////////////////////////// 
-        /////////////////////// Create SVG  /////////////////////// 
-        ////////////////////////////////////////////////////////////// 
+        /////////////////////// Create SVG  ///////////////////////
 
         _wrapper//.style('display', 'inline-block')
             .select('svg').remove()
@@ -104,9 +101,7 @@ export function circlePack(wrapper, packData, callbacks) {
                 })
                 .sort((a, b) => b.value - a.value));
 
-        ////////////////////////////////////////////////////////////// 
-        //////// Function | Draw the bars inside the circles ///////// 
-        ////////////////////////////////////////////////////////////// 
+        //////// Function | Draw the bars inside the circles /////////
 
         function drawBars() {
             let elementsPerBar = 7,
@@ -121,7 +116,7 @@ export function circlePack(wrapper, packData, callbacks) {
                     let _data = data.find(x => x.key === d.data.ID)
 
                     if (_data) {
-                        barsDrawn = true;
+                        barsDrawn = true
 
                         //Save current circle data in separate variable	
                         let current = d
@@ -317,9 +312,7 @@ export function circlePack(wrapper, packData, callbacks) {
                 });//each barWrapperOuter 
         }
 
-        ////////////////////////////////////////////////////////////// 
-        ///////////////// Function | Initiates /////////////////////// 
-        ////////////////////////////////////////////////////////////// 
+        ///////////////// Function | Initiates ///////////////////////
 
         //Create the bars inside the circles
         function runCreateBars() {
@@ -337,13 +330,12 @@ export function circlePack(wrapper, packData, callbacks) {
             focus0 = root
             k0 = 1
             d3.select("#loadText").remove()
-            if (_packData.location) searchByName(_packData.location)
+            // if (_packData.location) searchByName(_packData.location)
+            if (_packData.location) searchByID(_packData.location.value)
             else zoomTo(root)
         }
 
-        ////////////////////////////////////////////////////////////// 
-        ///////////////// Data | Read in Age data //////////////////// 
-        ////////////////////////////////////////////////////////////// 
+        ///////////////// Data | Read in Age data ////////////////////
 
         //Global variables
         let data;//, dataMax, dataById = {};
@@ -352,24 +344,21 @@ export function circlePack(wrapper, packData, callbacks) {
             .key(d => d.ID)
             .entries(stats)
 
-        ////////////////////////////////////////////////////////////// 
-        /////////// Read in Occupation Circle data /////////////////// 
-        ////////////////////////////////////////////////////////////// 
+        /////////// Read in Occupation Circle data ///////////////////
 
         root = pack(nodes)
         focus = root;
 
-        ////////////////////////////////////////////////////////////// 
-        /////////// Create a wrappers for each occupation //////////// 
-        ////////////////////////////////////////////////////////////// 
+        /////////// Create a wrappers for each occupation ////////////
         let plotWrapper = svg.selectAll("g")
             .data(root.descendants())
             .enter().append("g")
             .attr("class", "plotWrapper")
             .attr("id", function (d, i) {
                 // allOccupations[i] = d.data.name;
-                if (d.data.ID != undefined) return "plotWrapper_" + d.data.ID;
-                else return "plotWrapper_node";
+                // if (d.data.ID != undefined) return "plotWrapper_" + d.data.ID;
+                if (d.data.ID != undefined) return d.data.ID
+                else return "plotWrapper_node"
             });
 
         if (!mobileSize) {
@@ -379,31 +368,33 @@ export function circlePack(wrapper, packData, callbacks) {
                 // return typeof d.children === "undefined"
             })
                 .on("mouseover", showTooltip)
-                .on("mouseout", removeTooltip);
+                .on("mouseout", removeTooltip)
         }//if
 
-        ////////////////////////////////////////////////////////////// 
-        ///////////////////// Draw the circles /////////////////////// 
-        ////////////////////////////////////////////////////////////// 
+        ///////////////////// Draw the circles ///////////////////////
         let circle = plotWrapper.append("circle")
             .attr("id", "nodeCircle")
-            .attr("class", function (d, i) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
-            .style("fill", function (d) { return d.children ? circleColor(d.depth) : null; })
+            .attr("class", function (d, i) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root" })
+            .style("fill", function (d) { return d.children ? circleColor(d.depth) : null })
             .attr("r", function (d) {
                 // if (d.ID === "1.1.1.1") scaleFactor = d.value / (d.r * d.r);
-                if (d.data.building_name) scaleFactor = d.value / (d.r * d.r);
-                return d.r;
+                if (d.data.building_name) scaleFactor = d.value / (d.r * d.r)
+                return d.r
             })
             .on("click", function (d) {
                 if (root === d && focus == d) return
-                if (focus !== d) zoomTo(d)
+                if (focus !== d) {
+                    zoomFromCircle = true
+                    zoomTo(d)
+                }
                 else if (focus === d && !d.children) callbacks && callbacks.moreInfo.call(this, d)
-                else zoomTo(root)
-            });
+                else {
+                    zoomFromCircle = true
+                    zoomTo(root)
+                }
+            })
 
-        ////////////////////////////////////////////////////////////// 
-        //////// Draw the titles of parent circles on the Arcs /////// 
-        ////////////////////////////////////////////////////////////// 	
+        //////// Draw the titles of parent circles on the Arcs ///////
 
         //Create the data for the parent circles only
         let overlapNode = [];
@@ -452,47 +443,24 @@ export function circlePack(wrapper, packData, callbacks) {
             // .text(function (d) { return d.name.replace(/ and /g, ' & '); });
             // .text(d => { return `${d.name} ${_packData.moneyValue ? moneyFormat(d.value) : _packData.percentValue ? `${d.value}%` : d.value}` })
             .text(d => { return getStatDisplay(d, false) })
-
-        ////////////////////////////////////////////////////////////// 
-        ////////////////// Draw the Bar charts /////////////////////// 
-        ////////////////////////////////////////////////////////////// 
+ 
+        ////////////////// Draw the Bar charts ///////////////////////
 
         //Create a wrapper for everything inside a leaf circle
         let barWrapperOuter = plotWrapper.append("g")
             .attr("id", function (d) {
-                if (d.data.ID != undefined) return d.data.ID;
-                else return "node";
+                if (d.data.ID != undefined) return d.data.ID
+                else return "node"
             })
             .style("opacity", 0)
-            .attr("class", "barWrapperOuter");
-
-        ////////////////////////////////////////////////////////////// 
-        ////////////////// Create search box ///////////////////////// 
-        ////////////////////////////////////////////////////////////// 
-
-        /* //Create new options
-        let options = allOccupations;
-        let select = document.getElementById("searchBox");
-        //Put new options into select box
-        for (let i = 0; i < options.length; i++) {
-            let opt = options[i];
-            let el = document.createElement("option");
-            el.textContent = opt;
-            el.value = opt;
-            select.appendChild(el);
-        }
-
-        //Create combo box
-        $('.combobox').combobox(); */
+            .attr("class", "barWrapperOuter")
 
         // call runCreateBars and use the `done` method
         // with `runAfterCompletion` as it's parameter
         setTimeout(function () { runCreateBars().then(runAfterCompletion); }, 100);
     }//drawAll
 
-    ////////////////////////////////////////////////////////////// 
-    //////////////// Function | Search Box Event ///////////////// 
-    ////////////////////////////////////////////////////////////// 
+    //////////////// Search /////////////////
 
     function searchByName(location) {
         if (location !== "" & typeof location !== "undefined") {
@@ -504,9 +472,17 @@ export function circlePack(wrapper, packData, callbacks) {
         }
     }
 
-    ////////////////////////////////////////////////////////////// 
-    //////////////////// The zoom function ///////////////////////
-    ////////////////////////////////////////////////////////////// 
+    function searchByID(location) {
+        if (location !== "" & typeof location !== "undefined") {
+            d3.selectAll("#nodeCircle")
+                .filter(d => d.data.ID === location)
+                .each(function (d, i) { zoomTo(d) })
+        } else {
+            zoomTo(root)
+        }
+    }
+
+    //////////////////// The zoom function /////////////////////// 
 
     //The zoom function
     //Change the sizes of everything inside the circle and the arc texts
@@ -535,9 +511,7 @@ export function circlePack(wrapper, packData, callbacks) {
 
             let currentID = d.data.ID
             
-            ////////////////////////////////////////////////////////////// 
             /////////////// Change titles on the arcs ////////////////////
-            ////////////////////////////////////////////////////////////// 
 
             //Update the arcs with the new radii	
             d3.selectAll(".hiddenArcWrapper").selectAll(".circleArcHidden")
@@ -560,9 +534,7 @@ export function circlePack(wrapper, packData, callbacks) {
                 .style("font-size", function (d) { return Math.round(d.fontSize * k) + 'px' })
                 .style("opacity", function (d) { return kids.indexOf(d.ID) >= 0 ? 1 : 0 })
 
-            ////////////////////////////////////////////////////////////// 
             ////////////////////// The bar charts ////////////////////////
-            ////////////////////////////////////////////////////////////// 
 
             //The title inside the circles
             d3.selectAll(".innerCircleTitle")
@@ -691,9 +663,7 @@ export function circlePack(wrapper, packData, callbacks) {
             d3.select(".legendWrapper").transition().duration(1000).style("opacity", 1);
         }//else */
 
-        ////////////////////////////////////////////////////////////// 
         //////////////// Overal transform and resize /////////////////
-        //////////////////////////////////////////////////////////////
         let duration = 1250
 
         //Transition the circles to their new location
@@ -727,14 +697,12 @@ export function circlePack(wrapper, packData, callbacks) {
             focus0 = focus;
             k0 = k;
 
-            if (callbacks && callbacks.zoomed) callbacks.zoomed.call(this, focus)
+            if (zoomFromCircle && callbacks && callbacks.zoomed) callbacks.zoomed.call(this, focus)
         }, duration);
 
     }
 
-    ////////////////////////////////////////////////////////////// 
-    ///////////////////// Helper Functions ///////////////////////
-    ////////////////////////////////////////////////////////////// 
+    ///////////////////// Helper Functions /////////////////////// 
 
     //Wraps SVG text - Taken from http://bl.ocks.org/mbostock/7555321
     function wrap(textNode, width) {
@@ -789,8 +757,11 @@ export function circlePack(wrapper, packData, callbacks) {
         drawAll(data.nodes, data.stats)
     }
 
-    this.goTo = function (location) {
-        searchByName(location)
+    // this.goTo = function (location) { searchByName(location) }
+
+    this.zoomLocation = function (location, fromDropdown = false) {
+        zoomFromCircle = false
+        searchByID(location.value)
     }
 
     this.reDraw = function () {

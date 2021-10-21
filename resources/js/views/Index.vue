@@ -5,7 +5,7 @@
             <template v-if="dataLoaded">
                 <div class="graph-filters" v-if="dataLoaded">
                     <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter.value" :chosenAsSelected="true" @onSelect="filterSelect" />
-                    <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter" :chosenAsSelected="true" @onSelect="locFilter" />
+                    <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter.value" :chosenAsSelected="true" @onSelect="locFilter" />
                     <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
@@ -24,8 +24,8 @@
         </div>
         <div class="graph-content">
             <!-- graph & legends here -->
-            <circle-pack-stats
-                :custData="summary" :statFilter="filter" :locFilter="locationFilter" :dataFilters="dataFilters"
+            <circle-pack-stats ref="circlePack"
+                :custData="summary" :statFilter="filter" :dataFilters="dataFilters"
                 @dataLoaded="circlePackLoaded" @costClick="toTreeSummary" @peakClick="toPeak" @wfhClick="toWFH" @goToTime="toTimeChart" />
             <div class="bottom-filters">
                 <time-slider :from="timeFilter.start" :to="timeFilter.end"
@@ -50,7 +50,7 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import { addEvent, removeEvent, toHour, toISOStart, toISOEnd } from '@/helpers'
+import { addEvent, removeEvent, toHour, toISOStart, toISOEnd, extractLocations } from '@/helpers'
 import { DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
 import { CirclePackStats } from '@/components/partials'
 import { format as d3Format } from 'd3-format'
@@ -126,11 +126,13 @@ export default {
             this.dataLoaded = true
             if (!fromCache) {
                 this.setSummary(data)
-                this.setLocation(data.customer)
+                // this.setLocation(data.customer)
+                this.setLocation({ label: data.customer, value: data.customer })
                 this.setPeakSummary(null)
             }
 
-            this.locations = [data.customer, ...new Set(data.building_summary.map(x => x.building_country).sort())]
+            // this.locations = [data.customer, ...new Set(data.building_summary.map(x => x.building_country).sort())]
+            this.locations = extractLocations(data)
         },
         rangeSelect(range, from, to) {
             this.dataLoaded = false
@@ -142,7 +144,11 @@ export default {
             // this.filter = obj
             this.setFilter(obj)
         },
-        locFilter(loc) { this.setLocation(loc) },
+        locFilter(value, label, loc) {
+            this.setLocation(loc)
+
+            if (this.$refs.circlePack) this.$refs.circlePack.zoomTo(loc)
+        },
         // period filter
         filterMinute(minute) {
             this.minuteFilter = minute
@@ -175,12 +181,7 @@ export default {
             this.dataFilters.stop_hour = hour
             this.setTime({ start: this.dataFilters.start_hour, end: hour })
         },
-        toPeak(location) {
-            // console.log('toPeak', location)
-            let query = location ? JSON.parse(JSON.stringify(location)) : null
-
-            this.$router.push({ name: 'peak', query })
-        },
+        toPeak(location) { this.$router.push({ name: 'peak' }) },
         toWFH() { this.$router.push({ name: 'wfh' }) },
         toTimeChart() { this.$router.push({ name: 'time' }) }
     },

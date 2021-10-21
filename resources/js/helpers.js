@@ -346,6 +346,10 @@ export function roundNum(value, precision) {
     return Math.round(value * multiplier) / multiplier;
 }
 
+/**
+ * Returns the room size based on the given type
+ * @param {String} type Room type
+ */
 export function getRoomSize(type) {
     if (type === "Phone room (1)") return 1
     else if (type === "1:1 Room (2)") return 2
@@ -355,6 +359,10 @@ export function getRoomSize(type) {
     else if (type === "Large (20+)") return 20
 }
 
+/**
+ * Returns the meeting size based on the given type
+ * @param {String} type Meeting size type
+ */
 export function getMeetingSize(type) {
     if (type === "1 PAX Meeting Sizes") return 1
     else if (type === "2 PAX Meeting Sizes") return 2
@@ -393,8 +401,43 @@ export function dateRangeStr(from, to) {
     return ''
 }
 
+/**
+ * Removes the element's child nodes
+ * @param {String} selector HTML query selector
+ */
 export function clearEl(selector) {
     let elem = document.querySelector(selector)
 
     Array.prototype.slice.call(elem.children).forEach(child =>{ elem.removeChild(child) })
+}
+
+/**
+ * Returns the list of locations
+ * @param {Object} customerSummary Customer summary (from /api/summary/customer)
+ */
+export function extractLocations(customerSummary) {
+    let summary = JSON.parse(JSON.stringify(customerSummary))
+    let buildings = summary.building_summary
+    let locations = [{ label: summary.customer, value: summary.customer }]
+    let countries = [...new Set(buildings.map(x => x.building_country).sort())]
+
+    countries.forEach(country => {
+        locations.push({ label: country, value: country.replace(/\s/g,''), country: true })
+        let cities = [...new Set(buildings.filter(x => x.building_country == country).map(x => x.building_city).sort())]
+
+        cities.forEach(city => {
+            locations.push({ label: city, value: `${country}_${city}_City`.replace(/\s/g,''), city: true })
+
+            locations.push(...buildings.filter(x => x.building_country == country && x.building_city == city).map(x => {
+                return {
+                    label: x.building_name,
+                    value: x.building_id,
+                    // id: x.building_id,
+                    building: true
+                }
+            }).sort())
+        })
+    })
+
+    return locations
 }
