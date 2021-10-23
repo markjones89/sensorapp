@@ -126,7 +126,6 @@ export default {
 
 <style lang="scss">
 $primary: #ed762c;
-$buffer: #32313d;
 
 .time-slider {
     position: relative;
@@ -137,12 +136,12 @@ $buffer: #32313d;
         position: relative;
         height: 4px;
         border-radius: 2px;
-        background-color: $buffer;
+        background-color: var(--app-input-background);
 
         .slot-selected {
             position: absolute;
             top: 0;
-            background-color: $primary;
+            background-color: var(--app-primary-color);
             height: 4px;
             border-radius: 2px;
             transition: all .14s;
@@ -156,7 +155,7 @@ $buffer: #32313d;
             border-radius: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            background-color: $primary;
+            background-color: var(--app-primary-color);
             cursor: pointer;
             transition: all .14s;
 

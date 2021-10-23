@@ -27,6 +27,7 @@ export default {
     }),
     computed: {
         ...mapState({
+            theme: state => state.theme,
             user: state => state.user
         }),
         baseUrl() { return getBaseUrl() },
@@ -70,6 +71,9 @@ export default {
         }, 10 * (60 * 60 * 1000))
 
         if (this.user && this.user.company_id) this.setClient(this.user.company_id)
+    },
+    mounted() {
+        document.body.setAttribute('data-theme', this.theme)
     },
     destroyed() {
         if (this.backendAuthInterval) clearInterval(this.backendAuthInterval)

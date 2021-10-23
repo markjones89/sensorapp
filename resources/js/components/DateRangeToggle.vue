@@ -9,6 +9,7 @@
 </template>
 <script>
 import { padNum } from '@/helpers'
+import { mapState } from 'vuex'
 export default {
     props: ['active'],
     data: () => ({
@@ -25,6 +26,11 @@ export default {
         },
         customRangeValue: null
     }),
+    computed: {
+        ...mapState({
+            theme: state => state.theme
+        })
+    },
     methods: {
         selectRange(range) {
             let now = new Date(),
@@ -62,6 +68,8 @@ export default {
         pickerHidden() { this.showDatePicker = false }
     },
     created() {
+        this.datepickerOpts.theme = this.theme == 'light' ? 'orange' : 'dark'
+
         if (this.active) {
             this.selected = this.active.type
 

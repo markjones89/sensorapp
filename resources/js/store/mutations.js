@@ -1,3 +1,7 @@
+const setTheme = (state, theme) => {
+    state.theme = theme
+}
+
 const setUser = (state, user) => {
     state.user = user
 }
@@ -15,6 +19,7 @@ const setClients = (state, clients) => {
 }
 
 export default {
+    setTheme,
     setUser,
     setUserPhoto,
     setCompanyLogo,

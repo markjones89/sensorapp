@@ -1,12 +1,39 @@
 @import url("https://fonts.googleapis.com/css?family=Lato:400,500");
 
-$bg: #32313d;
-$wrapperBg: #282737;
-$primaryColor: #ed762c;
-$secondaryOverlay: #0B1A29;
+:root {
+    --app-text-color: #FFF;
+    --app-text-rgb: 255, 255, 255;
+    --app-background-color: #32313d;
+    --app-background-rgb: 50, 49, 61;
+    --app-box-color: #282737;
+    --app-box-rgb: 40, 39, 55;
+    --app-box-border: rgba(57, 57, 57, 0.08);
+    --app-primary-color: #ed762c;
+    --app-primary-rgb: 237, 118, 44;
+    --app-overlay-color: #0B1A29;
+    --app-overlay-rgb: 11, 26, 41;
+    --app-input-background: #333241;
+    --app-input-bg-rgb: 57, 56, 70;
+    --app-input-border: #282737;
+    --app-input-border-rgb: 40, 39, 55;
+}
+
+[data-theme="light"] {
+    --app-text-color: #0B1A29;
+    --app-text-rgb: 11, 26, 41;
+    --app-background-color: #FBFCFD;
+    --app-background-rgb: 251, 252, 253;
+    --app-box-color: #FFFFFF;
+    --app-box-rgb: 255, 255, 255;
+    --app-box-border: #E5E5E5;
+    --app-input-background: #F2F2F2;
+    --app-input-bg-rgb: 242, 242, 242;
+    --app-input-border: #F0F0F0;
+    --app-input-border-rgb: 240, 240, 240;
+}
+
 $btnHeight: 34px;
 $btnRadius: 18px;
-$modalOverlay: #0B1A29;
 $modalOverlayAlpha: 0.8;
 
 html, body {
@@ -14,11 +41,11 @@ html, body {
     padding: 0;
     font-family: Lato, sans-serif;
     height: 100vh;
-    color: #fff;
+    color: var(--app-text-color);
 }
 
 body {
-    background-color: $bg;
+    background-color: var(--app-background-color);
 
     &.modal--open {
         overflow: hidden;
@@ -106,7 +133,7 @@ svg { pointer-events: none; }
                 .caret { 
                     display: block; 
 
-                    svg { fill: #fff; }
+                    svg { fill: var(--app-text-color); }
                 }
             }
 
@@ -132,7 +159,7 @@ svg { pointer-events: none; }
                     margin: 0;
                     padding: 8px 0;
                     list-style: none;
-                    background-color: $primaryColor;
+                    background-color: var(--app-primary-color);
                     border-radius: 20px;
                     overflow: hidden;
                 }
@@ -159,8 +186,8 @@ svg { pointer-events: none; }
                     white-space: nowrap;
                     transition: background-color .24s ease;
 
-                    &:hover { background-color: rgba($color: $secondaryOverlay, $alpha: 0.1); }
-                    &:active { background-color: rgba($color: $secondaryOverlay, $alpha: 0.2); }
+                    &:hover { background-color: rgba($color: var(--app-overlay-rgb), $alpha: 0.1); }
+                    &:active { background-color: rgba($color: var(--app-overlay-rgb), $alpha: 0.2); }
 
                     .opt-icon {
                         height: 18px;
@@ -191,7 +218,7 @@ svg { pointer-events: none; }
             // margin: 0 64px;
             padding: 36px 32px;
             border-radius: 10px;
-            background-color: $wrapperBg;
+            background-color: var(--app-box-color);
             // min-height: calc(100% - 72px);
             // height: 100%;
             box-sizing: border-box;
@@ -228,8 +255,8 @@ textarea, select {
     color: inherit;
     width: 100%;
     padding: 10px;
-    background-color: #393846;
-    border: 1px solid rgba(11, 26, 41, 0.08);
+    background-color: var(--app-input-background);
+    border: 1px solid rgba($color: var(--app-input-border-rgb), $alpha: 0.08);
     outline: none;
     border-radius: 10px;
     box-sizing: border-box;
@@ -239,7 +266,7 @@ textarea, select {
     }
 
     &:disabled {
-        background-color: rgba($color: #393846, $alpha: 0.7);
+        background-color: rgba($color: var(--app-input-border-rgb), $alpha: 0.7);
     }
 }
 
@@ -268,12 +295,12 @@ textarea {
     line-height: $btnHeight;
     padding: 0 20px;
     text-decoration: none;
-    color: #fff;
+    color: var(--app-text-color);
     border: none;
     outline: none;
     user-select: none;
     cursor: pointer;
-    background-color: #393846;
+    background-color: var(--app-input-background);
     border-radius: $btnRadius;
 
     & + & {
@@ -296,10 +323,11 @@ textarea {
     }
 
     &.btn-primary {
-        background-color: $primaryColor;
+        color: #FFF;
+        background-color: var(--app-primary-color);
 
         &:not(.btn-link):disabled {
-            background-color: rgba($color: $primaryColor, $alpha: 0.7);
+            background-color: rgba($color: var(--app-primary-rgb), $alpha: 0.7);
         }
     }
 
@@ -314,7 +342,7 @@ textarea {
     &.btn-link {
         background-color: transparent;
         
-        &.btn-link.btn-primary { color: $primaryColor; }
+        &.btn-link.btn-primary { color: var(--app-primary-color); }
         &.btn-link.btn-danger { color: #f44336; }
 
         &:hover {
@@ -367,7 +395,7 @@ textarea {
             display: block;
             line-height: 20px;
             font-size: 14px;
-            color: rgba($color: #ffffff, $alpha: 0.5);
+            color: rgba($color: var(--app-text-rgb), $alpha: 0.5);
         }
     }
 
@@ -405,12 +433,12 @@ textarea {
         & + .graph-range-btn { margin-left: 4px; }
 
         &:hover {
-            background-color: rgba($color: #fff, $alpha: 0.03);
+            background-color: rgba($color: var(--app-input-bg-rgb), $alpha: 0.03);
         }
         
         &.btn--active {
-            background-color: rgba($color: #fff, $alpha: 0.05);
-            color: $primaryColor;
+            background-color: var(--app-input-background);
+            color: var(--app-primary-color);
         }
     }
 }
@@ -424,7 +452,7 @@ textarea {
     padding: 0 32px 0 20px;
     cursor: pointer;
     user-select: none;
-    background-color: rgba($color: #fff, $alpha: 0.05);
+    background-color: var(--app-input-background);
 
     & + .graph-filter {
         margin-left: 12px;
@@ -444,7 +472,7 @@ textarea {
             display: inherit;
             width: 10px;
             height: 6px;
-            fill: #fff;
+            fill: var(--app-text-color);
         }
     }
 }
@@ -458,7 +486,7 @@ textarea {
         display: inline-flex;
         align-items: center;
         cursor: pointer;
-        color: rgba($color: #ffffff, $alpha: 0.5);
+        color: rgba($color: var(--app-text-rgb), $alpha: 0.5);
 
         .btn {
             height: 24px;
@@ -481,13 +509,13 @@ textarea {
     cursor: pointer;
     margin-left: 12px;
     border-radius: 50%;
-    background-color: rgba($color: #fff, $alpha: 0.05);
+    background-color: var(--app-input-background);
 
     .dot {
         display: block;
         width: 4px;
         height: 4px;
-        background-color: #fff;
+        background-color: var(--app-text-color);
         border-radius: 50%;
 
         & + .dot {
@@ -501,8 +529,9 @@ textarea {
     top: 100%;
     right: 0;
     margin-top: 10px;
-    background-color: $bg;
+    background-color: var(--app-input-background);
     border-radius: 20px;
+    border: 1px solid var(--app-input-border);
     overflow: hidden;
 
     ul {
@@ -521,11 +550,11 @@ textarea {
         transition: background-color .24s;
 
         &:hover, &:focus {
-            background-color: rgba($color: $wrapperBg, $alpha: 0.4);
+            background-color: rgba($color: var(--app-box-rgb), $alpha: 0.4);
         }
 
         &:active {
-            background-color: rgba($color: $wrapperBg, $alpha: 0.6);
+            background-color: rgba($color: var(--app-box-rgb), $alpha: 0.6);
         }
     }
 }
@@ -541,7 +570,7 @@ textarea {
         bottom: 0;
         opacity: 0;
         visibility: hidden;
-        background-color: rgba($color: $bg, $alpha: 0.7);
+        background-color: rgba($color: var(--app-background-rgb), $alpha: 0.7);
         transition: visibility .5s, opacity .5s;
         z-index: 98;
     }
@@ -569,7 +598,7 @@ textarea {
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba($color: $bg, $alpha: 0.7);
+        background-color: rgba($color: var(--app-background-rgb), $alpha: 0.75);
         z-index: -1;
     }
 
@@ -581,7 +610,7 @@ textarea {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-        background-color: #282737;
+        background-color: var(--app-box-color);
         border: 1px solid rgba(11, 26, 41, 0.08);
         box-shadow: 0px 0px 30px rgba(9, 34, 58, 0.03);
         border-radius: 10px;
@@ -596,7 +625,7 @@ textarea {
             z-index: 1;
 
             svg {
-                fill: $primaryColor;
+                fill: var(--app-primary-color);
             }
         }
 
@@ -724,16 +753,16 @@ textarea {
 /* nprogress override */
 #nprogress {
     .bar {
-        background: $primaryColor !important;
+        background: var(--app-primary-color) !important;
     }
 
     .peg {
-        box-shadow: 0 0 10px $primaryColor, 0 0 5px $primaryColor !important;
+        box-shadow: 0 0 10px var(--app-primary-color), 0 0 5px var(--app-primary-color) !important;
     }
 
     .spinner-icon {
-        border-left-color: $primaryColor !important;
-        border-top-color: $primaryColor  !important;
+        border-left-color: var(--app-primary-color) !important;
+        border-top-color: var(--app-primary-color)  !important;
     }
 }
 
@@ -746,4 +775,36 @@ textarea {
     text-align: center;
     justify-content: center;
     height: 200px;
+}
+
+/* Custom date picker theme */
+$theme: 'orange';                 // theme name
+$headerBg: #e96513;             // header background color
+$highlight: #ed762c;            // current date color, selected date(s) highlight color
+$selectedHighlight: #cf5a11;    // selected highlight & buttons color
+
+.dudp__wrapper[data-theme='#{$theme}'] {
+    .dudp__calendar-header { background-color: $headerBg !important; }
+
+    .dudp__calendar {
+        .dudp__cal-week {
+            .dudp__date.current { color: $highlight !important; }
+
+            .dudp__date.in-range,
+            .dudp__date.range-from,
+            .dudp__date.range-to { background-color: rgba($color: $highlight, $alpha: 0.2) !important; }
+
+            .dudp__date.selected:before,
+            .dudp__date.range-from:before,
+            .dudp__date.range-to:before { background-color: $highlight !important; }
+
+            .dudp__date.selected:hover:before,
+            .dudp__date.range-from:hover:before,
+            .dudp__date.range-to:hover:before { background-color: $selectedHighlight !important; }
+        }
+    }
+
+    .dudp__buttons .dudp__button,
+    .dudp__months-view .dudp__month.selected,
+    .dudp__years-view .dudp__year.selected { color: $selectedHighlight !important; }
 }

@@ -11,13 +11,13 @@ import mdtoast from '@dmuy/toast/vue-toast'
 import duDialog from '@dmuy/dialog/vue-dialog'
 import duDatepicker from '@dmuy/datepicker/vue-datepicker'
 
-Vue.use(mdtoast)
-Vue.use(duDialog)
-Vue.use(duDatepicker, { theme: 'dark', auto: true })
-
 import App from './views/App.vue'
 import { store } from './store'
 import router from "./router"
+
+Vue.use(mdtoast)
+Vue.use(duDialog)
+Vue.use(duDatepicker, { theme: 'dark', auto: true })
 
 const app = new Vue({
     // el: '#app',

@@ -22,6 +22,10 @@
                     </li>
                     <li class="divider"></li>
                     <li class="user-menu">
+                        <a href="#" @click.prevent="toggleTheme">{{ themeText }}</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="user-menu">
                         <a :href="`${baseUrl}/logout`" @click.prevent="logout">
                             <span class="opt-icon"><img :src="`${baseUrl}/images/icons/logout.svg`"></span>Logout</a>
                         </li>
@@ -31,7 +35,7 @@
     </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 import { addEvent, getBaseUrl, removeEvent } from '../../helpers'
 import { CaretIcon } from '../icons'
 
@@ -42,6 +46,7 @@ export default {
     }),
     computed: {
         ...mapState({
+            theme: state => state.theme,
             user: state => state.user
         }),
         baseUrl() { return getBaseUrl() },
@@ -49,9 +54,17 @@ export default {
             return this.user && this.user.photo ?
                 `${this.baseUrl}/storage/user-photos/thumbnail/${this.user.photo}`:
                 `${this.baseUrl}/images/user0001.jpg`
-        }
+        },
+        themeText() { return this.theme == 'light' ? 'Dark Mode' : 'Light Mode' }
+    },
+    watch: {
+        theme: function(value) { document.body.setAttribute('data-theme', value) }
     },
     methods: {
+        ...mapMutations({
+            setTheme: 'setTheme'
+        }),
+        toggleTheme() { this.setTheme(this.theme == 'dark' ? 'light' : 'dark') },
         userOptsHandler(e) {
             let _ = this
 

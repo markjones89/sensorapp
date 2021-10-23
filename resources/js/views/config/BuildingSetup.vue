@@ -623,7 +623,8 @@ export default {
             height: calc(100% - 2px);
             font-size: 14px;
             cursor: pointer;
-            border: 1px dashed rgba(255, 255, 255, .1);
+            // border: 1px dashed rgba(255, 255, 255, .1);
+            border: 1px dashed rgba($color: var(--app-text-rgb), $alpha: 0.1);
             border-radius: 8px;
         }
 
@@ -651,6 +652,7 @@ export default {
                 bottom: 0;
                 right: 0;
                 padding: 2px 6px 6px;
+                color: #fff;
                 background-color: rgba($color: #393939, $alpha: 0.8);
                 transform: translateY(100%);
                 transition: transform .24s;
@@ -706,11 +708,13 @@ export default {
     }
 
     &:hover {
-        background-color: rgba($color: #ffffff, $alpha: 0.04);
+        // background-color: rgba($color: #ffffff, $alpha: 0.04);
+        background-color: rgba($color: var(--app-text-rgb), $alpha: 0.04);
     }
 
     &.selected {
-        background-color: rgba($color: #ffffff, $alpha: 0.1);
+        // background-color: rgba($color: #ffffff, $alpha: 0.1);
+        background-color: rgba($color: var(--app-text-rgb), $alpha: 0.1);
 
         .floor-info {
             .floor-number {
@@ -733,6 +737,7 @@ export default {
         font-size: 18px;
         padding: 10px;
         line-height: 24px;
+        color: #fff;
         background-color: rgba($color: #141414, $alpha: 0.7);
         z-index: 1;
 
@@ -774,7 +779,8 @@ export default {
     flex-direction: column;
     padding: 16px;
     border-radius: 10px;
-    background-color: rgb(48, 47, 63);
+    background-color: var(--app-background-color);
+    border: 1px solid var(--app-box-border);
     overflow: hidden;
 
     ul {

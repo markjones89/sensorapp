@@ -93,9 +93,9 @@ export default {
     cursor: default;
     text-align: left;
     white-space: nowrap;
-    background-color: #393846;
+    background-color: var(--app-input-background);
     border-radius: 20px;
-    border: 1px solid #282737;
+    border: 1px solid var(--app-input-border);
     overflow: hidden;
     z-index: 1;
 

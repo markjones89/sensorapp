@@ -41,7 +41,7 @@ $height: 15px;
         margin-top: 1px;
 
         path {
-            fill: #f9f5f0;
+            fill: var(--app-input-background);
         }
     }
 
@@ -55,7 +55,7 @@ $height: 15px;
         display: none;
 
         & ~ .checkbox_box {
-            background-color: #f9f5f0;
+            background-color: var(--app-input-background);
             transition: background-color .15s;
         }
         

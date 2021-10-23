@@ -18,6 +18,7 @@ const vuexLocal = new VuexPersistence({
 
 export const store = new Vuex.Store({
     state: () => ({
+        theme: 'dark',
         user: null,
         clients: []
     }),

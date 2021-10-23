@@ -35,7 +35,7 @@
         transition: background-color .24s linear;
 
         &:hover {
-            background-color: rgba($color: #ffffff, $alpha: 0.04);
+            background-color: rgba($color: var(--app-text-rgb), $alpha: 0.04);
         }
         
         .name {
@@ -50,7 +50,7 @@
                 margin-right: 8px;
 
                 svg {
-                    fill: #ffffff;
+                    fill: var(--app-text-color);
                     margin-bottom: 1px;
                     transition: transform .24s;
                 }

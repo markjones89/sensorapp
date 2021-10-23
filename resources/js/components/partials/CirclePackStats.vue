@@ -387,8 +387,9 @@ export default {
 
     #chart-stats {
         padding: 20px;
-        background-color: #393846;
+        background-color: var(--app-background-color);
         border-radius: 10px;
+        border: 1px solid var(--app-box-border);
 
         .stat-date {
             font-size: 16px;

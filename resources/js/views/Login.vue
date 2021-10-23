@@ -23,9 +23,10 @@
     #login-wrapper {
         width: 350px;
         margin: 0 auto;
-        background-color: #282737;
+        background-color: var(--app-box-color);
         padding: 24px;
         border-radius: 10px;
+        border: 1px solid var(--app-box-border);
 
         h1 {
             margin-bottom: 24px;
