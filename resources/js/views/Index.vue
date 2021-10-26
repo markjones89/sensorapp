@@ -3,8 +3,9 @@
         <div class="graph-header">
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
             <template v-if="dataLoaded">
-                <div class="graph-filters" v-if="dataLoaded">
-                    <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter.value" :chosenAsSelected="true" @onSelect="filterSelect" />
+                <div class="graph-filters">
+                    <!-- <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter.value" :chosenAsSelected="true" @onSelect="filterSelect" /> -->
+                    <stat-filter></stat-filter>
                     <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter.value" :chosenAsSelected="true" @onSelect="locFilter" />
                     <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
                 </div>
@@ -52,7 +53,7 @@
 import { mapMutations, mapState } from 'vuex'
 import { addEvent, removeEvent, toHour, toISOStart, toISOEnd, extractLocations } from '@/helpers'
 import { DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
-import { CirclePackStats } from '@/components/partials'
+import { CirclePackStats, StatFilter } from '@/components/partials'
 import { format as d3Format } from 'd3-format'
 export default {
     title: 'Home',
@@ -61,16 +62,17 @@ export default {
         GraphFilter,
         Modal,
         TimeSlider,
-        CirclePackStats
+        CirclePackStats,
+        StatFilter
     },
     data: () => ({
-        filters: [
-            { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
-            { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
-            { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
-            { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
-            { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
-        ], 
+        // filters: [
+        //     { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
+        //     { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
+        //     { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
+        //     { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
+        //     { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
+        // ], 
         // filter: { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
         locations: [],
         minuteFilter: 60,
@@ -105,11 +107,6 @@ export default {
             let minutes = [60]
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
-        },
-        formatted_opportunity_cost() {
-            var formatter = d3Format('$,.2s')
-            
-            return formatter(this.statsDisplay.opportunity_cost)
         }
     },
     methods: {
@@ -126,24 +123,19 @@ export default {
             this.dataLoaded = true
             if (!fromCache) {
                 this.setSummary(data)
-                // this.setLocation(data.customer)
                 this.setLocation({ label: data.customer, value: data.customer })
                 this.setPeakSummary(null)
             }
 
-            // this.locations = [data.customer, ...new Set(data.building_summary.map(x => x.building_country).sort())]
             this.locations = extractLocations(data)
         },
         rangeSelect(range, from, to) {
             this.dataLoaded = false
             this.setRange({ type: range, start: toISOStart(from), end: toISOEnd(to) })
-            this.dataFilters.start_date = toISOStart(from)//from.toISOString()
-            this.dataFilters.stop_date = toISOEnd(to)//to.toISOString()
+            this.dataFilters.start_date = toISOStart(from)
+            this.dataFilters.stop_date = toISOEnd(to)
         },
-        filterSelect(value, label, obj) {
-            // this.filter = obj
-            this.setFilter(obj)
-        },
+        // filterSelect(value, label, obj) { this.setFilter(obj) },
         locFilter(value, label, loc) {
             this.setLocation(loc)
 
@@ -166,7 +158,10 @@ export default {
                 if (e.keyCode === 27) _.showPageOpts = false
             }
         },
-        toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
+        toTreeSummary() {
+            // this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } })
+            this.$router.push({ name: 'tree-summary' })
+        },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show

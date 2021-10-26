@@ -9,23 +9,28 @@
                     Back
                 </div>
             </div>
-            <!-- <div class="graph-filters"></div> -->
-            <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </span>
-            <transition name="fadeUp">
-                <div class="page-opt-panel" v-if="showPageOpts">
-                    <ul>
-                        <li><a @click="toggleEmbed(true)">Embed</a></li>
-                    </ul>
+            <template v-if="loaded">
+                <div class="graph-filters" v-if="loaded">
+                    <stat-filter @filterSelect="filterSelect"></stat-filter>
                 </div>
-            </transition>
+                <!-- <div class="graph-filters"></div> -->
+                <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </span>
+                <transition name="fadeUp">
+                    <div class="page-opt-panel" v-if="showPageOpts">
+                        <ul>
+                            <li><a @click="toggleEmbed(true)">Embed</a></li>
+                        </ul>
+                    </div>
+                </transition>
+            </template>
         </div>
         <div class="graph-content">
             <div class="chart-header">
-                <span class="chart-title">{{ dataFilter.btnLabel }}</span>
+                <span class="chart-title">{{ filter.btnLabel }}</span>
                 <span class="chart-subtitle">{{ statDateRange }}</span>
             </div>
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
@@ -59,31 +64,35 @@
         </div>
     </div>
 </template>
-<style lang="scss" scoped>
-#tree-summary {
-    margin: 24px auto;
-    max-width: 100%;
-    width: 1024px;
-}
-</style>
+
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import { getBaseUrl, sum, toHour, toISOStart, toISOEnd, getObjValue, dateRangeStr, average, clearEl } from '@/helpers'
-import { CaretIcon, CaretLeftIcon } from '@/components/icons'
 import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { StatFilter } from '@/components/partials'
 import { collapsibleTree } from '@/components/graphs/CollapsibleTree'
 export default {
-    props: ['data_filter'],
-    components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider },
+    // props: ['data_filter'],
+    components: {
+        CaretIcon,
+        CaretLeftIcon,
+        Checkbox,
+        DateRangeToggle,
+        FilterDropdown,
+        Loader,
+        TimeSlider,
+        StatFilter
+    },
     title: 'Summary',
     data: () => ({
-        filters: [
-            { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
-            { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
-            { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
-            { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
-            { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
-        ],
+        // filters: [
+        //     { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
+        //     { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
+        //     { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
+        //     { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
+        //     { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
+        // ],
         loaded: false, showPageOpts: false, showEmbed: false,
         timeFilter: {
             start: null, end: null
@@ -105,6 +114,7 @@ export default {
             user: state => state.user,
             company: state => state.user.company,
             summary: state => state.homepage.summary,
+            filter: state => state.homepage.filter,
             rangeFilter: state => state.homepage.rangeFilter,
             startTimeFilter: state => state.homepage.startTime,
             endTimeFilter: state => state.homepage.endTime,
@@ -122,7 +132,7 @@ export default {
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
         },
-        dataFilter() { return this.filters.find(x => x.value == (this.data_filter || 'opportunity_cost')) },
+        // dataFilter() { return this.filters.find(x => x.value == (this.data_filter || 'opportunity_cost')) },
         statDateRange() {
             let start = this.dataFilters.start_date
             let end = this.dataFilters.stop_date
@@ -143,7 +153,7 @@ export default {
             let isoStart = toISOStart(from)
             let isoEnd = toISOEnd(to)
 
-            console.log('rangeSelect', range, isoStart, isoEnd)
+            // console.log('rangeSelect', range, isoStart, isoEnd)
 
             this.setRange({ type: range, start: isoStart, end: isoEnd })
             this.dataFilters.start_date = isoStart
@@ -153,6 +163,10 @@ export default {
             clearEl('#tree-summary')
             this.renderTree(true)
         },
+        filterSelect() {
+            clearEl('#tree-summary')
+            this.renderTree() 
+        },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
             this.showEmbed = show
@@ -161,7 +175,7 @@ export default {
             let keys = ['building_country', 'building_city'],
                 grouped = [],
                 temp = { _: grouped },
-                dataKey = this.dataFilter.value,
+                dataKey = this.filter.value,
                 moneyValue = dataKey == 'opportunity_cost'
 
             this.loaded = false
@@ -278,7 +292,7 @@ export default {
             this.dataFilters.start_date = isoStart
             this.dataFilters.stop_date = isoEnd
             this.setRange({ type: 'today', start: isoStart, end: isoEnd })
-            console.log('setRange', 'today', isoStart, isoEnd)
+            // console.log('setRange', 'today', isoStart, isoEnd)
         }
         else {
             this.dataFilters.start_date = this.rangeFilter.start
@@ -299,3 +313,11 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+#tree-summary {
+    margin: 24px auto;
+    max-width: 100%;
+    width: 1024px;
+}
+</style>

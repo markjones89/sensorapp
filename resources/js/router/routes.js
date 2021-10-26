@@ -22,7 +22,7 @@ export default [
             },
             {
                 path: 'expandable-summary', name: 'tree-summary', meta: { needsAuth: true },
-                props: (route) => ({ data_filter: route.query.df }),
+                // props: (route) => ({ data_filter: route.query.df }),
                 component: () => import(/* webpackChunkName: "js/views/insights/tree-summary" */ '../views/insights/TreeSummary.vue')
             },
             {
