@@ -121,8 +121,9 @@ export default {
             .cover-box {
                 width: 50%;
                 padding: 16px;
-                background-color: #32313d;
                 color: #fff;
+                background-color: #32313d;
+                -webkit-print-color-adjust: exact;
 
                 h1 {
                     margin-bottom: 32px;

@@ -260,6 +260,7 @@ export default {
     margin-top: 16px;
     padding: 8px;
     background-color: black;
+    -webkit-print-color-adjust: exact;
 
     &.red {
         background-color: red;
@@ -307,6 +308,7 @@ export default {
             background-color: black;
             border-radius: 4px;
             transform: translateY(-50%);
+            -webkit-print-color-adjust: exact;
         }
 
         &.red::before {
@@ -332,6 +334,16 @@ export default {
     @page {
         size: A4 landscape;
 
+        // @top-left { content: none; }
+        // @top-center { content: none; }
+
+        // @bottom-left {
+        //     content: 'Intuitive Workspaces';
+        // }
+        // @bottom-center {
+        //     content: counter(page);
+        // }
+
         h2 {
             page-break-before: always;
         }
@@ -343,6 +355,16 @@ export default {
 
     .report-header {
         display: none;
+    }
+
+    .workstation-util,
+    .meeting-room-util,
+    .hourly-meeting-room-util,
+    .tabular-stats,
+    .mr-supply-vs-meeting-size,
+    .meeting-room-performance,
+    .simultaneous-mr-util-vs-hours {
+        page-break-before: always;
     }
 }
 </style>

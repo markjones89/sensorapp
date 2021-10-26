@@ -131,6 +131,7 @@ export default {
             color: #fff;
             background-color: #000;
             box-shadow: inset 0.1em 0.1em 0.1em 0 rgba(200,200,200,0.5), inset -0.1em -0.1em 0.1em 0 rgba(0,0,0,0.5);
+            -webkit-print-color-adjust: exact;
 
             &.red {
                 background-color: rgb(246,29,29);
