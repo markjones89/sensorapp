@@ -16,7 +16,7 @@
     </div>
 </template>
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 import { getBaseUrl } from "@/helpers"
 import UserPanel from '@/components/partials/UserPanel'
 
@@ -37,9 +37,6 @@ export default {
         ...mapMutations({
             setClient: 'locations/setClient',
         }),
-        ...mapActions({
-            clearStore: 'clearStore'
-        }),
         userOptsHandler(e) {
             let _ = this
 
@@ -54,13 +51,6 @@ export default {
         toHome() { this.$router.push({ name: 'home' }) },
         async backendAuth(url) {
             await this.$store.dispatch('doBackendAuth', { apiUrl: url })
-        },
-        logout() {
-            axios.get('/logout').then(() => {
-                this.$router.push({ name: 'login' }, () => {
-                    this.clearStore()
-                })
-            })
         }
     },
     async created() {

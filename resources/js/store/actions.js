@@ -29,20 +29,11 @@ const doBackendAuth = async ({ state, commit }, payload) => {
 }
 
 const clearStore = ({ commit }) => {
-    commit('setUser', null)
-    commit('setClients', [])
-
-    commit('locations/setClient', null)
-    commit('locations/setBuildings', [])
-    commit('locations/setBuilding', null)
-    commit('locations/setFloor', null)
-
-    commit('homepage/setSummary', null)
-    commit('homepage/setRange', { type: null, start: null, end: null })
-    commit('homepage/setLocation', null)
-    commit('homepage/setTime', { start: null, end: null })
-
-    console.log('clearStore:cleared!')
+    commit('resetState')
+    commit('backend/resetState')
+    commit('homepage/resetState')
+    commit('locations/resetState')
+    commit('peakchart/resetState')
 }
 
 export default {

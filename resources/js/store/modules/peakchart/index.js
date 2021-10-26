@@ -1,11 +1,10 @@
+import { peakChartState } from '@/store/vars'
 import mutations from './mutations'
 import getters from './getters'
 
 export default {
     namespaced: true,
-    state: () => ({
-        summary: null
-    }),
+    state: peakChartState,
     mutations,
     getters
 }

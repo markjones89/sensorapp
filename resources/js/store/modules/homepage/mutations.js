@@ -1,3 +1,13 @@
+import { homepageState } from '@/store/vars'
+
+const resetState = (state) => {
+    let initial = homepageState()
+
+    Object.keys(initial).forEach(key => {
+        state[key] = initial[key]
+    })
+}
+
 const setSummary = (state, summary) => {
     state.summary = summary
 }
@@ -26,6 +36,7 @@ const setPeriod = (state, minute) => {
 }
 
 export default {
+    resetState,
     setSummary,
     setRange,
     setFilter,

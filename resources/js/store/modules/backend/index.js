@@ -1,14 +1,10 @@
+import { backendState } from '@/store/vars'
 import mutations from './mutations'
 import getters from './getters'
 
 export default {
     namespaced: true,
-    state: () => ({
-        // Sensor backend api base url
-        url: null,
-        // Sensor backend api auth token
-        authToken: null,
-    }),
+    state: backendState,
     mutations,
     getters
 }

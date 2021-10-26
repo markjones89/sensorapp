@@ -36,8 +36,8 @@
 </template>
 <script>
 import { mapMutations, mapState } from 'vuex'
-import { addEvent, getBaseUrl, removeEvent } from '../../helpers'
-import { CaretIcon } from '../icons'
+import { addEvent, getBaseUrl, removeEvent } from '@/helpers'
+import { CaretIcon } from '@/components/icons'
 
 export default {
     components: { CaretIcon },
@@ -79,7 +79,7 @@ export default {
         logout() {
             axios.get('/logout').then(() => {
                 this.$router.push({ name: 'login' }, () => {
-                    this.$store.commit('setUser', null)
+                    this.$store.dispatch('clearStore')
                 })
             })
         }
@@ -88,7 +88,6 @@ export default {
         addEvent(document, ['mousedown', 'touchend', 'keydown'], this.userOptsHandler)
     },
     destroyed() {
-        this.$store.commit('setUser', null)
         removeEvent(document, ['mousedown', 'touchend', 'keydown'], this.userOptsHandler)
     }
 }

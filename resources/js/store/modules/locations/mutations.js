@@ -1,3 +1,13 @@
+import { locationsState } from '@/store/vars'
+
+const resetState = (state) => {
+    let initial = locationsState()
+
+    Object.keys(initial).forEach(key => {
+        state[key] = initial[key]
+    })
+}
+
 const setClient = (state, client) => {
     state.client = client
 }
@@ -50,6 +60,7 @@ const setAreas = (state, bid, fid, areas) => {
 }
 
 export default {
+    resetState,
     setClient,
     setBuildings,
     setBuilding,

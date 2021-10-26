@@ -1,3 +1,13 @@
+import { initialState } from '@/store/vars'
+
+const resetState = (state) => {
+    let initial = initialState()
+
+    Object.keys(initial).forEach(key => {
+        state[key] = initial[key]
+    })
+}
+
 const setTheme = (state, theme) => {
     state.theme = theme
 }
@@ -19,6 +29,7 @@ const setClients = (state, clients) => {
 }
 
 export default {
+    resetState,
     setTheme,
     setUser,
     setUserPhoto,

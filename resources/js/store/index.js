@@ -1,3 +1,4 @@
+import { initialState } from '@/store/vars'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersistence from 'vuex-persist'
@@ -17,11 +18,7 @@ const vuexLocal = new VuexPersistence({
 })
 
 export const store = new Vuex.Store({
-    state: () => ({
-        theme: 'dark',
-        user: null,
-        clients: []
-    }),
+    state: initialState,
     // mutations: {},
     mutations,
     // actions: {},
