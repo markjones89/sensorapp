@@ -77,31 +77,28 @@ export default {
                 name: graphTitle, 
                 children: []
             }
-            let buildings = summary.building_summary
+            let buildings = summary.building_summary.filter(x => {
+                return this.floorSummary.find(s => s.building_id == x.building_id) != null
+            })
             
             if (this.locFilter && this.locFilter.value != summary.customer) {
                 let location = this.locFilter.value
 
                 nodes.title = this.locFilter.label
                 nodes.name = location
-                // graphTitle = location
                 graphTitle = this.locFilter.label
-
-                console.log('getChartData', this.locFilter, nodes)
 
                 if (this.locFilter.country) {
                     groupKeys = ['building_city']
+                    buildings = summary.building_summary.filter(x => x.building_country.replace(/\s/g,'') == location)
                 }
-                // if (filter) buildings = summary.building_summary.filter(x => x[filter] == location)
-
-                if (this.locFilter.country) buildings = summary.building_summary.filter(x => x.building_country.replace(/\s/g,'') == location)
                 else if (this.locFilter.city) buildings = summary.building_summary.filter(x => `${x.building_country}_${x.building_city}_City`.replace(/\s/g,'') == location)
                 else if (this.locFilter.building) buildings = summary.building_summary.filter(x => x.building_id == location)
             }
             else groupKeys = ['building_country', 'building_city']
 
             let formatFloorSummary = (a, dataKey) => {
-                let floorSummary = this.floorSummary.find(x => x.building_name == a.building_name)
+                let floorSummary = this.floorSummary.find(x => x.building_id == a.building_id)
 
                 if (floorSummary) {
                     return floorSummary.floor_summary.map(f => {
@@ -128,6 +125,7 @@ export default {
                         return floor
                     })
                 }
+                else return []
             }
             
             categories.forEach(c => {
@@ -190,7 +188,7 @@ export default {
 
             nodes.children = categories
 
-            console.log('getChartData.nodes', nodes)
+            console.log('getChartData', nodes)
 
             return nodes
         },

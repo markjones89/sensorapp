@@ -30,7 +30,7 @@ const doBackendAuth = async ({ state, commit }, payload) => {
 
 const clearStore = ({ commit }) => {
     commit('resetState')
-    commit('backend/resetState')
+    // commit('backend/resetState')
     commit('homepage/resetState')
     commit('locations/resetState')
     commit('peakchart/resetState')

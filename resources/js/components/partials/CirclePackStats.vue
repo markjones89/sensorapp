@@ -217,11 +217,12 @@ export default {
                 // stats
                 categories.forEach(c => {
                     let stat = { ID: a.building_id, category: c.name }
+                    let keyNotFound =  c.key !== '' && typeof a[c.key] == 'undefined'
 
-                    stat.average = c.key == '' ? 0 : a[c.key].average
-                    stat.avgPercent = c.key == '' ? 0 : a[c.key].average_percentage
-                    stat.peak = c.key == '' ? 0 : a[c.key].max
-                    stat.peakPercent = c.key == '' ? 0 : a[c.key].max_percentage
+                    stat.average = c.key == '' || keyNotFound ? 0 : Math.round(a[c.key]?.average || 0)
+                    stat.avgPercent = c.key == '' || keyNotFound ? 0 : roundNum(a[c.key]?.average_percentage || 0, 1)
+                    stat.peak = c.key == '' || keyNotFound ? 0 : Math.round(a[c.key]?.max || 0)
+                    stat.peakPercent = c.key == '' || keyNotFound ? 0 : roundNum(a[c.key]?.max_percentage || 0, 1)
 
                     stats.push(stat)
                 })

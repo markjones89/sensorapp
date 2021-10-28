@@ -22,7 +22,7 @@
                     </li>
                     <li class="divider"></li>
                     <li class="user-menu">
-                        <a href="#" @click.prevent="toggleTheme">{{ themeText }}</a>
+                        <a href="#" @click.prevent="toggleTheme">Dark theme: {{ themeText }}</a>
                     </li>
                     <li class="divider"></li>
                     <li class="user-menu">
@@ -55,10 +55,7 @@ export default {
                 `${this.baseUrl}/storage/user-photos/thumbnail/${this.user.photo}`:
                 `${this.baseUrl}/images/user0001.jpg`
         },
-        themeText() { return this.theme == 'light' ? 'Dark Mode' : 'Light Mode' }
-    },
-    watch: {
-        theme: function(value) { document.body.setAttribute('data-theme', value) }
+        themeText() { return this.theme == 'light' ? 'Off' : 'On' }
     },
     methods: {
         ...mapMutations({

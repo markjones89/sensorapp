@@ -754,6 +754,7 @@ export function circlePack(wrapper, packData, callbacks) {
     this.setData = function (data) {
         barsDrawn = false
         _packData = data
+        zoomFromCircle = true
         drawAll(data.nodes, data.stats)
     }
 

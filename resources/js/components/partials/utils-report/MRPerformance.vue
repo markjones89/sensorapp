@@ -120,7 +120,7 @@ export default {
                         let seatsInUseHTML = seriesName == 'Room Utilisation' ? '' :
                         `<div class="apexcharts-tooltip-y-group">
                             <span class="apexcharts-tooltip-text-y-label">Seats in Use: </span>
-                            <span class="apexcharts-tooltip-text-y-value">${seatsInUse} out of ${pax} (${pax}/${(value / 100).toFixed(3)})</span>
+                            <span class="apexcharts-tooltip-text-y-value">${seatsInUse} out of ${pax}</span>
                         </div>`
 
                         return `<div class="apexcharts-tooltip-title" style="font-size: 12px;">${title}</div>

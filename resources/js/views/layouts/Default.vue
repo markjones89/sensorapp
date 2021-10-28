@@ -33,6 +33,9 @@ export default {
         baseUrl() { return getBaseUrl() },
         isAuth() { return this.user != null }
     },
+    watch: {
+        theme: function (value) { document.body.setAttribute('data-theme', value) }
+    },
     methods: {
         ...mapMutations({
             setClient: 'locations/setClient',
