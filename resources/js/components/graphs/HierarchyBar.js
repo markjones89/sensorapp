@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { extend } from '../../helpers'
+import { extend } from '@/helpers'
 
 export default function hierarchyBarChart(wrapper, data, options) {
     const container = d3.select(wrapper)

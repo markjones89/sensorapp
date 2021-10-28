@@ -106,14 +106,14 @@ export default {
                             name: `${toOrdinal(f.floor)} Floor`,
                             floor: f.floor,
                             title: `${toOrdinal(f.floor)} Floor ${a.building_name}`,
-                            value: getObjValue(f, dataKey)
+                            value: getObjValue(f, dataKey, 0)
                         }
 
-                        if (f.area_summary)
+                        if (f.area_summary && f.area_summary.length > 0)
                             floor.children = f.area_summary.map(area => {
                                 return {
                                     name: area.group_id,
-                                    value: getObjValue(area, dataKey) || 0,
+                                    value: getObjValue(area, dataKey, 0),
                                     route: 'bar-chart',
                                     routeParams: {
                                         building: a.building_name,

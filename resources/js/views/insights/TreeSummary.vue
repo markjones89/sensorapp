@@ -204,7 +204,7 @@ export default {
             let summary = JSON.parse(JSON.stringify(this.summary.building_summary))
 
             // nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
-            nodes.value = (moneyValue ? sum : average)(summary.map(x => getObjValue(x, dataKey)))
+            nodes.value = (moneyValue ? sum : average)(summary.map(x => getObjValue(x, dataKey, 0)))
 
             summary.forEach(a => {
                 // nodes

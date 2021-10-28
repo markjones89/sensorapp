@@ -149,35 +149,34 @@ export default {
             let stats = {}
 
             if (isBuilding) {
-                console.log('setStatsDisplay', data)
                 if (Array.isArray(data)) {
                     stats = {
                         first: {
                             label: this.statFilter.boxLabel,
                             value: this.isFilterPercent ?
-                                `${roundNum(average(data.map(x => getObjValue(x, this.statFilter.value))))}%` :
-                                d3Format('$,.2s')(sum(data.map(x => getObjValue(x, this.statFilter.value))))
+                                `${roundNum(average(data.map(x => getObjValue(x, this.statFilter.value, 0))))}%` :
+                                d3Format('$,.2s')(sum(data.map(x => getObjValue(x, this.statFilter.value, 0))))
                         },
-                        opportunity_cost: sum(data.map(x => x.opportunity_cost)),
-                        peak_workspace_util: average(data.map(x => x.workspace_utils.max_percentage)),
-                        average_workspace_util: average(data.map(x => x.workspace_utils.average_percentage)),
-                        peak_meeting_room: average(data.map(x => x.meeting_room_occupancy.max_percentage || 0)),
-                        user_to_workspace_ratio: average(data.map(x => x.user_to_workspace_ratio)),
-                        work_from_home: average(data.map(x => x.work_from_home.average_percentage))
+                        opportunity_cost: sum(data.map(x => getObjValue(x, 'opportunity_cost', 0))),
+                        peak_workspace_util: average(data.map(x => getObjValue(x, 'workspace_utils.max_percentage', 0))),
+                        average_workspace_util: average(data.map(x => getObjValue(x, 'workspace_utils.average_percentage', 0))),
+                        peak_meeting_room: average(data.map(x => getObjValue(x, 'meeting_room_occupancy.max_percentage', 0))),
+                        user_to_workspace_ratio: average(data.map(x => getObjValue(x, 'user_to_workspace_ratio', 0))),
+                        work_from_home: average(data.map(x => getObjValue(x, 'work_from_home.average_percentage', 0)))
                     }
                 }
                 else {
-                    let firstValue = getObjValue(data, this.statFilter.value)
+                    let firstValue = getObjValue(data, this.statFilter.value, 0)
                     stats.first = {
                         label: this.statFilter.boxLabel,
                         value: this.isFilterPercent ? `${roundNum(firstValue, 1)}%` : d3Format('$,.2s')(firstValue)
                     }
-                    stats.opportunity_cost = data.opportunity_cost
-                    stats.peak_workspace_util = data.workspace_utils.max_percentage
-                    stats.average_workspace_util = data.workspace_utils.average_percentage
-                    stats.peak_meeting_room = data.meeting_room_occupancy.max_percentage || 0
-                    stats.user_to_workspace_ratio = data.user_to_workspace_ratio
-                    stats.work_from_home = data.work_from_home.average_percentage
+                    stats.opportunity_cost = getObjValue(data, 'opportunity_cost', 0)
+                    stats.peak_workspace_util = getObjValue(data, 'workspace_utils.max_percentage', 0)
+                    stats.average_workspace_util = getObjValue(data, 'workspace_utils.average_percentage', 0)
+                    stats.peak_meeting_room = getObjValue(data, 'meeting_room_occupancy.max_percentage', 0)
+                    stats.user_to_workspace_ratio = getObjValue(data, 'user_to_workspace_ratio', 0)
+                    stats.work_from_home = getObjValue(data, 'work_from_home.average_percentage', 0)
                 }
             }
 
@@ -229,7 +228,7 @@ export default {
                 })
 
                 // nodes
-                let value = getObjValue(a, filter.value)
+                let value = getObjValue(a, filter.value, 0)
                 a.ID = a.building_id
                 a.name = a.building_name
                 a.value = value > 0 ? value : 1

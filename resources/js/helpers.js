@@ -229,7 +229,7 @@ export function extend() {
 export function getObjValue(obj, propStr, defaultValue) {
     return propStr
         .split('.')
-        .reduce((o, p) => o ? o[p] : defaultValue, obj)
+        .reduce((o, p) => o && o[p] ? o[p] : defaultValue, obj)
 }
 
 /**
