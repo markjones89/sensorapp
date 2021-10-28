@@ -25,35 +25,14 @@
         </div>
     </div>
 </template>
-<style lang="scss" scoped>
-#app-verify {
-    padding: 92px 0;
-    width: 100%;
 
-    #verify-wrapper {
-        width: 300px;
-        margin: 0 auto;
-        background-color: #282737;
-        padding: 24px;
-        border-radius: 10px;
-
-        h1 {
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        #verified {
-            text-align: center;
-        }
-    }
-}
-</style>
 <script>
-import { getBaseUrl, getUrlParam } from '../helpers'
+import { getBaseUrl, getUrlParam } from '@/helpers'
 
 const userApi = '/api/users'
 
 export default {
+    title: 'Account Verification',
     data: () => ({
         securityCode: '', pass: '', confPass: '', verified: false,
         state: { verifying: false }
@@ -85,3 +64,27 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+#app-verify {
+    padding: 92px 0;
+    width: 100%;
+
+    #verify-wrapper {
+        width: 300px;
+        margin: 0 auto;
+        background-color: #282737;
+        padding: 24px;
+        border-radius: 10px;
+
+        h1 {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        #verified {
+            text-align: center;
+        }
+    }
+}
+</style>

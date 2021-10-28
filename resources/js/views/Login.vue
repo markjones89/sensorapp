@@ -49,6 +49,7 @@
 <script>
 import { getBaseUrl } from '../helpers'
 export default {
+    title: 'Login',
     data: () => ({
         email: null, password: null, remember: false, loggingIn: false//, redirectTo: null
     }),

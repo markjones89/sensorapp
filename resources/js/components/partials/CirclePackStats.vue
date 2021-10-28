@@ -149,6 +149,7 @@ export default {
             let stats = {}
 
             if (isBuilding) {
+                console.log('setStatsDisplay', data)
                 if (Array.isArray(data)) {
                     stats = {
                         first: {
@@ -160,7 +161,7 @@ export default {
                         opportunity_cost: sum(data.map(x => x.opportunity_cost)),
                         peak_workspace_util: average(data.map(x => x.workspace_utils.max_percentage)),
                         average_workspace_util: average(data.map(x => x.workspace_utils.average_percentage)),
-                        peak_meeting_room: average(data.map(x => x.meeting_room_occupancy.max_percentage)),
+                        peak_meeting_room: average(data.map(x => x.meeting_room_occupancy.max_percentage || 0)),
                         user_to_workspace_ratio: average(data.map(x => x.user_to_workspace_ratio)),
                         work_from_home: average(data.map(x => x.work_from_home.average_percentage))
                     }
@@ -174,7 +175,7 @@ export default {
                     stats.opportunity_cost = data.opportunity_cost
                     stats.peak_workspace_util = data.workspace_utils.max_percentage
                     stats.average_workspace_util = data.workspace_utils.average_percentage
-                    stats.peak_meeting_room = data.meeting_room_occupancy.max_percentage
+                    stats.peak_meeting_room = data.meeting_room_occupancy.max_percentage || 0
                     stats.user_to_workspace_ratio = data.user_to_workspace_ratio
                     stats.work_from_home = data.work_from_home.average_percentage
                 }

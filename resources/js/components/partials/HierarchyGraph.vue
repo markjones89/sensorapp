@@ -188,7 +188,7 @@ export default {
 
             nodes.children = categories
 
-            console.log('getChartData', nodes)
+            // console.log('getChartData', nodes)
 
             return nodes
         },

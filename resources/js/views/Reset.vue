@@ -36,37 +36,11 @@
         </div>
     </div>
 </template>
-<style lang="scss" scoped>
-#app-login {
-    padding: 92px 0;
-    width: 100%;
 
-    #login-wrapper {
-        width: 300px;
-        margin: 0 auto;
-        background-color: #282737;
-        padding: 24px;
-        border-radius: 10px;
-
-        h1 {
-            margin-bottom: 24px;
-            text-align: center;
-        }
-    }
-}
-#login-wrapper {
-    h1 {
-        margin-bottom: 8px !important;
-    }
-    h2 {
-        text-align: center;
-        margin-bottom: 24px;
-    }
-}
-</style>
 <script>
 const userApi = '/api/users'
 export default {
+    title: 'Password Reset',
     props: ['uid'],
     data: () => ({
         user: null, email: '', password: '', newPass: '', newPassConfirm: '',
@@ -109,15 +83,44 @@ export default {
     async created() {
         this.state.resetMode = this.uid !== null && typeof this.uid !== 'undefined'
 
-        console.log('uid', this.uid, this.state.resetMode)
+        // console.log('uid', this.uid, this.state.resetMode)
         if (this.uid) {
             let { data } = await axios.get(`${userApi}/${this.uid}`)
         
             this.user = data
 
-            console.log('user', data)
+            // console.log('user', data)
         }
         this.state.loaded = true
     }
 }
 </script>
+
+<style lang="scss" scoped>
+#app-login {
+    padding: 92px 0;
+    width: 100%;
+
+    #login-wrapper {
+        width: 320px;
+        margin: 0 auto;
+        background-color: #282737;
+        padding: 24px;
+        border-radius: 10px;
+
+        h1 {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+    }
+}
+#login-wrapper {
+    h1 {
+        margin-bottom: 8px !important;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+}
+</style>
