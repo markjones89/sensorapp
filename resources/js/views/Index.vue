@@ -54,7 +54,6 @@ import { mapMutations, mapState } from 'vuex'
 import { addEvent, removeEvent, toHour, toISOStart, toISOEnd, extractLocations } from '@/helpers'
 import { DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
 import { CirclePackStats, StatFilter } from '@/components/partials'
-import { format as d3Format } from 'd3-format'
 export default {
     title: 'Home',
     components: {
@@ -66,14 +65,6 @@ export default {
         StatFilter
     },
     data: () => ({
-        // filters: [
-        //     { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
-        //     { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
-        //     { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
-        //     { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
-        //     { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
-        // ], 
-        // filter: { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
         locations: [],
         minuteFilter: 60,
         timeFilter: { start: null, end: null },
@@ -130,10 +121,13 @@ export default {
             this.locations = extractLocations(data)
         },
         rangeSelect(range, from, to) {
+            let isoStart = toISOStart(from),
+                isoEnd = toISOEnd(to)
+
             this.dataLoaded = false
-            this.setRange({ type: range, start: toISOStart(from), end: toISOEnd(to) })
-            this.dataFilters.start_date = toISOStart(from)
-            this.dataFilters.stop_date = toISOEnd(to)
+            this.setRange({ type: range, start: isoStart, end: isoEnd })
+            this.dataFilters.start_date = isoStart
+            this.dataFilters.stop_date = isoEnd
         },
         // filterSelect(value, label, obj) { this.setFilter(obj) },
         locFilter(value, label, loc) {
@@ -186,11 +180,13 @@ export default {
         if (this.rangeFilter.type == null) {
             let now = new Date(),
                 start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-                end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
+                end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23),
+                isoStart = toISOStart(start),
+                isoEnd = toISOEnd(end)
 
-            this.dataFilters.start_date = toISOStart(start)
-            this.dataFilters.stop_date = toISOEnd(end)
-            this.setRange({ type: 'today', start: toISOStart(start), end: toISOEnd(end) })
+            this.dataFilters.start_date = isoStart
+            this.dataFilters.stop_date = isoEnd
+            this.setRange({ type: 'today', start: isoStart, end: isoEnd })
         } else {
             this.dataFilters.start_date = this.rangeFilter.start
             this.dataFilters.stop_date = this.rangeFilter.end

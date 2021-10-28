@@ -63,43 +63,14 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
-<style lang="scss" scoped>
-#sensor-mapper {
-    display: flex;
-    margin-top: 24px;
-    height: calc(100% - 64px);
 
-    .row {
-        height: 100%;
-    }
-
-    #mapper-options {
-        margin-bottom: 24px;
-
-        #switches {
-            margin-top: 16px;
-        }
-
-        .vue-switcher {
-            position: relative;
-            display: inline-block;
-            margin: 5px 5px 20px;
-        }
-    }
-
-    #floor-map {
-        position: relative;
-        flex: 1 auto;
-    }
-}
-</style>
 <script>
 import { mapGetters, mapMutations, mapState } from 'vuex'
-import { getBaseUrl, toOrdinal } from '../../helpers'
-import { Loader, Modal } from '../../components'
-import floorMapper from '../../components/FloorMapper.js'
-import { FilterDropdown } from '../../components'
-import { CaretIcon } from '../../components/icons'
+import { getBaseUrl, toOrdinal } from '@/helpers'
+import { Loader, Modal } from '@/components'
+import floorMapper from '@/components/FloorMapper.js'
+import { FilterDropdown } from '@/components'
+import { CaretIcon } from '@/components/icons'
 
 const api = {
     bldg: '/api/locations',
@@ -344,7 +315,7 @@ export default {
             this.entry.id = id
             this.entry.sensor = s.sensor_id
             this.entry.name = s.name
-            this.entry.group = s.group_id
+            this.entry.group = s.parent_id//s.group_id
             this.entry.pos_x = s.pos_x
             this.entry.pos_y = s.pos_y
             this.entry.scale = s.scale
@@ -444,3 +415,35 @@ export default {
     }
 }
 </script>
+
+
+<style lang="scss" scoped>
+#sensor-mapper {
+    display: flex;
+    margin-top: 24px;
+    height: calc(100% - 64px);
+
+    .row {
+        height: 100%;
+    }
+
+    #mapper-options {
+        margin-bottom: 24px;
+
+        #switches {
+            margin-top: 16px;
+        }
+
+        .vue-switcher {
+            position: relative;
+            display: inline-block;
+            margin: 5px 5px 20px;
+        }
+    }
+
+    #floor-map {
+        position: relative;
+        flex: 1 auto;
+    }
+}
+</style>

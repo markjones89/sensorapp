@@ -294,6 +294,26 @@ export function toISOEnd(date) {
 }
 
 /**
+ * Returns a Date object of specified the ISO date/time
+ * @param {String} isoDate ISO date/time string
+ */
+export function isoToDate(isoDate) {
+    let dateStr = isoDate.substring(0, isoDate.indexOf('T')).split('-').map(x => parseInt(x))
+    let date = new Date(dateStr[0], dateStr[1] - 1, dateStr[2])
+    
+    return date
+}
+
+/**
+ * Returns true if the specified dates (first, second) are the same
+ * @param {Date} first First date to compare
+ * @param {Date} second Second date to compare
+ */
+export function isSameDate(first, second) {
+    return first.getTime() == second.getTime()
+}
+
+/**
  * Returns the start and end date of the specified year & month (ISO start & end format)
  * @param {Number} year Year (4-digit)
  * @param {Number} month Month (0 - 11)

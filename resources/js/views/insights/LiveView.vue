@@ -83,16 +83,17 @@
 </template>
 
 <script>
-import { addEvent, removeEvent, getBaseUrl, toOrdinal } from '../../helpers'
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { FilterDropdown, Loader } from '../../components'
-import floorMapper from '../../components/FloorMapper.js'
+import { addEvent, removeEvent, getBaseUrl, toOrdinal } from '@/helpers'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { FilterDropdown, Loader } from '@/components'
+import floorMapper from '@/components/FloorMapper.js'
 import { mapState, mapGetters } from 'vuex'
 
 const api = {
     building: '/api/locations',
     floor: '/api/floors',
-    sensor: '/api/sensors'
+    sensor: '/api/sensors',
+    area: '/api/areas'
 }
 export default {
     title: 'Live',
@@ -102,7 +103,7 @@ export default {
         loaded: false, mapper: null, showPageOpts: false, showEmbed: false,
         liveWS: null, wsConnected: false,
         building: null, floors: [], floor: null, showFilter: false, floorFilter: null,
-        sensors: [],
+        sensors: [], areas: [],
         sci_id: null // sensor change interval
     }),
     computed: {
@@ -119,10 +120,10 @@ export default {
         floorFilters() { return this.floors.map(f => { return { value: f.id, label: `${f.ordinal_no} Floor` } }) },
         freeSensors() { return this.sensors.filter(s => s.sensor_state == 'available') },
         occupiedSensors() { return this.sensors.filter(s => s.sensor_state == 'occupied') },
-        freeDeskSensors() { return this.freeSensors.filter(s => s.area && s.area.type_id == 4).length },
-        occupiedDeskSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type_id == 4).length },
-        freeRoomSensors() { return this.freeSensors.length },
-        occupiedRoomSensors() { return this.occupiedSensors.length },
+        freeDeskSensors() { return this.freeSensors.filter(s => s.area && s.area.type == 'Desk Area').length },
+        occupiedDeskSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type == 'Desk Area').length },
+        freeRoomSensors() { return this.freeSensors.filter(s => s.area && s.area.type == 'Meeting Room').length },
+        occupiedRoomSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room').length },
     },
     methods: {
         wsConnect() {
@@ -240,6 +241,8 @@ export default {
             setTimeout(() => { this.setFloorMap() }, 100)
         },
         async getFloorData(fid) {
+            this.areas = [...this.floor.areas]
+
             let res = await axios.all([
                 axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header()),
                 axios.get(api.sensor, { fid: fid })
@@ -257,6 +260,7 @@ export default {
                     s.scale = map.scale
                 }
                 s.sensor_state = 'available'
+                s.area = this.areas.find(x => x.id == s.parent_id)
             })
 
             this.sensors = [...sensors]
