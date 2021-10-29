@@ -10,6 +10,9 @@
     --app-box-border: rgba(57, 57, 57, 0.08);
     --app-primary-color: #ed762c;
     --app-primary-rgb: 237, 118, 44;
+    --app-primary-darker: #eb6a19;
+    --app-primary-dark: #dd6013;
+    --app-red-color: #f44336;
     --app-overlay-color: #0B1A29;
     --app-overlay-rgb: 11, 26, 41;
     --app-input-background: #333241;
@@ -284,7 +287,7 @@ textarea {
     }
 
     .input-error {
-        color: #f44336;
+        color: var(--app-red-color);
         font-size: 13px;
     }
 }
@@ -325,17 +328,26 @@ textarea {
     &.btn-primary {
         color: #FFF;
         background-color: var(--app-primary-color);
+        transition: background-color .2s;
 
         &:not(.btn-link):disabled {
             background-color: rgba($color: var(--app-primary-rgb), $alpha: 0.7);
         }
+
+        &:not(:disabled):hover {
+            background-color: var(--app-primary-darker);
+        }
+
+        &:not(:disabled):active {
+            background-color: var(--app-primary-dark);
+        }
     }
 
     &.btn-danger {
-        background-color: #f44336;
+        background-color: var(--app-red-color);
 
         &:not(.btn-link):disabled {
-            background-color: rgba($color: #f44336, $alpha: 0.7);
+            background-color: rgba($color: var(--app-red-color), $alpha: 0.7);
         }
     }
     
@@ -343,7 +355,7 @@ textarea {
         background-color: transparent;
         
         &.btn-link.btn-primary { color: var(--app-primary-color); }
-        &.btn-link.btn-danger { color: #f44336; }
+        &.btn-link.btn-danger { color: var(--app-red-color); }
 
         &:hover {
             text-decoration: underline;

@@ -41,11 +41,10 @@
             </div>
         </div>
         <div class="graph-footer">
-            <div class="left-options">
+            <div class="left-options" v-if="locationFilter && locationFilter.building">
                 <button class="btn btn-primary btn-small" @click="toLive">Live</button>
                 <button class="btn btn-primary btn-small"
-                    @click="showReport(true)"
-                    v-if="locationFilter && locationFilter.building">
+                    @click="showReport(true)">
                     Report
                 </button>
             </div>
@@ -219,9 +218,7 @@ export default {
             this.$router.push({ name: route, query })
         },
         toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
-        toLive() {
-            this.$router.push({ name: 'occupancy' }) //, query: { bid: bid }
-        },
+        toLive() { this.$router.push({ name: 'occupancy', query: { bid: this.locationFilter.value } }) },
         showReport(show) {
             this.filterReport = show
 

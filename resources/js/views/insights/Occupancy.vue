@@ -11,13 +11,14 @@
                     </div>
                 </div>
                 <div class="graph-filters">
-                    <span class="graph-filter" @click="showFilter = !showFilter">
+                    <graph-filter placeholder="Select Building" :filters="buildingFilters" :chosen="bldgFilter" :chosenAsSelected="true" @onSelect="filterSelect" />
+                    <!-- <span class="graph-filter" @click="showFilter = !showFilter">
                         {{ bldgFilter ? bldgFilter : 'Select Building' }}
                         <span class="caret">
                             <caret-icon />
                         </span>
                         <filter-dropdown :filters="buildingFilters" :show="showFilter" @onSelect="filterSelect" />
-                    </span>
+                    </span> -->
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
                     <span class="dot"></span>
@@ -64,6 +65,127 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
+
+<script>
+import { GraphFilter, Loader } from '@/components'
+import { BuildingSvg } from '@/components/svg'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { mapState, mapGetters } from 'vuex'
+import { toOrdinal } from '@/helpers'
+
+const api = {
+    building: '/api/locations',
+    floor: '/api/floors'
+}
+
+export default {
+    props: ['bldg_id'],
+    components: {
+        BuildingSvg,
+        CaretIcon,
+        CaretLeftIcon,
+        GraphFilter,
+        Loader
+    },
+    data: () => ({
+        buildings: [], building: null, bldgFilter: null, loaded: false, showPageOpts: false, showEmbed: false, showFilter: false,
+        floors: [], floorsReverse: []
+    }),
+    computed: {
+        ...mapState({
+            user: state => state.user 
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers',
+            api_buildings: 'backend/api_buildings',
+            api_floors: 'backend/api_floors'
+        }),
+        buildingFilters() {
+            return this.buildings.map(b => { return { value: b.id, label: b.name } })
+        }
+    },
+    methods: {
+        backTo() { this.$router.back() },
+        async getBuildings() {
+            let compId = this.user.company_id
+
+            let { data } = await axios.get(this.api_buildings(compId), this.api_header())
+
+            this.buildings = data
+            if (this.bldg_id) {
+                this.building = data.find(b => b.id === this.bldg_id)
+            } else {
+                this.building = data[0]
+            }
+            // this.bldgFilter = this.building.name
+            this.bldgFilter = this.building.id
+
+            await this.getFloors(this.building.id)
+            this.loaded = true
+        },
+        async getFloors(id) {
+            let compId = this.user.company_id
+
+            // let { data } = await axios.get(this.api_floors(compId, id), this.api_header())
+            let res = await axios.all([
+                axios.get(api.floor, { params: { bid: id } }),
+                axios.get(this.api_floors(compId, id), this.api_header())
+            ])
+
+            let refs = res[0].data,
+                floors = res[1].data
+
+            floors.forEach(f => {
+                let ref = refs.find(x => x.ref_id == f.id)
+                
+                f.ordinal_no = toOrdinal(f.number)
+                f.occupancy_limit = ref?.occupancy_limit || Math.floor((Math.random() * 25) + 1)
+                f.occupancy_live = Math.floor((Math.random() * f.occupancy_limit) + 1)
+            })
+
+            this.floors = floors.sort((a, b) => {
+                if (a.number > b.number) return 1
+                if (a.number < b.number) return -1
+                return 0
+            })
+            this.floorsReverse = floors.sort((a, b) => {
+                if (a.number > b.number) return -1
+                if (a.number < b.number) return 1
+                return 0
+            })
+        },
+        getLiveColor(live, limit){
+            let percent = (live / limit) * 100
+
+            return {
+                green: percent < 50,
+                yellow: percent >= 50,
+                orange: percent >= 90
+            }
+        },
+        filterSelect(value, label, obj) {
+            this.showFilter = false
+            this.building = this.buildings.find(b => b.id === value)
+            // this.bldgFilter = this.building.name
+            this.bldgFilter = value
+            this.getFloors(this.building.id)
+        },
+        toggleEmbed(show) {
+            if (show) this.showPageOpts = false
+            this.showEmbed = show
+        },
+        floorClick(floor) { this.toLive(floor.id) },
+        toLive(fid) {
+            this.$router.push({ name: 'live', query: { bid: this.building.id, fid: fid } })
+        }
+    },
+    mounted() {
+        this.getBuildings()
+    }
+}
+</script>
+
 <style lang="scss" scoped>
 $green: #01FE01;//#3DCFA3;
 $yellow: #FF8600;//#F0A718;
@@ -141,114 +263,3 @@ $darkenAmount: 10%;
     }
 }
 </style>
-<script>
-import { FilterDropdown, Loader } from '../../components'
-import { BuildingSvg } from '../../components/svg'
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { mapState, mapGetters } from 'vuex'
-import { toOrdinal } from '../../helpers'
-
-const api = {
-    building: '/api/locations',
-    floor: '/api/floors'
-}
-
-export default {
-    props: ['bldg_id'],
-    components: { BuildingSvg, CaretIcon, CaretLeftIcon, FilterDropdown, Loader },
-    data: () => ({
-        buildings: [], building: null, bldgFilter: null, loaded: false, showPageOpts: false, showEmbed: false, showFilter: false,
-        floors: [], floorsReverse: []
-    }),
-    computed: {
-        ...mapState({
-            user: state => state.user 
-        }),
-        ...mapGetters({
-            api_header: 'backend/api_header',
-            api_customers: 'backend/api_customers',
-            api_buildings: 'backend/api_buildings',
-            api_floors: 'backend/api_floors'
-        }),
-        buildingFilters() {
-            return this.buildings.map(b => { return { value: b.id, label: b.name } })
-        }
-    },
-    methods: {
-        backTo() { this.$router.back() },
-        async getBuildings() {
-            let compId = this.user.company_id
-
-            let { data } = await axios.get(this.api_buildings(compId), this.api_header())
-
-            this.buildings = data
-            if (this.bldg_id) {
-                this.building = data.find(b => b.id === this.bldg_id)
-            } else {
-                this.building = data[0]
-            }
-            this.bldgFilter = this.building.name
-
-            await this.getFloors(this.building.id)
-            this.loaded = true
-        },
-        async getFloors(id) {
-            let compId = this.user.company_id
-
-            // let { data } = await axios.get(this.api_floors(compId, id), this.api_header())
-            let res = await axios.all([
-                axios.get(api.floor, { params: { bid: id } }),
-                axios.get(this.api_floors(compId, id), this.api_header())
-            ])
-
-            let refs = res[0].data,
-                floors = res[1].data
-
-            floors.forEach(f => {
-                let ref = refs.find(x => x.ref_id == f.id)
-                
-                f.ordinal_no = toOrdinal(f.number)
-                f.occupancy_limit = ref?.occupancy_limit || Math.floor((Math.random() * 25) + 1)
-                f.occupancy_live = Math.floor((Math.random() * f.occupancy_limit) + 1)
-            })
-
-            this.floors = floors.sort((a, b) => {
-                if (a.number > b.number) return 1
-                if (a.number < b.number) return -1
-                return 0
-            })
-            this.floorsReverse = floors.sort((a, b) => {
-                if (a.number > b.number) return -1
-                if (a.number < b.number) return 1
-                return 0
-            })
-        },
-        getLiveColor(live, limit){
-            let percent = (live / limit) * 100
-
-            return {
-                green: percent < 50,
-                yellow: percent >= 50,
-                orange: percent >= 90
-            }
-        },
-        filterSelect(value) {
-            this.showFilter = false
-            this.building = this.buildings.find(b => b.id === value)
-            this.bldgFilter = this.building.name
-            this.getFloors(this.building.id)
-        },
-        toggleEmbed(show) {
-            if (show) this.showPageOpts = false
-            this.showEmbed = show
-        },
-        floorClick(floor) { this.toLive(floor.id) },
-        toLive(fid) {
-            this.$router.push({ name: 'live', query: { bid: this.building.id, fid: fid } })
-        }
-    },
-    mounted() {
-        this.getBuildings()
-    }
-}
-</script>
