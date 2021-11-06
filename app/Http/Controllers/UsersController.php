@@ -205,6 +205,23 @@ class UsersController extends Controller
         return response(['r' => false, 'm' => 'Logo image is expected']);
     }
 
+    public function setTheme(Request $request, $id) {
+        $uid = Hashids::connection('user')->decode($id)[0];
+        $user = User::find($uid);
+
+        if ($user) {
+            if ($request->theme == '' || !$request->has('theme')) {
+                return response(['r' => false, 'm' => 'Theme is required']);
+            } else {
+                $user->app_theme = $request->theme;
+                $user->save();
+
+                return response(['r' => false, 'm' => 'Theme preference saved']);
+            }
+        }
+        return response(['r' => false, 'm' => 'User not found']);
+    }
+
     public function verify(Request $request, $id) {
         $uid = Hashids::connection('user')->decode($id)[0];
         $user = User::find($uid);

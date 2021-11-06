@@ -6,10 +6,12 @@ const doLogin = ({ commit }, payload) => {
                 let data = res.data
 
                 if (data.r) {
-                    // set user
-                    commit('setUser', data.user)
+                    // set theme
+                    commit('setTheme', data.user.app_theme)
                     // set customer ID
                     commit('locations/setClient', data.user.company_id)
+                    // set user
+                    commit('setUser', data.user)
                 }
                 resolve(res)
             })

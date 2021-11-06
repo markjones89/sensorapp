@@ -65,6 +65,7 @@ Route::delete('work-configs/{id}', 'WorkSettingsController@delete');
 Route::get('users/{id?}', 'UsersController@get');
 Route::post('users', 'UsersController@create');
 Route::post('users/photo/{id}', 'UsersController@setPhoto');
+Route::put('users/theme/{id}', 'UsersController@setTheme');
 Route::put('users/{id}', 'UsersController@update');
 Route::put('users/reset-pass/{id}', 'UsersController@resetPass');
 Route::put('users/change-pass/{id}', 'UsersController@changePassword');

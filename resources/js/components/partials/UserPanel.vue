@@ -61,7 +61,12 @@ export default {
         ...mapMutations({
             setTheme: 'setTheme'
         }),
-        toggleTheme() { this.setTheme(this.theme == 'dark' ? 'light' : 'dark') },
+        toggleTheme() {
+            let newTheme = this.theme == 'dark' ? 'light' : 'dark'
+
+            this.setTheme(newTheme)
+            axios.put(`/api/users/theme/${this.user.hid}`, { theme: newTheme })
+        },
         userOptsHandler(e) {
             let _ = this
 
