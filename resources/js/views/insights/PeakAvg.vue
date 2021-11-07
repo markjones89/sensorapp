@@ -41,12 +41,14 @@
             </div>
         </div>
         <div class="graph-footer">
-            <div class="left-options" v-if="locationFilter && locationFilter.building">
-                <button class="btn btn-primary btn-small" @click="toLive">Live</button>
-                <button class="btn btn-primary btn-small"
-                    @click="showReport(true)">
-                    Report
-                </button>
+            <div class="left-options">
+                <template v-if="locationFilter && locationFilter.building">
+                    <button class="btn btn-primary btn-small" @click="toLive">Live</button>
+                    <button class="btn btn-primary btn-small"
+                        @click="showReport(true)">
+                        Report
+                    </button>
+                </template>
             </div>
             <div class="right-options">
                 <checkbox label="Save to report" />
@@ -123,6 +125,7 @@ export default {
             trigger: 6,
             start_hour: 8,
             stop_hour: 16,
+            low_desk_filter: 0.2,
             start_date: '',
             stop_date: '',
             node_type: 'Customer',

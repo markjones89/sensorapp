@@ -36,10 +36,32 @@ export function circlePack(wrapper, packData, callbacks) {
     }
 
     //Hide the tooltip when the mouse moves away
-    function removeTooltip() { d3.select('body .cp-tooltip').remove() }
+    function removeTooltip() {
+        d3.select('body .cp-tooltip').remove()
+        d3.select('body .cp-tooltip.zoom').remove()
+    }
+
+    function showZoomTooltip(d) {
+        let evt = d3.event, 
+            isRoot = d == root,
+            isFocused = d == focus,
+            isBuilding = typeof d.data.building_id !== 'undefined' && d.data.building_id
+
+        d3.select('body .cp-tooltip.zoom').remove()
+
+        // if (isFocused && !isBuilding) return
+        if (isFocused || (!isRoot && !isBuilding)) return
+
+        d3.select('body').append('div').attr('class', 'cp-tooltip zoom')
+            // .text(isFocused && isBuilding ? 'Click to view time chart' : isRoot ? 'Click to zoom out' : 'Click to zoom in')
+            .text(isRoot ? 'Click to zoom out' : 'Click to zoom in')
+            .style('left', () => `${evt.pageX}px`)
+            .style('top', () => `${evt.pageY + 25}px`)
+    }
 
     //Show the tooltip on the hovered over slice
     function showTooltip(d) {
+        if (d == root) return
         let target = d3.event.target,
             rect = target.getBoundingClientRect(),
             offset = { 
@@ -344,18 +366,17 @@ export function circlePack(wrapper, packData, callbacks) {
             .key(d => d.ID)
             .entries(stats)
 
-        /////////// Read in Occupation Circle data ///////////////////
+        /////////// Read in Location Circle data ///////////////////
 
         root = pack(nodes)
         focus = root;
 
-        /////////// Create a wrappers for each occupation ////////////
+        /////////// Create a wrappers for each location ////////////
         let plotWrapper = svg.selectAll("g")
             .data(root.descendants())
             .enter().append("g")
             .attr("class", "plotWrapper")
             .attr("id", function (d, i) {
-                // allOccupations[i] = d.data.name;
                 // if (d.data.ID != undefined) return "plotWrapper_" + d.data.ID;
                 if (d.data.ID != undefined) return d.data.ID
                 else return "plotWrapper_node"
@@ -363,10 +384,8 @@ export function circlePack(wrapper, packData, callbacks) {
 
         if (!mobileSize) {
             //Mouseover only on leaf nodes		
-            plotWrapper.filter(function (d) { 
-                return d !== root
-                // return typeof d.children === "undefined"
-            })
+            plotWrapper//.filter(function (d) { return d !== root })
+                .on('mousemove', showZoomTooltip)
                 .on("mouseover", showTooltip)
                 .on("mouseout", removeTooltip)
         }//if

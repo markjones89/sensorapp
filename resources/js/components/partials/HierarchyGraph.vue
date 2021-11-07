@@ -3,6 +3,7 @@
         <template v-if="!dataError">
             <div class="chart-header">
                 <span class="chart-title">{{ graphTitle }}</span>
+                <span class="chart-subtitle">({{ statDateRange }})</span>
                 <span class="chart-subtitle">{{ subtitle }}</span>
             </div>
             <div id="peak-chart"></div>
@@ -18,9 +19,9 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { Loader } from '@/components'
-import { getObjValue, toOrdinal } from '@/helpers'
+import { average, dateRangeStr, getObjValue, roundNum, sum, toOrdinal, weightedAvg } from '@/helpers'
 import hierarchyBarChart from '@/components/graphs/HierarchyBar'
 export default {
     props: {
@@ -45,7 +46,15 @@ export default {
         }),
         ...mapState({
             locFilter: state => state.homepage.locationFilter
-        })
+        }),
+        statDateRange() {
+            let start = this.dataFilters.start_date
+            let end = this.dataFilters.stop_date
+            let from = new Date(start.substring(0, start.indexOf('T')))
+            let to = new Date(end.substring(0, end.indexOf('T')))
+
+            return dateRangeStr(from, to)
+        }
     },
     watch: {
         dataFilters: {
@@ -67,7 +76,8 @@ export default {
                     { name: 'Workspace Utilisation Peak', key: 'work_space_utils.max_percentage' },
                     { name: 'Low performing spaces', key: 'low_perform_workspace.average_percentage' }
                 ],
-                groupKeys = []
+                groupKeys = [],
+                weightKey = 'meeting_room_count'
 
             let summary = JSON.parse(JSON.stringify(this.summary))
             let graphTitle = summary.customer
@@ -77,9 +87,7 @@ export default {
                 name: graphTitle, 
                 children: []
             }
-            let buildings = summary.building_summary.filter(x => {
-                return this.floorSummary.find(s => s.building_id == x.building_id) != null
-            })
+            let buildings = summary.building_summary.filter(x => { return this.floorSummary.find(s => s.building_id == x.building_id) != null })
             
             if (this.locFilter && this.locFilter.value != summary.customer) {
                 let location = this.locFilter.value
@@ -98,6 +106,7 @@ export default {
             else groupKeys = ['building_country', 'building_city']
 
             let formatFloorSummary = (a, dataKey) => {
+                // let isWeighted = dataKey == 'meeting_room_occupancy.average_percentage'
                 let floorSummary = this.floorSummary.find(x => x.building_id == a.building_id)
 
                 if (floorSummary) {
@@ -106,7 +115,8 @@ export default {
                             name: `${toOrdinal(f.floor)} Floor`,
                             floor: f.floor,
                             title: `${toOrdinal(f.floor)} Floor ${a.building_name}`,
-                            value: getObjValue(f, dataKey, 0)
+                            value: getObjValue(f, dataKey, 0),
+                            weight: getObjValue(f, weightKey, 0)
                         }
 
                         if (f.area_summary && f.area_summary.length > 0)
@@ -114,8 +124,10 @@ export default {
                                 return {
                                     name: area.group_id,
                                     value: getObjValue(area, dataKey, 0),
+                                    weight: getObjValue(area, weightKey, 0),
                                     route: 'bar-chart',
                                     routeParams: {
+                                        bid: a.building_id,
                                         building: a.building_name,
                                         floor: floor.name
                                     }
@@ -127,31 +139,60 @@ export default {
                 }
                 else return []
             }
+
+            let averaged = (data) => {
+                if (data.value) return data
+
+                if (!data.children) return data
+
+                const children = data.children.map(averaged)
+                let avgValue = data.weighted ? weightedAvg(children) : average(children.map(x => x.value)) //(children.reduce((total, { value }) => total + value, 0) / children.length)
+
+                if (!data.weight && data.weighted) data.weight = sum(children.map(x => x.weight))
+
+                return {
+                    ...data,
+                    children,
+                    value: roundNum(avgValue, 1)
+                }
+            }
             
             categories.forEach(c => {
                 let grouped = [],
                     temp = { _: grouped },
-                    dataKey = c.key
+                    dataKey = c.key,
+                    isWeighted = dataKey == 'meeting_room_occupancy.average_percentage'
 
                 delete c.key
                 c.title = graphTitle
                 c.subtitle = c.name
+                c.weighted = isWeighted
                 
                 if (this.locFilter?.building) {
                     let building = buildings.find(x => x.building_id == this.locFilter.value)
+                    let fsBldg = this.floorSummary.find(x => x.building_id == this.locFilter.value)
                     let floors = formatFloorSummary(building, dataKey)
+
+                    c.value = getObjValue(building, dataKey, null)
+
+                    if (isWeighted) c.weight = getObjValue(fsBldg, weightKey, 0)
 
                     if (floors) c.children = floors
                 }
                 else {
                     buildings.forEach(a => {
+                        let fsBldg = this.floorSummary.find(x => x.building_id == a.building_id)
                         let bldg = {
                             // ID: a.building_name.replace(/\s/g,''),
                             ID: a.building_id,
                             name: a.building_name,
-                            title: a.building_name
-                            // value: getObjValue(a, dataKey, null)
+                            title: a.building_name,
+                            value: getObjValue(a, dataKey, null),
+                            weighted: isWeighted
                         }
+
+                        if (isWeighted) bldg.weight = getObjValue(fsBldg, weightKey, 0)
+
                         let floors = formatFloorSummary(a, dataKey)
 
                         if (floors) bldg.children = floors
@@ -168,6 +209,7 @@ export default {
 
                                     l.ID = `${prefix}${a[k].replace(/\s/g,'')}${type}`
                                     l.title = a[k]
+                                    l.weighted = isWeighted
 
                                     if (k == 'building_country') l.building_country = true
                                     else if (k == 'building_city') {
@@ -188,9 +230,11 @@ export default {
 
             nodes.children = categories
 
-            // console.log('getChartData', nodes)
+            let nodesAvg = averaged(nodes)
 
-            return nodes
+            // console.log('getChartData', nodesAvg)
+
+            return nodesAvg
         },
         async renderChart(refresh = false) {
             this.dataLoaded = false

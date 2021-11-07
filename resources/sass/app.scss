@@ -342,7 +342,7 @@ textarea, select {
     }
 
     &:disabled {
-        background-color: rgba($color: var(--app-input-border-rgb), $alpha: 0.7);
+        background-color: rgba($color: var(--app-input-bg-rgb), $alpha: 0.2);
     }
 }
 
@@ -404,7 +404,7 @@ textarea {
         transition: background-color .2s;
 
         &:not(.btn-link):disabled {
-            background-color: rgba($color: var(--app-primary-rgb), $alpha: 0.7);
+            background-color: rgba($color: var(--app-primary-rgb), $alpha: 0.3);
         }
 
         &:not(:disabled):hover {
@@ -420,7 +420,7 @@ textarea {
         background-color: var(--app-red-color);
 
         &:not(.btn-link):disabled {
-            background-color: rgba($color: var(--app-red-color), $alpha: 0.7);
+            background-color: rgba($color: var(--app-red-color), $alpha: 0.3);
         }
     }
     

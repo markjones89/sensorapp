@@ -74,6 +74,7 @@ export default {
             trigger: 6,
             start_hour: 8,
             stop_hour: 16,
+            low_desk_filter: 0.2,
             start_date: '',
             stop_date: '',
             node_type: 'Customer',
@@ -229,6 +230,12 @@ export default {
         border-width: 5px;
         border-style: solid;
         border-color: #2B2B2B transparent transparent transparent;
+    }
+
+    &.zoom {
+        transform: translateX(-50%);
+        
+        &:before { display: none; }
     }
 }
 .circle-packs {

@@ -249,6 +249,16 @@ export function average(arr) {
 }
 
 /**
+ * Returns the weighted average of the given array
+ * @param {Object[]} arr List of { value, weight } object to compute
+ */
+export function weightedAvg(arr) {
+    let totalWeight = sum(arr.map(x => x.weight))
+
+    return totalWeight > 0 ? arr.reduce((a, b) => a + (b.value * b.weight), 0) / totalWeight : 0
+}
+
+/**
  * Returns the hour (24-hour format) of the time
  * @param {string} timeStr Time string
  */
