@@ -134,7 +134,7 @@ export default {
         locFilter(value, label, loc) {
             this.setLocation(loc)
 
-            if (this.$refs.circlePack) this.$refs.circlePack.zoomTo(loc)
+            if (this.$refs.circlePack) this.$refs.circlePack.zoomTo(loc, true)
         },
         // period filter
         filterMinute(minute) {

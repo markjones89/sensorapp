@@ -102,7 +102,7 @@ export default {
             showPeak: false,
             showAvg: false
         },
-        isFilterPercent: false,
+        // isFilterPercent: false,
         zoomedLocation: null
     }),
     watch: {
@@ -136,7 +136,8 @@ export default {
             let to = new Date(end.substring(0, end.indexOf('T')))
 
             return dateRangeStr(from, to)
-        }
+        },
+        isFilterPercent() { return this.statFilter && this.statFilter.value != 'opportunity_cost' }
     },
     methods: {
         ...mapMutations({
@@ -154,7 +155,7 @@ export default {
                         first: {
                             label: this.statFilter.boxLabel,
                             value: this.isFilterPercent ?
-                                `${roundNum(average(data.map(x => getObjValue(x, this.statFilter.value, 0))))}%` :
+                                `${roundNum(average(data.map(x => getObjValue(x, this.statFilter.value, 0))), 2)}%` :
                                 d3Format('$,.2s')(sum(data.map(x => getObjValue(x, this.statFilter.value, 0))))
                         },
                         opportunity_cost: sum(data.map(x => getObjValue(x, 'opportunity_cost', 0))),
@@ -169,7 +170,7 @@ export default {
                     let firstValue = getObjValue(data, this.statFilter.value, 0)
                     stats.first = {
                         label: this.statFilter.boxLabel,
-                        value: this.isFilterPercent ? `${roundNum(firstValue, 1)}%` : d3Format('$,.2s')(firstValue)
+                        value: this.isFilterPercent ? `${roundNum(firstValue, 2)}%` : d3Format('$,.2s')(firstValue)
                     }
                     stats.opportunity_cost = getObjValue(data, 'opportunity_cost', 0)
                     stats.peak_workspace_util = getObjValue(data, 'workspace_utils.max_percentage', 0)
@@ -182,17 +183,17 @@ export default {
 
             this.statsDisplay.first = stats.first
             this.statsDisplay.opportunity_cost = stats.opportunity_cost
-            this.statsDisplay.peak_workspace_util = roundNum(stats.peak_workspace_util, 1)
-            this.statsDisplay.average_workspace_util = roundNum(stats.average_workspace_util, 1)
-            this.statsDisplay.peak_meeting_room = roundNum(stats.peak_meeting_room, 1)
+            this.statsDisplay.peak_workspace_util = roundNum(stats.peak_workspace_util, 2)
+            this.statsDisplay.average_workspace_util = roundNum(stats.average_workspace_util, 2)
+            this.statsDisplay.peak_meeting_room = roundNum(stats.peak_meeting_room, 2)
             this.statsDisplay.user_to_workspace_ratio = roundNum(stats.user_to_workspace_ratio, 2)
-            this.statsDisplay.work_from_home = roundNum(stats.work_from_home, 1)
+            this.statsDisplay.work_from_home = roundNum(stats.work_from_home, 2)
 
             this.statsDisplay.showCost = this.statFilter.value != 'opportunity_cost'
             this.statsDisplay.showPeak = this.statFilter.value != 'workspace_utils.max_percentage'
             this.statsDisplay.showAvg = this.statFilter.value != 'workspace_utils.average_percentage'
 
-            // console.log('setStatsDisplay', data, this.statsDisplay, this.statFilter)
+            // console.log('setStatsDisplay', this.isFilterPercent, this.statFilter, data, this.statsDisplay)
         },
         getCircleData(filter) {
             let _data = {},
@@ -269,8 +270,6 @@ export default {
             if (filter.value == 'opportunity_cost') _data.moneyValue = true
             else _data.percentValue = true
 
-            this.isFilterPercent = filter.value != 'opportunity_cost'
-
             return _data
         },
         async renderChart(refresh = false) {
@@ -297,7 +296,7 @@ export default {
                 this.$emit('dataLoaded',
                     JSON.parse(JSON.stringify(this.summary)),
                     dataFromCache)
-                this.setStatsDisplay(this.summary.building_summary, true)
+                // this.setStatsDisplay(this.summary.building_summary, true)
 
                 let _data = this.getCircleData(this.statFilter)
 

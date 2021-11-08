@@ -353,7 +353,10 @@ export function circlePack(wrapper, packData, callbacks) {
             k0 = 1
             d3.select("#loadText").remove()
             // if (_packData.location) searchByName(_packData.location)
-            if (_packData.location) searchByID(_packData.location.value)
+            if (_packData.location) {
+                zoomFromCircle = true
+                searchByID(_packData.location.value)
+            }
             else zoomTo(root)
         }
 
@@ -780,7 +783,7 @@ export function circlePack(wrapper, packData, callbacks) {
     // this.goTo = function (location) { searchByName(location) }
 
     this.zoomLocation = function (location, fromDropdown = false) {
-        zoomFromCircle = false
+        zoomFromCircle = fromDropdown
         searchByID(location.value)
     }
 

@@ -52,7 +52,8 @@ export default {
                     if (_selected) this.$refs.wrapper.scrollTop = _selected.offsetTop
                 }, 0)
             }
-        }
+        },
+        chosen: function(value) { this.selected = value }
     },
     computed: {
         height() {
