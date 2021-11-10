@@ -36,7 +36,8 @@ class AuthController extends Controller
             return response(['r' => false, 'm' => 'Account not verified']);
         }
 
-        if (Auth::attempt($credentials)) {
+        // attempt (then remember user)
+        if (Auth::attempt($credentials, true)) {
             return response(['r' => true, 'm' => 'Success', 'user' => $this->getAuthUser()]);
         } else {
             return response(['r' => false, 'm' => 'Email and password does not match']);
@@ -61,6 +62,11 @@ class AuthController extends Controller
 
         $user['isSuper'] = $user->isSuperAdmin();
         $user['isAdmin'] = $user->isAdmin();
+
+        $apiUser = is_null($user->company) ? 'admin' : $user->company->api_user;
+        $apiPass = is_null($user->company) ? 'ydqpZT(]23umu#=y' : $user->company->api_pass;
+
+        $user['apiInfo'] = ['user' => $apiUser, 'pass' => $apiPass];
 
         $menus = [
             // ['name' => 'profile', 'icon' => 'profile.svg', 'label' => 'Profile']

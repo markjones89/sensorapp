@@ -5,6 +5,8 @@ export function initialState () {
     return {
         theme: 'dark',
         user: null,
+        api_user: null,
+        api_pass: null,
         clients: []
     }
 }

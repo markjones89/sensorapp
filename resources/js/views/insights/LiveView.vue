@@ -122,8 +122,18 @@ export default {
         occupiedSensors() { return this.sensors.filter(s => s.sensor_state == 'occupied') },
         freeDeskSensors() { return this.freeSensors.filter(s => s.area && s.area.type == 'Desk Area').length },
         occupiedDeskSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type == 'Desk Area').length },
-        freeRoomSensors() { return this.freeSensors.filter(s => s.area && s.area.type == 'Meeting Room').length },
-        occupiedRoomSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room').length },
+        freeRoomSensors() {
+            // return this.freeSensors.filter(s => s.area && s.area.type == 'Meeting Room').length 
+            let areas = this.freeSensors.filter(s => s.area && s.area.type == 'Meeting Room').map(s => s.area.id)
+
+            return new Set(areas).size
+        },
+        occupiedRoomSensors() {
+            // return this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room').length
+            let areas = this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room').map(s => s.area.id)
+
+            return new Set(areas).size
+        },
     },
     methods: {
         wsConnect() {

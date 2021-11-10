@@ -49,7 +49,7 @@
                 <div class="input-field" v-if="entry.showClient && user.isSuper">
                     <label>Client</label>
                     <select v-model="entry.client" :disabled="state.saving">
-                        <option v-for="c in clients" :key="c.hid" :value="c.hid">{{ c.name }}</option>
+                        <option v-for="c in clients" :key="c.hid" :value="c.ref_id">{{ c.name }}</option>
                     </select>
                 </div>
                 <div class="input-field">
@@ -68,6 +68,134 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
+
+<script>
+import { mapState, mapGetters } from 'vuex'
+import { Loader, Modal } from '@/components'
+
+const api = '/api/users'
+
+export default {
+    title: 'Users',
+    components: { Loader, Modal },
+    data: () => ({
+        clients: [], roles: [], users: [],
+        loaded: false, showEntry: false, editMode: false,
+        entry: {
+            showClient: false, client: null, role: '', name: '', email: '', id: null
+        },
+        state: {
+            saving: false
+        }
+    }),
+    computed: {
+        ...mapState({
+            user: state => state.user
+        }),
+        ...mapGetters({
+            api_header: 'backend/api_header',
+            api_customers: 'backend/api_customers'
+        }),
+        compId() {
+            return this.user.isSuper ? this.entry.client : this.user.company_id
+        },
+        groupedUsers() {
+            return this.roles.map(r => {
+                return {
+                    hid: r.hid,
+                    name: r.name,
+                    byClient: r.byCompany,
+                    users: this.users.filter(u => u.role.hid === r.hid)
+                }
+            })
+        }
+    },
+    methods: {
+        async getDependencies(cb) {
+            let res = await axios.all([
+                axios.get(this.api_customers, this.api_header()),
+                axios.get('/users/init-dependencies')
+            ])
+
+            let clients = res[1].data.clients
+
+            if (clients) {
+                let custs = res[0].data
+                this.clients = []
+                
+                clients.forEach(c => {
+                    let cust = custs.find(x => x.id == c.ref_id)
+
+                    if (cust) {
+                        c.name = cust.name
+                        this.clients.push(c)
+                    }
+                })
+            }
+
+            console.log('getDependencies.clients', this.clients)
+
+            this.roles = res[1].data.roles
+
+            return cb && cb()
+        },
+        async getData() {
+            let params = this.user.isSuper ? null : { params: { cid: this.compId } }
+            let { data } = await axios.get(api, params)
+
+            data.forEach(d => {
+                if (d.company) d.company.name = this.clients.find(x => x.ref_id == d.company_id)?.name
+            })
+
+            this.users = data
+            this.loaded = true
+        },
+        toggleEntry(show) {
+            this.showEntry = show
+
+            // if (show) setTimeout(() => { this.$refs.location.focus() }, 0)
+        },
+        triggerAdd(role, byClient) {
+            this.entry.showClient = byClient
+            this.entry.role = role
+            this.editMode = false
+            this.toggleEntry(true)
+        },
+        getEntry() {
+            return {
+                company: this.compId,
+                name: this.entry.name,
+                email: this.entry.email,
+                role: this.entry.role
+            }
+        },
+        toggleSaving(saving) { this.state.saving = saving },
+        async addUser() {
+            this.toggleSaving(true)
+            axios.post(api, this.getEntry()).then(x => {
+                this.toggleSaving(false)
+                let res = x.data
+
+                if (res.r) {
+                    this.users.push(res.data)
+                    this.toggleEntry(false)
+                }
+
+                this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
+            })
+        }
+    },
+    // async created() {
+    //     await this.getDependencies()
+    // },
+    mounted() {
+        this.getDependencies(() => {
+            this.getData()
+        })
+    }
+}
+</script>
+
 <style lang="scss" scoped>
 #user-list {
     margin-top: 24px;
@@ -132,130 +260,3 @@
     width: 400px;
 }
 </style>
-<script>
-import { mapState, mapGetters } from 'vuex'
-import { Loader, Modal } from '../../components'
-
-const api = '/api/users'
-
-export default {
-    title: 'Users',
-    components: { Loader, Modal },
-    data() {
-        return {
-            // user: null, 
-            clients: [], roles: [], users: [],
-            loaded: false, showEntry: false, editMode: false,
-            entry: {
-                showClient: false, client: null, role: '', name: '', email: '', id: null
-            },
-            state: {
-                saving: false
-            }
-        }
-    },
-    computed: {
-        ...mapState({
-            user: state => state.user
-        }),
-        ...mapGetters({
-            api_header: 'backend/api_header',
-            api_customers: 'backend/api_customers'
-        }),
-        compId() {
-            return this.user.isSuper ? this.entry.client : this.user.company_id
-        },
-        groupedUsers() {
-            return this.roles.map(r => {
-                return {
-                    hid: r.hid,
-                    name: r.name,
-                    byClient: r.byCompany,
-                    users: this.users.filter(u => u.role.hid === r.hid)
-                }
-            })
-        }
-    },
-    methods: {
-        async getDependencies(cb) {
-            let res = await axios.all([
-                axios.get(this.api_customers, this.api_header()),
-                axios.get('/users/init-dependencies')
-            ])
-
-            let clients = res[1].data.clients
-
-            if (clients) {
-                let custs = res[0].data
-                this.clients = []
-                
-                clients.forEach(c => {
-                    let cust = custs.find(x => x.id == c.ref_id)
-
-                    if (cust) {
-                        c.name = cust.name
-                        this.clients.push(c)
-                    }
-                })
-            }
-
-            this.roles = res[1].data.roles
-
-            return cb && cb()
-        },
-        async getData() {
-            let params = this.user.isSuper ? null : { params: { cid: this.compId } }
-            let { data } = await axios.get(api, params)
-
-            data.forEach(d => {
-                if (d.company) d.company.name = this.clients.find(x => x.ref_id == d.company_id)?.name
-            })
-
-            this.users = data
-            this.loaded = true
-        },
-        toggleEntry(show) {
-            this.showEntry = show
-
-            // if (show) setTimeout(() => { this.$refs.location.focus() }, 0)
-        },
-        triggerAdd(role, byClient) {
-            this.entry.showClient = byClient
-            this.entry.role = role
-            this.editMode = false
-            this.toggleEntry(true)
-        },
-        getEntry() {
-            return {
-                company: this.compId,
-                name: this.entry.name,
-                email: this.entry.email,
-                role: this.entry.role
-            }
-        },
-        toggleSaving(saving) { this.state.saving = saving },
-        async addUser() {
-            this.toggleSaving(true)
-            axios.post(api, this.getEntry()).then(x => {
-                this.toggleSaving(false)
-                let res = x.data
-
-                if (res.r) {
-                    this.users.push(res.data)
-                    this.toggleEntry(false)
-                }
-
-                this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
-            })
-        }
-    },
-    // async created() {
-    //     await this.getDependencies()
-    // },
-    mounted() {
-        this.getDependencies(() => {
-            this.getData()
-        })
-    }
-}
-</script>

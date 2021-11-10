@@ -8,7 +8,7 @@ const resetState = (state) => {
     })
 }
 
-const setAPI = (state, url) => {
+const setAPIUrl = (state, url) => {
     state.url = url
 }
 
@@ -18,6 +18,6 @@ const setAuthToken = (state, token) => {
 
 export default {
     resetState,
-    setAPI,
+    setAPIUrl,
     setAuthToken
 }

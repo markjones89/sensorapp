@@ -5,24 +5,45 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex'
 export default {
     data: () => ({
         backendAuthInterval: null
     }),
+    computed: {
+        ...mapState({
+            authToken: state => state.backend.authToken
+        })
+    },
     methods: {
-        async backendAuth(url) {
-            await this.$store.dispatch('doBackendAuth', { apiUrl: url })
+        ...mapMutations({
+            setAPIInfo: 'setAPIInfo',
+            setAPIUrl: 'backend/setAPIUrl'
+        }),
+        async doBackendAuth(credentials) {
+            this.setAPIInfo(credentials)
+            await this.$store.dispatch('doBackendAuth')
+            this.doAuthInterval()
+        },
+        async doAuthInterval() {
+            this.backendAuthInterval = setInterval(async () => {
+                await this.$store.dispatch('doBackendAuth')
+            }, 10 * (60 * 60 * 1000))
+        },
+        clearAuthInterval() {
+            if (this.backendAuthInterval) clearInterval(this.backendAuthInterval)
         }
     },
-    async created() {
-        await this.backendAuth(document.getElementById('sensor_api').value)
+    created() {
+        let apiEl = document.getElementById('sensor_api')
 
-        this.backendAuthInterval = setInterval(async () => {
-            await this.backendAuth()
-        }, 10 * (60 * 60 * 1000))
+        if (apiEl) {
+            this.setAPIUrl(apiEl.value)
+            apiEl.remove()
+        }
     },
     destroyed() {
-        if (this.backendAuthInterval) clearInterval(this.backendAuthInterval)
+        this.clearAuthInterval()
     }
 }
 </script>

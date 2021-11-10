@@ -105,7 +105,6 @@ export default {
         limit: { type: Number, required: true }
     },
     data: () => ({
-        checkAuthInterval: null,
         dataLoaded: false, dataError: false,
         company: null,
         building: null,
@@ -139,16 +138,18 @@ export default {
         monthName() { return getMonthName(this.month) }
     },
     methods: {
-        async getBuildingOverview() {
+        async getCustRef() {
+            let { data } = await axios.get('/api/clients', { params: { rid: this.cid } })
+
+            return data
+        },
+        async getBuildingOverview(cref) {
             try {
-                // let { data } = await axios.get(this.api_building_overview(this.cid, this.bid), this.api_header())
                 let res = await axios.all([
                     axios.get(this.api_customers, this.api_header()),
-                    axios.get('/api/clients', { params: { rid: this.cid } }),
                     axios.get(this.api_building_overview(this.cid, this.bid), this.api_header())
                 ])
                 let clients = res[0].data
-                let cref = res[1].data
                 let client = clients.find(x => x.id == this.cid)
 
                 if (client && cref) {
@@ -157,7 +158,7 @@ export default {
                 }
 
                 this.company = client
-                this.building = res[2].data //data
+                this.building = res[1].data //data
                 this.dataLoaded = true
                 this.dataError = false
             } catch (error) {
@@ -206,18 +207,15 @@ export default {
             this.roomSizeVSMeetingSizeFooter = `1 and 2 person meetings make up ${oneTwoSum}% of all meeting sizes`
         }
     },
-    mounted() {
+    async mounted() {
+        let cref = await this.getCustRef()
+
         if (this.authToken == null) {
-            this.checkAuthInterval = setInterval(() => {
-                if (this.authToken) {
-                    this.getBuildingOverview()
-                    clearInterval(this.checkAuthInterval)
-                }
-            }, 500)
+            await this.$parent.doBackendAuth({ user: cref.api_user, pass: cref.api_pass })
+
+            this.getBuildingOverview(cref)
         }
-        else {
-            this.getBuildingOverview()
-        }
+        else this.getBuildingOverview(cref)
     }
 }
 </script>

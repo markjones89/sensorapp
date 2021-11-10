@@ -6,7 +6,7 @@
                 <div class="graph-filters">
                     <!-- <graph-filter placeholder="Filter By" :filters="filters" :chosen="filter.value" :chosenAsSelected="true" @onSelect="filterSelect" /> -->
                     <stat-filter></stat-filter>
-                    <graph-filter placeholder="Select Location" :filters="locations" :chosen="locationFilter.value" :chosenAsSelected="true" @onSelect="locFilter" />
+                    <graph-filter placeholder="Select Location" :filters="locations" :chosen="selectedLocation" :chosenAsSelected="true" @onSelect="locFilter" />
                     <a href="javascript:;" class="btn btn-primary ml-12" @click="toTreeSummary">{{ filter.btnLabel }}</a>
                 </div>
                 <span class="page-opt-trigger" role="button" @click="showPageOpts = !showPageOpts">
@@ -94,6 +94,7 @@ export default {
             endTimeFilter: state => state.homepage.endTime,
             periodFilter: state => state.homepage.periodFilter
         }),
+        selectedLocation() { return this.locationFilter?.value },
         minuteFilters() {
             // var minutes = [10, 15, 30, 45, 60, 120, 240, 480];
             let minutes = [60]
@@ -118,6 +119,8 @@ export default {
                 this.setLocation({ label: data.customer, value: data.customer })
                 this.setPeakSummary(null)
             }
+
+            if (this.locationFilter == null) this.setLocation({ label: data.customer, value: data.customer })
 
             this.locations = extractLocations(data)
         },

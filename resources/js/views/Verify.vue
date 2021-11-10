@@ -71,7 +71,7 @@ export default {
     width: 100%;
 
     #verify-wrapper {
-        width: 300px;
+        width: 340px;
         margin: 0 auto;
         background-color: #282737;
         padding: 24px;

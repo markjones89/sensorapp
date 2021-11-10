@@ -15,6 +15,46 @@
         </div>
     </div>
 </template>
+
+<script>
+import { getBaseUrl } from '@/helpers'
+export default {
+    title: 'Login',
+    data: () => ({
+        email: null, password: null, remember: false, loggingIn: false//, redirectTo: null
+    }),
+    computed: {
+        baseUrl() { return getBaseUrl() }
+    },
+    methods: {
+        async login() {
+            this.loggingIn = true;
+            this.$store.dispatch('doLogin', { email: this.email, password: this.password })
+                .then(res => {
+                    if (res.data.r) {
+                        this.$parent.doAuthInterval()
+                        this.$router.push(this.$route.query.to || '/')
+                    }
+                    else 
+                        this.$mdtoast(res.data.m, { type: 'error', interaction: true, interactionTimeout: 5000 })
+                })
+                .catch(e => {
+                    this.$mdtoast('An error occured while trying to login', { type: 'error', interaction: true, interactionTimeout: 5000 })
+                })
+                .finally(() => {
+                    this.loggingIn = false
+                })
+        },
+        inputKeydown(e) {
+            if (e.keyCode === 13) this.login()
+        }
+    },
+    mounted() {
+        this.$refs.email.focus()
+    }
+}
+</script>
+
 <style lang="scss" scoped>
 #app-login {
     padding: 92px 0;
@@ -46,39 +86,3 @@
     }
 }
 </style>
-<script>
-import { getBaseUrl } from '../helpers'
-export default {
-    title: 'Login',
-    data: () => ({
-        email: null, password: null, remember: false, loggingIn: false//, redirectTo: null
-    }),
-    computed: {
-        baseUrl() { return getBaseUrl() }
-    },
-    methods: {
-        async login() {
-            this.loggingIn = true;
-            this.$store.dispatch('doLogin', { email: this.email, password: this.password })
-                .then(res => {
-                    if (res.data.r) 
-                        this.$router.push(this.$route.query.to || '/')
-                    else 
-                        this.$mdtoast(res.data.m, { type: 'error', interaction: true, interactionTimeout: 5000 })
-                })
-                .catch(e => {
-                    this.$mdtoast('An error occured while trying to login', { type: 'error', interaction: true, interactionTimeout: 5000 })
-                })
-                .finally(() => {
-                    this.loggingIn = false
-                })
-        },
-        inputKeydown(e) {
-            if (e.keyCode === 13) this.login()
-        }
-    },
-    mounted() {
-        this.$refs.email.focus()
-    }
-}
-</script>

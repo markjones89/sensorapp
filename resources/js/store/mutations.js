@@ -16,6 +16,11 @@ const setUser = (state, user) => {
     state.user = user
 }
 
+const setAPIInfo = (state, info) => {
+    state.api_user = info.user
+    state.api_pass = info.pass
+}
+
 const setUserPhoto = (state, photo) => {
     if (state.user) state.user.photo = photo
 }
@@ -32,6 +37,7 @@ export default {
     resetState,
     setTheme,
     setUser,
+    setAPIInfo,
     setUserPhoto,
     setCompanyLogo,
     setClients

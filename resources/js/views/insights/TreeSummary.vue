@@ -67,7 +67,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
-import { getBaseUrl, sum, toHour, toISOStart, toISOEnd, getObjValue, dateRangeStr, average, clearEl } from '@/helpers'
+import { getBaseUrl, sum, toHour, toISOStart, toISOEnd, getObjValue, dateRangeStr, average, clearEl, toOrdinal } from '@/helpers'
 import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
 import { CaretIcon, CaretLeftIcon } from '@/components/icons'
 import { StatFilter } from '@/components/partials'
@@ -86,13 +86,6 @@ export default {
     },
     title: 'Summary',
     data: () => ({
-        // filters: [
-        //     { value: 'opportunity_cost', label: 'Cost of Unused Spaces', boxLabel: 'Opportunity Cost', btnLabel: 'Cost Analysis' },
-        //     { value: 'workspace_utils.max_percentage', label: 'Peak Usage', boxLabel: 'Peak Workspace Utilisation', btnLabel: 'Peak Usage' },
-        //     { value: 'workspace_utils.average_percentage', label: 'Average Usage', boxLabel: 'Average Workspace Utilisation', btnLabel: 'Average Usage' },
-        //     { value: 'low_perform_workspace.average_percentage', label: 'Low Performing Spaces', boxLabel: 'Low Performing Spaces', btnLabel: 'Low Performing Spaces' },
-        //     { value: 'free_workspace_utils.average_percentage', label: 'Spare Capacity', boxLabel: 'Spare Capacity', btnLabel: 'Spare Capacity' }
-        // ],
         loaded: false, showPageOpts: false, showEmbed: false,
         timeFilter: {
             start: null, end: null
@@ -103,6 +96,7 @@ export default {
             trigger: 6,
             start_hour: 8,
             stop_hour: 16,
+            low_desk_filter: 0.2,
             start_date: '',
             stop_date: '',
             node_type: 'Customer',
@@ -114,6 +108,7 @@ export default {
             user: state => state.user,
             company: state => state.user.company,
             summary: state => state.homepage.summary,
+            floorSummary: state => state.peakchart.summary,
             filter: state => state.homepage.filter,
             rangeFilter: state => state.homepage.rangeFilter,
             startTimeFilter: state => state.homepage.startTime,
@@ -122,7 +117,8 @@ export default {
         }),
         ...mapGetters({
             api_header: 'backend/api_header',
-            api_customer_summary: 'backend/api_customer_summary'
+            api_customer_summary: 'backend/api_customer_summary',
+            api_graph_view: 'backend/api_graph_view'
         }),
         settings() { return this.user.company ? this.user.company.settings : null },
         baseUrl() { return getBaseUrl() },
@@ -145,8 +141,9 @@ export default {
     methods: {
         ...mapMutations({
             setSummary: 'homepage/setSummary',
+            setPeakSummary: 'peakchart/setSummary',
             setRange: 'homepage/setRange',
-            setTime: 'homepage/setTime',
+            setTime: 'homepage/setTime'
         }),
         backTo() { this.$router.back() },
         rangeSelect(range, from, to) {
@@ -180,79 +177,131 @@ export default {
 
             this.loaded = false
 
-            if (this.summary == null || refresh) {
-                this.axiosSrc = axios.CancelToken.source()
-                let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
+            let doRequest = this.summary == null || this.floorSummary == null || refresh
 
-                if (!data.building_summary) {
-                    this.dataError = data
-                    this.loaded = true
-                    return
+            try {
+                if (doRequest) {
+                    this.axiosSrc = axios.CancelToken.source()
+                    // let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
+
+                    // if (!data.building_summary) {
+                    //     this.dataError = data
+                    //     this.loaded = true
+                    //     return
+                    // }
+                    // else if (data.building_summary && data.building_summary.length == 0) {
+                    //     this.dataError = "No results"
+                    //     this.loaded = true
+                    //     return
+                    // }
+                    // else {
+                    //     this.dataError = null
+                    //     this.setSummary(data)
+                    // }
+                    if (this.summary == null || refresh) {
+                        let res = await axios.all([
+                            axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token)),
+                            axios.post(this.api_graph_view, this.dataFilters, this.api_header(this.axiosSrc.token))
+                        ])
+
+                        this.setSummary(res[0].data)
+                        this.setPeakSummary(res[1].data)
+                    } else {
+                        let { data } = await axios.post(this.api_graph_view, this.dataFilters, this.api_header(this.axiosSrc.token))
+
+                        this.setPeakSummary(data)
+                    }
                 }
-                else if (data.building_summary && data.building_summary.length == 0) {
-                    this.dataError = "No results"
-                    this.loaded = true
-                    return
-                }
-                else {
-                    this.dataError = null
-                    this.setSummary(data)
-                }
-            }
 
-            let nodes = { ID: '', name: this.summary.customer, children: [] }
-            let summary = JSON.parse(JSON.stringify(this.summary.building_summary))
+                this.loaded = true
+                this.dataError = null
 
-            // nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
-            nodes.value = (moneyValue ? sum : average)(summary.map(x => getObjValue(x, dataKey, 0)))
+                let nodes = { ID: '', name: this.summary.customer, children: [] }
+                let summary = JSON.parse(JSON.stringify(this.summary.building_summary))
+                let floorSummary = JSON.parse(JSON.stringify(this.floorSummary))
 
-            summary.forEach(a => {
-                // nodes
-                a.name = a.building_name
-                // a.value = a.opportunity_cost
-                a.value = getObjValue(a, dataKey)
+                // nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
+                nodes.value = (moneyValue ? sum : average)(summary.map(x => getObjValue(x, dataKey, 0)))
 
-                // free desks/meeting at peak
-                a.children = [
-                    { name: 'Free Desks at Peak', value: a.free_workspace_utils.max, number: true },
-                    { name: 'Free Meeting Rooms at Peak', value: a.free_meeting_room_occupancy.max, number: true },
+                let freeCats = [
+                    { name: 'Free Desks at Peak', key: 'free_workspace_utils.max' },
+                    { name: 'Free Meeting Rooms at Peak', key: 'free_meeting_room_occupancy.max' }
                 ]
 
-                keys.reduce((r, k) => {
-                    if (!r[a[k]]) {
+                summary.forEach(a => {
+                    let fsBldg = floorSummary.find(x => x.building_id == a.building_id)
 
-                        r[a[k]] = { _: [] }
-                        
-                        if (a[k]) {
-                            let l = { ['name']: a[k], ['children']: r[a[k]]._ }
+                    // nodes
+                    a.name = a.building_name
+                    // a.value = a.opportunity_cost
+                    a.value = getObjValue(a, dataKey, 0)
 
-                            if (k === 'building_country') {
-                                let buildings = summary.filter(x => x[k] == a[k])
-                                
-                                // l.value = sum(buildings.map(x => x.opportunity_cost))
-                                l.value = (moneyValue ? sum : average)(buildings.map(x => getObjValue(x, dataKey)))
-                                l.building_country = true
-                            }
-                            else if (k === 'building_city') {
-                                let buildings = summary.filter(x => x[k] == a[k])
-
-                                // l.value = sum(buildings.map(x => x.opportunity_cost))
-                                l.value = (moneyValue ? sum : average)(buildings.map(x => getObjValue(x, dataKey)))
-                                l.building_city = true
-                            }
-
-                            r._.push(l)
+                    // free desks/meeting at peak
+                    a.children = []
+                    freeCats.forEach(c => {
+                        let catDetails = {
+                            name: c.name,
+                            value: getObjValue(a, c.key, 0),
+                            number: true
                         }
-                    }
-                    return r[a[k]]
-                }, temp)._.push(a)
-            })
 
-            nodes.children = grouped
+                        if (fsBldg) {
+                            catDetails.children = fsBldg.floor_summary.map(x => {
+                                return {
+                                    name: `${toOrdinal(x.floor)} Floor`,
+                                    value: getObjValue(x, c.key, 0),
+                                    number: true
+                                }
+                            })
+                        }
 
-            this.loaded = true
+                        a.children.push(catDetails)
+                    })
+                    // a.children = [
+                    //     { name: 'Free Desks at Peak', value: a.free_workspace_utils.max, number: true },
+                    //     { name: 'Free Meeting Rooms at Peak', value: a.free_meeting_room_occupancy.max, number: true },
+                    // ]
 
-            setTimeout(() => { collapsibleTree('#tree-summary', nodes, moneyValue) }, 100)
+                    keys.reduce((r, k) => {
+                        if (!r[a[k]]) {
+
+                            r[a[k]] = { _: [] }
+                            
+                            if (a[k]) {
+                                let l = { ['name']: a[k], ['children']: r[a[k]]._ }
+
+                                if (k === 'building_country') {
+                                    let buildings = summary.filter(x => x[k] == a[k])
+                                    
+                                    // l.value = sum(buildings.map(x => x.opportunity_cost))
+                                    l.value = (moneyValue ? sum : average)(buildings.map(x => getObjValue(x, dataKey, 0)))
+                                    l.building_country = true
+                                }
+                                else if (k === 'building_city') {
+                                    let buildings = summary.filter(x => x[k] == a[k])
+
+                                    // l.value = sum(buildings.map(x => x.opportunity_cost))
+                                    l.value = (moneyValue ? sum : average)(buildings.map(x => getObjValue(x, dataKey, 0)))
+                                    l.building_city = true
+                                }
+
+                                r._.push(l)
+                            }
+                        }
+                        return r[a[k]]
+                    }, temp)._.push(a)
+                })
+
+                nodes.children = grouped
+
+                this.loaded = true
+
+                setTimeout(() => { collapsibleTree('#tree-summary', nodes, moneyValue) }, 100)   
+            } catch (error) {
+                console.error('renderTree', error, error.response?.data)
+                this.dataError = 'Unable to retrieve data, please try again'
+                this.loaded = true
+            }
         },
         timeStartChange(time, hour) {
             this.dataFilters.start_hour = hour
@@ -318,6 +367,6 @@ export default {
 #tree-summary {
     margin: 24px auto;
     max-width: 100%;
-    width: 1024px;
+    width: 1200px;
 }
 </style>

@@ -38,6 +38,7 @@ export default {
     },
     methods: {
         ...mapMutations({
+            setAPIUrl: 'backend/setAPIUrl',
             setClient: 'locations/setClient',
         }),
         userOptsHandler(e) {
@@ -52,16 +53,20 @@ export default {
             }
         },
         toHome() { this.$router.push({ name: 'home' }) },
-        async backendAuth(url) {
-            await this.$store.dispatch('doBackendAuth', { apiUrl: url })
+        async doAuthInterval() {
+            this.backendAuthInterval = setInterval(async () => {
+                await this.$store.dispatch('doBackendAuth')
+            }, 10 * (60 * 60 * 1000))
+        },
+        clearAuthInterval() {
+            if (this.backendAuthInterval) clearInterval(this.backendAuthInterval)
         }
     },
     async created() {
-        await this.backendAuth(document.getElementById('sensor_api').value)
+        let apiEl = document.getElementById('sensor_api')
 
-        this.backendAuthInterval = setInterval(async () => {
-            await this.backendAuth()
-        }, 10 * (60 * 60 * 1000))
+        this.setAPIUrl(apiEl.value)
+        apiEl.remove()
 
         if (this.user && this.user.company_id) this.setClient(this.user.company_id)
     },
@@ -69,7 +74,7 @@ export default {
         document.body.setAttribute('data-theme', this.theme)
     },
     destroyed() {
-        if (this.backendAuthInterval) clearInterval(this.backendAuthInterval)
+        this.clearAuthInterval()
     }
 }
 </script>

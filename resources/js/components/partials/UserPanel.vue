@@ -82,6 +82,7 @@ export default {
             axios.get('/logout').then(() => {
                 this.$router.push({ name: 'login' }, () => {
                     this.$store.dispatch('clearStore')
+                    this.$parent.clearAuthInterval()
                 })
             })
         }

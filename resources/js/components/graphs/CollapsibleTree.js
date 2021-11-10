@@ -4,12 +4,12 @@ export function collapsibleTree(wrapper, data, moneyValue) {
     const container = d3.select(wrapper);
     const root = d3.hierarchy(data),
         moneyFormat = d3.format('$,.2s'),
-        width = 900,
+        width = 1200,
         // wrapperRect = container.node().getBoundingClientRect(),
         // width = wrapperRect.width,
-        dx = 16,
+        dx = 24,
         dy = width / 6,
-        margin = { top: 10, right: 80, bottom: 10, left: 80 };
+        margin = { top: 10, right: 10, bottom: 10, left: 85 };
 
     const tree = (d3.tree().nodeSize([dx, dy]));
     // const line = (d3.line().x(d => d.y).y(d => d.x));
