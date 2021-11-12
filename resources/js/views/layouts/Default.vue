@@ -63,10 +63,7 @@ export default {
         }
     },
     async created() {
-        let apiEl = document.getElementById('sensor_api')
-
-        this.setAPIUrl(apiEl.value)
-        apiEl.remove()
+        this.setAPIUrl(process.env.MIX_SENSOR_API)
 
         if (this.user && this.user.company_id) this.setClient(this.user.company_id)
     },

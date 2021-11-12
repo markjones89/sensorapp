@@ -192,7 +192,11 @@ function mapper(wrapper, data, options) {
      * @param {string} content Tooltip content
      */
     function setTooltip(x, y, content) {
+        let bodyWidth = document.body.clientWidth
+
         if (content) tooltip.html(content)
+        if (x < 0) x = 0
+        if (x > bodyWidth) x = x - Math.abs(bodyWidth - x)
 
         tooltip.style('left', `${x}px`)
                 .style('top', `${y}px`)
@@ -279,19 +283,32 @@ function mapper(wrapper, data, options) {
                 if (config.comfortmap) return
                 let s_circle = d3.select(this),
                     s = sensors.find(x => x.id === s_circle.attr('data-id'))
+                
+                if (!config.heatmap) s_circle.classed('hovered', true)
                 tooltip.transition().duration(200).style('opacity', 0.95)
 
-                setTooltip(d3.event.offsetX + tooltipOffsetX, 
-                    d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2),
-                    `<div>ID: ${s.sensor_id}</div><div>Name: ${s.name ? s.name : '(None)'}</div>`)
+                let ttRect = tooltip.node().getBoundingClientRect()
+                let tooltipX = d3.event.pageX - (ttRect.width / 2) //d3.event.offsetX + tooltipOffsetX
+                let tooltipY = d3.event.pageY - (ttRect.height + 10) //d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2)
+
+                setTooltip(tooltipX, tooltipY,
+                    `<div>ID: ${s.sensor_id}</div>
+                    <div>Name: ${s.name ? s.name : '(None)'}</div>
+                    <div>Area: ${s.parent}</div>`)
             })
             .on('mousemove', function() {
                 if (config.comfortmap) return
-                setTooltip(d3.event.offsetX + tooltipOffsetX, 
-                    d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2))
+
+                let ttRect = tooltip.node().getBoundingClientRect()
+                let tooltipX = d3.event.pageX - (ttRect.width / 2) //d3.event.offsetX + tooltipOffsetX
+                let tooltipY = d3.event.pageY - (ttRect.height + 10) //d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2)
+
+                setTooltip(tooltipX, tooltipY)
             })
             .on('mouseout', function() { 
                 if (config.comfortmap) return
+                
+                if (!config.heatmap) d3.select(this).classed('hovered', false)
                 tooltip.transition().duration(200).style('opacity', 0) 
             })
             .on('click', s => canEdit && (sensorClick(s), d3.event.stopPropagation()))

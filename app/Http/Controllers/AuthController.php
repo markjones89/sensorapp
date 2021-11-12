@@ -9,6 +9,7 @@ use App\Mail\UserResetMail;
 use App\Models\WorkSetting;
 use App\User;
 use Hashids;
+use Config;
 
 class AuthController extends Controller
 {
@@ -63,8 +64,8 @@ class AuthController extends Controller
         $user['isSuper'] = $user->isSuperAdmin();
         $user['isAdmin'] = $user->isAdmin();
 
-        $apiUser = is_null($user->company) ? 'admin' : $user->company->api_user;
-        $apiPass = is_null($user->company) ? 'ydqpZT(]23umu#=y' : $user->company->api_pass;
+        $apiUser = is_null($user->company) ? config('backend.user') : $user->company->api_user;
+        $apiPass = is_null($user->company) ? config('backend.password') : $user->company->api_pass;
 
         $user['apiInfo'] = ['user' => $apiUser, 'pass' => $apiPass];
 

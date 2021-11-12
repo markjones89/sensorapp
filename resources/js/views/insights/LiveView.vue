@@ -64,12 +64,12 @@
                             <div class="stats-wrapper">
                                 <div class="stat-group free">
                                     <!-- <span class="stat">{{ stats.rooms_free }}</span> -->
-                                    <span class="stat">{{ freeRoomSensors }}</span>
+                                    <span class="stat">{{ freeRoomCount }}</span>
                                     <span class="label">Free</span>
                                 </div>
                                 <div class="stat-group occupied">
                                     <!-- <span class="stat">{{ stats.rooms_occupied }}</span> -->
-                                    <span class="stat">{{ occupiedRoomSensors }}</span>
+                                    <span class="stat">{{ occupiedRoomCount }}</span>
                                     <span class="label">Occupied</span>
                                 </div>
                             </div>
@@ -122,18 +122,18 @@ export default {
         occupiedSensors() { return this.sensors.filter(s => s.sensor_state == 'occupied') },
         freeDeskSensors() { return this.freeSensors.filter(s => s.area && s.area.type == 'Desk Area').length },
         occupiedDeskSensors() { return this.occupiedSensors.filter(s => s.area && s.area.type == 'Desk Area').length },
-        freeRoomSensors() {
-            // return this.freeSensors.filter(s => s.area && s.area.type == 'Meeting Room').length 
+        occupiedRooms() {
+            let areas = this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room')
+
+            return [...new Set(areas.map(s => s.area.id))]
+        },
+        occupiedRoomCount() { return this.occupiedRooms.length },
+        freeRoomCount() {
             let areas = this.freeSensors.filter(s => s.area && s.area.type == 'Meeting Room').map(s => s.area.id)
+            let free = areas.filter(a => this.occupiedRooms.indexOf(a) < 0)
 
-            return new Set(areas).size
-        },
-        occupiedRoomSensors() {
-            // return this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room').length
-            let areas = this.occupiedSensors.filter(s => s.area && s.area.type == 'Meeting Room').map(s => s.area.id)
-
-            return new Set(areas).size
-        },
+            return new Set(free).size
+        }
     },
     methods: {
         wsConnect() {
@@ -165,8 +165,8 @@ export default {
             this.liveWS.connect({
                 useSSL: true,
                 // reconnect: true,
-                userName: 'intuitive-api',
-                password: 'TRuhC3jBFrb3',
+                userName: process.env.MIX_LIVE_USER,
+                password: process.env.MIX_LIVE_PASS,
                 onSuccess: (res) => {
                     this.wsConnected = true
                     console.log('wsConnect.onSuccess', res)

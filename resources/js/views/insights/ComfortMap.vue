@@ -97,6 +97,7 @@ $blue: #0998ff;
         flex: 1 auto;
         display: flex;
         justify-content: center;
+        min-height: 50vh;
 
         #temp-legend {
             display: flex;

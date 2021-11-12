@@ -35,12 +35,7 @@ export default {
         }
     },
     created() {
-        let apiEl = document.getElementById('sensor_api')
-
-        if (apiEl) {
-            this.setAPIUrl(apiEl.value)
-            apiEl.remove()
-        }
+        this.setAPIUrl(process.env.MIX_SENSOR_API)
     },
     destroyed() {
         this.clearAuthInterval()

@@ -809,24 +809,34 @@ textarea {
     box-sizing: border-box;
 
     .tooltip {
-        position: absolute;
-        padding: 6px 8px;
+        position: fixed;
+        padding: 10px 12px;
         text-align: left;
-        background: #2B2B2B;
-        border-radius: 4px;
+        background: var(--app-background-color);
+        border-radius: 8px;
         pointer-events: none;
         font-size: 12px;
         opacity: 0;
 
-        &:before {
+        div + div {
+            margin-top: 2px;
+        }
+
+        .caret {
             content: '';
             position: absolute;
-            left: -10px;
-            top: 50%;
-            margin-top: -5px;
+            // left: 50%;
+            top: 100%;
+            // margin-left: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: transparent #2B2B2B transparent transparent;
+            border-color: var(--app-background-color) transparent transparent transparent;
+        }
+    }
+
+    .sensor {
+        &.hovered {
+            filter: grayscale(80%);
         }
     }
     

@@ -67,30 +67,13 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
-<style lang="scss" scoped>
-.graph-content .range-toggle {
-    flex: 0;
-    padding-bottom: 24px;
-}
 
-#live-view {
-    flex: 1 auto;
-    display: flex;
-    flex-direction: column;
-
-    #heat-map {
-        flex: 1 auto;
-        display: flex;
-        justify-content: center;
-    }
-}
-</style>
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { addEvent, removeEvent, getBaseUrl, toOrdinal } from '../../helpers'
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
-import floorMapper from '../../components/FloorMapper'
+import { getBaseUrl, toOrdinal } from '@/helpers'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
+import floorMapper from '@/components/FloorMapper'
 
 const api = {
     building: '/api/locations',
@@ -237,3 +220,24 @@ export default {
     }
 }
 </script>
+
+
+<style lang="scss" scoped>
+.graph-content .range-toggle {
+    flex: 0;
+    padding-bottom: 24px;
+}
+
+#live-view {
+    flex: 1 auto;
+    display: flex;
+    flex-direction: column;
+
+    #heat-map {
+        flex: 1 auto;
+        display: flex;
+        justify-content: center;
+        min-height: 50vh;
+    }
+}
+</style>

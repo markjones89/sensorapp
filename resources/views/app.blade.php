@@ -15,7 +15,6 @@
 </head>
 <body>
     <div id="app"></div>
-    <input type="hidden" id="sensor_api" value="{{ env('SENSOR_API') }}">
     <div class="app-loader">
         <div class="sk-folding-cube">
             <div class="sk-cube1 sk-cube"></div>

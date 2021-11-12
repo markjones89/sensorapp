@@ -381,6 +381,15 @@ export default {
         let bldg = this.building,
             floors = this.floors
 
+        function getFloorData() {
+            _.getFloors(function() {
+                _.loaded = true
+                _.getSensors(_.floor.id, function() {
+                    _.setupMapper()
+                })
+            })
+        }
+
         if (bldg && bldg.id === _.bldg_id) {
             _.bldg = bldg
             
@@ -390,27 +399,19 @@ export default {
                 } else if (_.floors.length > 0) {
                     _.floorSel = _.floors[0].id
                 }
-                _.loaded = true
 
                 if (!_.floor) return
-                setTimeout(() => { _.setupMapper() }, 100)
-            } else {
-                _.getFloors(function() {
+
+                if (_.floor.sensors && _.floor.sensors.length > 0) {
                     _.loaded = true
-                    _.getSensors(_.floor.id, function() {
-                        _.setupMapper()
-                    })
-                })
+                    setTimeout(() => { _.setupMapper() }, 100)
+                }
+                else getFloorData()
+            } else {
+                getFloorData()
             }
         } else {
-            _.getBuilding(_.bldg_id, function() {
-                _.getFloors(function() {
-                    _.loaded = true
-                    _.getSensors(_.floor.id, function() {
-                        _.setupMapper()
-                    })
-                })
-            })
+            _.getBuilding(_.bldg_id, getFloorData)
         }
     }
 }

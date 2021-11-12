@@ -193,7 +193,7 @@ export default {
             api_area: 'backend/api_area',
         }),
         // floors() { return this.$store.getters['locations/getFloors'](this.bldg_id) },
-        floors() { return this.buildings.find(x => x.id == this.bldg_id).floors },
+        floors() { return this.buildings.find(x => x.id == this.bldg_id)?.floors },
         baseUrl() { return getBaseUrl() },
         floorList() {
             return this.floors.sort((a, b) => {
