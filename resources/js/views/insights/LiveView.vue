@@ -137,7 +137,10 @@ export default {
     },
     methods: {
         wsConnect() {
-            this.liveWS = new Paho.MQTT.Client('mqtt.intuitive.works', 443, `intuitive_app_${ parseInt(Math.random() * 100, 10) }`)
+            let wsClient = process.env.MIX_LIVE_CLIENT
+            let wsPort = parseInt(process.env.MIX_LIVE_PORT)
+
+            this.liveWS = new Paho.MQTT.Client(wsClient, wsPort, `intuitive_app_${ parseInt(Math.random() * 100, 10) }`)
             this.liveWS.onConnectionLost = (res) => {
                 this.wsConnected = false
                 

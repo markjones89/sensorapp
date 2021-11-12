@@ -71,7 +71,7 @@ import { GraphFilter, Loader } from '@/components'
 import { BuildingSvg } from '@/components/svg'
 import { CaretIcon, CaretLeftIcon } from '@/components/icons'
 import { mapState, mapGetters } from 'vuex'
-import { toOrdinal } from '@/helpers'
+import { addEvent, removeEvent, toOrdinal } from '@/helpers'
 
 const api = {
     building: '/api/locations',
@@ -79,6 +79,7 @@ const api = {
 }
 
 export default {
+    title: 'Occupancy',
     props: ['bldg_id'],
     components: {
         BuildingSvg,
@@ -89,7 +90,8 @@ export default {
     },
     data: () => ({
         buildings: [], building: null, bldgFilter: null, loaded: false, showPageOpts: false, showEmbed: false, showFilter: false,
-        floors: [], floorsReverse: []
+        floors: [], floorsReverse: [], sensors: [],
+        liveWS: null, wsConnected: false
     }),
     computed: {
         ...mapState({
@@ -99,13 +101,62 @@ export default {
             api_header: 'backend/api_header',
             api_customers: 'backend/api_customers',
             api_buildings: 'backend/api_buildings',
-            api_floors: 'backend/api_floors'
+            api_building_overview: 'backend/api_building_overview',
+            // api_floors: 'backend/api_floors',
+            api_sensors_by_node: 'backend/api_sensors_by_node'
         }),
         buildingFilters() {
             return this.buildings.map(b => { return { value: b.id, label: b.name } })
         }
     },
     methods: {
+        wsConnect() {
+            let wsClient = process.env.MIX_LIVE_CLIENT
+            let wsPort = parseInt(process.env.MIX_LIVE_PORT)
+            
+            this.liveWS = new Paho.MQTT.Client(wsClient, wsPort, `intuitive_app_${ parseInt(Math.random() * 100, 10) }`)
+            this.liveWS.onConnectionLost = (res) => {
+                this.wsConnected = false
+                
+                if (res.errorCode != 0) {
+                    console.log('wsClosed: ', res.errorMessage)
+                    this.wsConnect()
+                }
+            }
+            this.liveWS.onMessageArrived = (msg) => {
+                const data = JSON.parse(msg.payloadString)
+                const sid = data.sensorId
+                const occupancy = data.occupancy_status
+                const state = occupancy == '0' ? 'available' : occupancy == '1' ? 'occupied' : null
+                let sensor = this.sensors.find(s => s.id === sid)
+
+                if (sensor && state) {
+                    let floor = this.floors.find(f => f.id == sensor.fid)
+
+                    sensor.sensor_state = state
+                    if (floor && state == 'occupied') floor.occupancy_limit += 1
+                    else if (floor && state == 'available') floor.occupancy_limit -= 1
+                }
+                // console.log('onMessageArrived', sensor, data)
+            }
+
+            this.liveWS.connect({
+                useSSL: true,
+                userName: process.env.MIX_LIVE_USER,
+                password: process.env.MIX_LIVE_PASS,
+                onSuccess: (res) => {
+                    this.wsConnected = true
+                    this.sensors.forEach(s => { this.liveWS.subscribe(`sensor_data/${s.id}/data`) })
+                    console.log('wsConnect.onSuccess', res)
+                },
+                onFailure: (e) => {
+                    this.wsConnected = false
+                    console.log('wsConnect.onFailure: ', e)
+                }
+            })
+        },
+        wsClose() { this.liveWS.disconnect() },
+        windowUnload() { this.wsClose() },
         backTo() { this.$router.back() },
         async getBuildings() {
             let compId = this.user.company_id
@@ -118,30 +169,52 @@ export default {
             } else {
                 this.building = data[0]
             }
-            // this.bldgFilter = this.building.name
+            
             this.bldgFilter = this.building.id
 
-            await this.getFloors(this.building.id)
+            await this.getBuildingOverview(this.building.id)
             this.loaded = true
+            this.wsConnect()
         },
-        async getFloors(id) {
+        async getBuildingOverview(id) {
             let compId = this.user.company_id
-
-            // let { data } = await axios.get(this.api_floors(compId, id), this.api_header())
             let res = await axios.all([
+                axios.get(this.api_building_overview(compId, id), this.api_header()),
                 axios.get(api.floor, { params: { bid: id } }),
-                axios.get(this.api_floors(compId, id), this.api_header())
+                axios.get(this.api_sensors_by_node(id, 'Building'), this.api_header())
             ])
+            
+            let bldgOverview = res[0].data,
+                floorsRef = res[1].data,
+                bldgSensors = res[2].data,
+                floors = []
 
-            let refs = res[0].data,
-                floors = res[1].data
+            this.sensors = []
 
-            floors.forEach(f => {
-                let ref = refs.find(x => x.ref_id == f.id)
-                
+            // floors
+            bldgOverview.children.forEach(f => {
+                let ref = floorsRef.find(x => x.ref_id == f.id)
+
                 f.ordinal_no = toOrdinal(f.number)
-                f.occupancy_limit = ref?.occupancy_limit || Math.floor((Math.random() * 25) + 1)
-                f.occupancy_live = Math.floor((Math.random() * f.occupancy_limit) + 1)
+                f.occupancy_limit = ref?.occupancy_limit || 0
+                f.occupancy_live = 0
+
+                // areas
+                let areas = f.children.filter(a => a.type == 'Desk Area')
+                let areaIds = areas.map(a => a.id)
+                f.areas = areas
+                
+                // sensors
+                let floorSensors = bldgSensors.filter(s => areaIds.indexOf(s.parent_id) >= 0)
+
+                floorSensors.forEach(s => {
+                    s.fid = f.id
+                    s.sensor_state = 'available'
+                })
+                this.sensors.push(...floorSensors)
+
+                delete f.children
+                floors.push(f)
             })
 
             this.floors = floors.sort((a, b) => {
@@ -167,9 +240,8 @@ export default {
         filterSelect(value, label, obj) {
             this.showFilter = false
             this.building = this.buildings.find(b => b.id === value)
-            // this.bldgFilter = this.building.name
             this.bldgFilter = value
-            this.getFloors(this.building.id)
+            this.getBuildingOverview(this.building.id)
         },
         toggleEmbed(show) {
             if (show) this.showPageOpts = false
@@ -182,6 +254,12 @@ export default {
     },
     mounted() {
         this.getBuildings()
+
+        addEvent(window, 'beforeunload', this.windowUnload)
+    },
+    destroyed() {
+        if (this.wsConnected) this.wsClose()
+        removeEvent(window, 'beforeunload', this.windowUnload)
     }
 }
 </script>
