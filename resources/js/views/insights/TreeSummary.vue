@@ -30,19 +30,40 @@
         </div>
         <div class="graph-content">
             <div class="chart-header">
-                <span class="chart-title">{{ filter.btnLabel }}</span>
-                <span class="chart-subtitle">{{ statDateRange }}</span>
+                <span class="chart-title">{{ chartTitle }}</span>
+                <span class="chart-subtitle floor-title" v-if="sensorMap && currentFloor">{{ currentFloor.name }}</span>
+                <span class="chart-subtitle">({{ statDateRange }})</span>
             </div>
             <date-range-toggle @select="rangeSelect" :active="rangeFilter" />
-            <template v-if="loaded">
-                <div id="tree-summary" v-if="!dataError"></div>
-                <div v-else class="error-display" style="height: 40vh">
-                    <p>{{ dataError }}</p>
-                    <a href="javascript:;" class="btn btn-primary" @click="renderTree(true)" style="align-self:center;">Retry</a>
+            <div class="tree-content">
+                <div class="chart-wrapper" :class="{ 'map-view': sensorMap }">
+                    <div class="tree-wrapper">
+                        <template v-if="loaded">
+                            <div id="tree-summary" v-if="!dataError"></div>
+                            <div v-else class="error-display" style="height: 40vh">
+                                <p>{{ dataError }}</p>
+                                <a href="javascript:;" class="btn btn-primary" @click="renderTree(true)" style="align-self:center;">Retry</a>
+                            </div>
+                        </template>
+                        <div v-else style="height: 40vh">
+                            <loader :show="!loaded" type="ripple"/>
+                        </div>
+                    </div>
+                    <div class="mapper">
+                        <template v-if="mapperLoaded">
+                            <div class="sensor-map" v-if="!dataError">
+                                <div id="sensor-map"></div>
+                            </div>
+                            <div v-else class="error-display" style="height: 40vh">
+                                <p>{{ dataError }}</p>
+                                <a href="javascript:;" class="btn btn-primary" @click="renderMap" style="align-self:center;">Retry</a>
+                            </div>
+                        </template>
+                        <div v-else style="height: 40vh">
+                            <loader :show="!mapperLoaded" type="ripple"/>
+                        </div>
+                    </div>
                 </div>
-            </template>
-            <div v-else style="height: 40vh">
-                <loader :show="!loaded" type="ripple"/>
             </div>
             <div class="bottom-filters">
                 <time-slider :from="timeFilter.start" :to="timeFilter.end"
@@ -72,6 +93,8 @@ import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@
 import { CaretIcon, CaretLeftIcon } from '@/components/icons'
 import { StatFilter } from '@/components/partials'
 import { collapsibleTree } from '@/components/graphs/CollapsibleTree'
+import floorMapper from '@/components/FloorMapper.js'
+import axios from 'axios'
 export default {
     // props: ['data_filter'],
     components: {
@@ -101,7 +124,9 @@ export default {
             stop_date: '',
             node_type: 'Customer',
             node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
-        }
+        },
+        mapperLoaded: false, mapper: null, 
+        sensorMap: false, currentFloor: null
     }),
     computed: {
         ...mapState({
@@ -118,7 +143,9 @@ export default {
         ...mapGetters({
             api_header: 'backend/api_header',
             api_customer_summary: 'backend/api_customer_summary',
-            api_graph_view: 'backend/api_graph_view'
+            api_graph_view: 'backend/api_graph_view',
+            api_building_overview: 'backend/api_building_overview',
+            api_sensors_by_node: 'backend/api_sensors_by_node'
         }),
         settings() { return this.user.company ? this.user.company.settings : null },
         baseUrl() { return getBaseUrl() },
@@ -128,7 +155,11 @@ export default {
             
             return minutes.map(function(x){ return { value: x, label: `${x} minutes` } });
         },
-        // dataFilter() { return this.filters.find(x => x.value == (this.data_filter || 'opportunity_cost')) },
+        chartTitle() {
+            return this.sensorMap ? 
+                `Low Performing ${this.currentFloor && this.currentFloor.area == 'Desk Area' ? 'Workspaces' : 'Meeting Rooms'}` : 
+                this.filter.btnLabel
+        },
         statDateRange() {
             let start = this.dataFilters.start_date
             let end = this.dataFilters.stop_date
@@ -145,7 +176,13 @@ export default {
             setRange: 'homepage/setRange',
             setTime: 'homepage/setTime'
         }),
-        backTo() { this.$router.back() },
+        backTo() {
+            if (this.sensorMap) {
+                this.sensorMap = false
+                setTimeout(() => { this.mapperLoaded = false }, 250)
+            }
+            else this.$router.back()
+        },
         rangeSelect(range, from, to) {
             let isoStart = toISOStart(from)
             let isoEnd = toISOEnd(to)
@@ -182,22 +219,6 @@ export default {
             try {
                 if (doRequest) {
                     this.axiosSrc = axios.CancelToken.source()
-                    // let { data } = await axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token))
-
-                    // if (!data.building_summary) {
-                    //     this.dataError = data
-                    //     this.loaded = true
-                    //     return
-                    // }
-                    // else if (data.building_summary && data.building_summary.length == 0) {
-                    //     this.dataError = "No results"
-                    //     this.loaded = true
-                    //     return
-                    // }
-                    // else {
-                    //     this.dataError = null
-                    //     this.setSummary(data)
-                    // }
                     if (this.summary == null || refresh) {
                         let res = await axios.all([
                             axios.post(this.api_customer_summary, this.dataFilters, this.api_header(this.axiosSrc.token)),
@@ -220,12 +241,16 @@ export default {
                 let summary = JSON.parse(JSON.stringify(this.summary.building_summary))
                 let floorSummary = JSON.parse(JSON.stringify(this.floorSummary))
 
-                // nodes.value = summary.map(x => x.opportunity_cost).reduce((a, b) => a + b, 0)
                 nodes.value = (moneyValue ? sum : average)(summary.map(x => getObjValue(x, dataKey, 0)))
 
-                let freeCats = [
-                    { name: 'Free Desks at Peak', key: 'free_workspace_utils.max' },
-                    { name: 'Free Meeting Rooms at Peak', key: 'free_meeting_room_occupancy.max' }
+                let freeCats = /*dataKey == 'low_perform_workspace.average_percentage' ?
+                [
+                    { name: 'Number of Workspaces occupied < 20%', key: 'low_perform_workspace.average_percentage' },
+                    { name: 'Number of Meeting Rooms occupied < 20%', key: '' }
+                ] : */
+                [
+                    { name: dataKey == 'low_perform_workspace.average_percentage' ? 'Workspaces occupied < 20%' : 'Free Desks at Peak', key: 'free_workspace_utils.max', area: 'Desk Area' },
+                    { name: dataKey == 'low_perform_workspace.average_percentage' ? 'Meeting Rooms occupied < 20%' : 'Free Meeting Rooms at Peak', key: 'free_meeting_room_occupancy.max', area: 'Meeting Room' }
                 ]
 
                 summary.forEach(a => {
@@ -248,19 +273,19 @@ export default {
                         if (fsBldg) {
                             catDetails.children = fsBldg.floor_summary.map(x => {
                                 return {
+                                    no: x.floor,
+                                    bid: a.building_id,
                                     name: `${toOrdinal(x.floor)} Floor`,
                                     value: getObjValue(x, c.key, 0),
-                                    number: true
+                                    number: true,
+                                    floor: true,
+                                    area: c.area
                                 }
                             })
                         }
 
                         a.children.push(catDetails)
                     })
-                    // a.children = [
-                    //     { name: 'Free Desks at Peak', value: a.free_workspace_utils.max, number: true },
-                    //     { name: 'Free Meeting Rooms at Peak', value: a.free_meeting_room_occupancy.max, number: true },
-                    // ]
 
                     keys.reduce((r, k) => {
                         if (!r[a[k]]) {
@@ -296,11 +321,82 @@ export default {
 
                 this.loaded = true
 
-                setTimeout(() => { collapsibleTree('#tree-summary', nodes, moneyValue) }, 100)   
+                let callbacks = dataKey == 'low_perform_workspace.average_percentage' ? {
+                    viewFloor: (node) => {
+                        // console.log('viewFloor.node', node)
+                        this.sensorMap = true
+                        this.currentFloor = node.data
+                        this.renderMap()
+                    }
+                } : null
+
+                setTimeout(() => { collapsibleTree('#tree-summary', nodes, moneyValue, callbacks) }, 100)
             } catch (error) {
                 console.error('renderTree', error, error.response?.data)
                 this.dataError = 'Unable to retrieve data, please try again'
                 this.loaded = true
+            }
+        },
+        async renderMap() {
+            try {
+                let bid = this.currentFloor.bid
+                let floorNum = this.currentFloor.no
+                let areaType = this.currentFloor.area
+                let sensorCount = this.currentFloor.value
+
+                this.mapperLoaded = false
+                this.axiosSrc = axios.CancelToken.source()
+
+                let res = await axios.all([
+                    axios.get(this.api_building_overview(this.dataFilters.node_id, bid), this.api_header(this.axiosSrc.token)),
+                    axios.get('/api/floors', { params: { bid: bid } })
+                ])
+                let overview = res[0].data
+                let floor = overview.children.find(x => x.number == floorNum)
+                let floorRefs = res[1].data
+
+                if (floor) {
+                    let ref = floorRefs.find(x => x.ref_id == floor.id)
+
+                    floor.floor_plan = ref?.floor_plan
+                    floor.floor_plan_url = ref?.floor_plan ? `${getBaseUrl()}/plans/${ref.floor_plan}` : null
+                    floor.areas = floor.children
+
+                    delete floor.children
+                }
+
+                let sensorData = await axios.all([
+                    axios.get(this.api_sensors_by_node(floor.id, 'Floor'), this.api_header()),
+                    axios.get('/api/sensors', { fid: floor.id })
+                ])
+
+                let sensors = sensorData[0].data,
+                    refs = sensorData[1].data
+
+                sensors.forEach(s => {
+                    let map = refs.find(x => x.ref_id == s.id)
+
+                    if (map) {
+                        s.pos_x = map.pos_x
+                        s.pos_y = map.pos_y
+                        s.scale = map.scale
+                    }
+                    s.sensor_state = 'available'
+                    s.area = floor.areas.find(x => x.id == s.parent_id)
+                })
+
+                let areaSensors = sensors.filter(x => x.area.type == areaType)
+                
+                if (areaType == 'Desk Area') floor.sensors = areaSensors.slice(0, sensorCount)
+                else floor.sensors = areaSensors
+
+                this.mapperLoaded = true
+                this.dataError = null
+                setTimeout(() => { this.mapper = new floorMapper('#sensor-map', floor) }, 100)
+            } catch (error) {
+                this.mapperLoaded = true
+                this.dataError = 'Unable to retrieve data, please try again'
+                console.error('renderMap.error', error)
             }
         },
         timeStartChange(time, hour) {
@@ -364,6 +460,50 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.floor-title {
+    font-size: 18px !important;
+    line-height: 24px !important;
+    font-weight: 700;
+    color: rgba(var(--app-text-rgb), 0.85) !important;
+}
+
+.tree-content {
+    position: relative;
+    width: 100%;
+    margin-top: 20px;
+    overflow: hidden;
+
+    .chart-wrapper {
+        position: relative;
+        display: flex;
+        width: 200%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        transform: translateX(0);
+        transition: transform .25s cubic-bezier(0.4, 0.0, 0.2, 1);
+
+        .tree-wrapper {
+            position: relative;
+            flex: 50%;
+        }
+
+        .mapper {
+            position: relative;
+            flex: 50%;
+
+            .sensor-map {
+                flex: 1 auto;
+                display: flex;
+                justify-content: center;
+                min-height: 50vh;
+            }
+        }
+
+        &.map-view {
+            transform: translateX(-50%);
+        }
+    }
+}
 #tree-summary {
     margin: 24px auto;
     max-width: 100%;

@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 
-export function collapsibleTree(wrapper, data, moneyValue) {
+export function collapsibleTree(wrapper, data, moneyValue, callbacks) {
     const container = d3.select(wrapper);
     const root = d3.hierarchy(data),
         moneyFormat = d3.format('$,.2s'),
@@ -73,8 +73,11 @@ export function collapsibleTree(wrapper, data, moneyValue) {
             .attr("fill-opacity", 0)
             .attr("stroke-opacity", 0)
             .on("click", d => {
-                d.children = d.children ? null : d._children;
-                update(d);
+                d.children = d.children ? null : d._children
+
+                update(d)
+
+                if (d.data.floor && callbacks && callbacks.viewFloor) callbacks.viewFloor.call(this, d)
             });
 
         nodeEnter.append("circle")
