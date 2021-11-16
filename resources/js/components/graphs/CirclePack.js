@@ -21,11 +21,11 @@ export function circlePack(wrapper, packData, callbacks) {
 
     let circleColor = d3.scaleOrdinal()
         .domain([0, 1, 2])
-        .range(['#393846', '#32313d', '#ed762c']);
+        .range(['#393846', '#32313d', '#ed762c']) // default palette
 
     let barColor = d3.scaleOrdinal()
         .domain([0, 1])
-        .range(['#3DCFA3', '#ed762c']);
+        .range(['#46D2A3', '#ed762c']) // green - orange
 
     function getStatDisplay(d, tooltip = false) {
         let isBuilding = !!d.data?.building_name

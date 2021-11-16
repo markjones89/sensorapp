@@ -216,7 +216,7 @@ class UsersController extends Controller
                 $user->app_theme = $request->theme;
                 $user->save();
 
-                return response(['r' => false, 'm' => 'Theme preference saved']);
+                return response(['r' => true, 'm' => 'Theme preference saved']);
             }
         }
         return response(['r' => false, 'm' => 'User not found']);

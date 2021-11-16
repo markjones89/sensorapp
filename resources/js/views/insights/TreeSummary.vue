@@ -53,6 +53,7 @@
                         <template v-if="mapperLoaded">
                             <div class="sensor-map" v-if="!dataError">
                                 <div id="sensor-map"></div>
+                                <p>{{ sensorMapText }}</p>
                             </div>
                             <div v-else class="error-display" style="height: 40vh">
                                 <p>{{ dataError }}</p>
@@ -126,7 +127,8 @@ export default {
             node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
         },
         mapperLoaded: false, mapper: null, 
-        sensorMap: false, currentFloor: null
+        sensorMap: false, currentFloor: null,
+        sensorMapText: ''
     }),
     computed: {
         ...mapState({
@@ -324,8 +326,10 @@ export default {
                 let callbacks = dataKey == 'low_perform_workspace.average_percentage' ? {
                     viewFloor: (node) => {
                         // console.log('viewFloor.node', node)
+                        let data = node.data
                         this.sensorMap = true
-                        this.currentFloor = node.data
+                        this.currentFloor = data
+                        this.sensorMapText = `${data.value} ${data.area == 'Desk Area' ? 'Workspaces' : 'Meeting Rooms'} occupied < 20% of the period selected`
                         this.renderMap()
                     }
                 } : null
@@ -342,7 +346,7 @@ export default {
                 let bid = this.currentFloor.bid
                 let floorNum = this.currentFloor.no
                 let areaType = this.currentFloor.area
-                let sensorCount = this.currentFloor.value
+                let statValue = this.currentFloor.value
 
                 this.mapperLoaded = false
                 this.axiosSrc = axios.CancelToken.source()
@@ -387,8 +391,12 @@ export default {
 
                 let areaSensors = sensors.filter(x => x.area.type == areaType)
                 
-                if (areaType == 'Desk Area') floor.sensors = areaSensors.slice(0, sensorCount)
-                else floor.sensors = areaSensors
+                if (areaType == 'Desk Area') floor.sensors = areaSensors.slice(0, statValue)
+                else {
+                    let areas = floor.areas.filter(a => a.type == areaType).slice(0, statValue).map(a => a.id)
+
+                    floor.sensors = areaSensors.filter(x => areas.indexOf(x.area.id) >= 0)
+                }
 
                 this.mapperLoaded = true
                 this.dataError = null
@@ -494,7 +502,9 @@ export default {
             .sensor-map {
                 flex: 1 auto;
                 display: flex;
+                flex-direction: column;
                 justify-content: center;
+                align-items: center;
                 min-height: 50vh;
             }
         }
