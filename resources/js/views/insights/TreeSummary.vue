@@ -520,3 +520,17 @@ export default {
     width: 1200px;
 }
 </style>
+
+<style lang="scss">
+[data-theme="light"] {
+    #tree-summary {
+        text {
+            fill: #000 !important;
+
+            &[stroke-width="3"] {
+                stroke: #fff !important;
+            }
+        }
+    }
+}
+</style>

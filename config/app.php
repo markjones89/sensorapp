@@ -176,6 +176,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        // Laravel\Socialite\SocialiteServiceProvider::class,
     ],
 
     /*
@@ -230,7 +231,8 @@ return [
         
         /* Package alias */
         'Image' => Intervention\Image\Facades\Image::class,
-        'Hashids' => Vinkla\Hashids\Facades\Hashids::class
+        'Hashids' => Vinkla\Hashids\Facades\Hashids::class,
+        // 'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ],
 
 ];
