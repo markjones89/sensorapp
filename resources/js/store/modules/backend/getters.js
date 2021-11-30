@@ -49,6 +49,10 @@ const api_room_supply_vs_size = state => `${state.url}/api/filters/meeting_room/
 
 const api_room_util_vs_efficiency = state => `${state.url}/api/filters/meeting_room/room_utilisation_vs_efficiency`
 
+const api_low_performing_stats = state => `${state.url}/api/filters/desk_area/low_workspace_stats`
+
+const api_low_performing_sensors = state => `${state.url}/api/filters/desk_area/low_workspace_sensor_detail`
+
 export default {
     /** API request header (plus auth token) */
     api_header,
@@ -78,6 +82,8 @@ export default {
     api_customer_summary,
     /** Customer API (bar charts - floor summary) */
     api_graph_view,
+    api_low_performing_stats,
+    api_low_performing_sensors,
     /** Utilisation report (workspace utilisation page 2-4) */
     api_monthly_workspace_utils_rpt,
     /** Utilisation report (meeting room utilisation page 5-7) */

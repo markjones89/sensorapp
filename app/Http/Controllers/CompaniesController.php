@@ -104,6 +104,19 @@ class CompaniesController extends Controller
         return response(['r' => false, 'm' => 'Logo image is expected']);
     }
 
+    public function setUtilRptPeriods(Request $request) {
+        $cid = Hashids::decode($request->id)[0];
+        $comp = Company::find($cid);
+
+        if ($comp) {
+            $comp->util_rpt_periods = $request->periods;
+            $comp->save();
+
+            return response(['r' => true, 'm' => 'Utilisation report periods updated']);
+        }
+        return response(['r' => false, 'm' => 'Company not found']);
+    }
+
     public function delete($id) {
         $cid = Hashids::decode($id)[0];
         $comp = Company::find($cid);

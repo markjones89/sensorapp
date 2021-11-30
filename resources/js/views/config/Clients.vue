@@ -17,11 +17,12 @@
                         </div>
                     </div>
                     <div class="client-info">
-                        <!-- <div class="client-opts">
-                            <a class="client-opt" @click="triggerEdit(c.hid)">Edit</a>
-                            <a class="client-opt" @click="delClient(c.hid)">Remove</a>
-                        </div> -->
                         {{ c.name }}
+                        <div class="client-opts">
+                            <!-- <a class="client-opt" @click="triggerEdit(c.hid)">Edit</a>
+                            <a class="client-opt" @click="delClient(c.hid)">Remove</a> -->
+                            <a class="client-opt" @click="showSetPeriods(c)">Report Periods (Utilisation)</a>
+                        </div>
                     </div>
                 </div>
                 <input type="file" ref="logoFile" hidden accept="image/*" @change="logoFileChange" />
@@ -43,23 +44,39 @@
                 <button class="btn btn-primary" @click="upClient" :disabled="state.saving" v-else>{{ state.saving ? 'Updating...' : 'Update'}}</button>
             </template>
         </modal>
+        <modal :show="periodSetting" @close="periodSetting = false">
+            <template v-slot:header>
+                <h2>Report Periods</h2>
+            </template>
+            <div id="period-list">
+                <checkbox v-for="p in periods" :key="p.id" :label="p.name" :val="p.id" v-model="clientPeriods" />
+            </div>
+            <template v-slot:footer>
+                <button class="btn btn-primary" @click="setPeriods" :disabled="state.saving">{{ state.saving ? 'Saving...' : 'Save'}}</button>
+            </template>
+        </modal>
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { getBaseUrl } from '../../helpers'
-import { CircleProgress, Loader, Modal } from '../../components'
+import { getBaseUrl } from '@/helpers'
+import { CircleProgress, Checkbox, Loader, Modal } from '@/components'
 
-const api = '/api/clients'
+const api = {
+    clients: '/api/clients',
+    clientPeriods: 'api/clients/util-rpt-periods',
+    periods: '/api/util-report/periods'
+}
 
 export default {
     title: 'Clients',
-    components: { CircleProgress, Loader, Modal },
+    components: { CircleProgress, Checkbox, Loader, Modal },
     data: () => ({
         clients: [], cName: '', cId: null, refId: null,
         loaded: false, clientEntry: false, editMode: false,
+        periodSetting: false, periods: [], clientPeriods: [],
         state: {
             saving: false
         }
@@ -82,7 +99,7 @@ export default {
         async getData() {
             let res = await axios.all([
                 axios.get(this.api_customers, this.api_header()),
-                axios.get(api)
+                axios.get(api.clients)
             ])
 
             let custs = res[0].data,
@@ -120,7 +137,7 @@ export default {
             let cust = await axios.post(this.api_customers, { name: this.cName }, this.api_header())
 
             if (cust.status == 200) {
-                axios.post(api, { ref_id: cust.data.id })
+                axios.post(api.clients, { ref_id: cust.data.id })
                     .then(x => {
                         this.toggleSaving(false)
                         let res = x.data
@@ -178,7 +195,7 @@ export default {
                     okClick: function (e) {
                         this.hide()
                         _.toggleSaving(true)
-                        axios.delete(`${api}/${id}`)
+                        axios.delete(`${api.clients}/${id}`)
                             .then(x => {
                                 _.toggleSaving(false)
                                 let res = x.data
@@ -223,7 +240,7 @@ export default {
             formData.append('logo', file)
             formData.append('id', this.cId)
 
-            axios.post(`${api}/logo`, formData, {
+            axios.post(`${api.clients}/logo`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -234,6 +251,38 @@ export default {
                 }
             }).then(x => cb(true, x.data))
             .catch(err => cb(false, err))
+        },
+        async showSetPeriods(client) {
+            let periods = client.util_rpt_periods ? client.util_rpt_periods.split(',').map(x => parseInt(x)) : []
+            let { data } = await axios.get(api.periods)
+
+            this.cId = client.hid
+            this.periods = data.periods
+            this.clientPeriods = periods
+            this.periodSetting = true
+            console.log('showSetPeriods', data.periods, client)
+        },
+        setPeriods() {
+            let c = this.clients.find(c => c.hid == this.cId)
+            let selectedPeriods = this.clientPeriods.sort().join(',')
+            
+            this.toggleSaving(true)
+            axios.put(api.clientPeriods, { id: this.cId, periods: selectedPeriods })
+                .then(x => {
+                    this.toggleSaving(false)
+                    if (x.status == 200) {
+                        let res = x.data
+
+                        if (res.r) {
+                            c.util_rpt_periods = selectedPeriods
+                            this.periodSetting = false
+                        }
+
+                        this.$mdtoast(res.m, { type: res.r ? 'success' : 'error', interaction: true, interactionTimeout: 5000 })
+                    }
+                })
+
+            // console.log('setPeriods', this.clientPeriods.sort().join(','))
         }
     },
     mounted() {
@@ -336,17 +385,20 @@ export default {
 
     .client-info {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        justify-content: center;
         padding-left: 16px;
     }
 
     .client-opts {
+        padding: 4px;
         line-height: 13px;
 
         .client-opt {
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             user-select: none;
+            color: rgba($color: #fff, $alpha: 0.8);
 
             &:hover { text-decoration: underline; }
         }
@@ -354,5 +406,8 @@ export default {
 }
 #client-entry {
     width: 400px;
+}
+#period-list {
+    padding: 10px;
 }
 </style>

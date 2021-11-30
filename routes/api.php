@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('clients', 'CompaniesController@get');
 Route::post('clients', 'CompaniesController@create');
 Route::post('clients/logo', 'CompaniesController@setLogo');
+Route::put('clients/util-rpt-periods', 'CompaniesController@setUtilRptPeriods');
 // Route::put('clients/{id}', 'CompaniesController@update');
 Route::delete('clients/{id}', 'CompaniesController@delete');
 
@@ -61,6 +62,8 @@ Route::get('work-configs', 'WorkSettingsController@get');
 Route::post('work-configs', 'WorkSettingsController@create');
 Route::put('work-configs/{id}', 'WorkSettingsController@update');
 Route::delete('work-configs/{id}', 'WorkSettingsController@delete');
+
+Route::get('util-report/periods', 'WorkSettingsController@getUtilRptPeriods');
 
 Route::get('users/{id?}', 'UsersController@get');
 Route::post('users', 'UsersController@create');

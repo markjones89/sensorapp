@@ -62,12 +62,38 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-field">
+                            <label>Covid Limit (%)</label>
+                            <input type="number" v-model="rptFilters.limit">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-field">
+                            <label>Report Period</label>
+                            <select v-model="rptFilters.period">
+                                <option
+                                    v-for="p in reportPeriods"
+                                    :key="p.id"
+                                    :value="p.id"
+                                >
+                                    {{ p.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="input-field">
                             <label>Year</label>
                             <input type="number" v-model="rptFilters.year" ref="rptYear">
                         </div>
                     </div>
                     <div class="col">
-                        <div class="input-field">
+                        <div class="input-field" v-if="rptFilters.period == 1">
+                            <label>Week</label>
+                            <week-select :year="rptFilters.year" v-model="rptFilters.week" />
+                        </div>
+                        <div class="input-field" v-if="rptFilters.period == 2">
                             <label>Month</label>
                             <select v-model="rptFilters.month">
                                 <option v-for="(m, i) in monthList" :key="i"
@@ -76,13 +102,14 @@
                                 </option>
                             </select>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="input-field">
-                            <label>Covid Limit (%)</label>
-                            <input type="number" v-model="rptFilters.limit">
+                        <div class="input-field" v-if="rptFilters.period == 3">
+                            <label>Quarter</label>
+                            <select v-model="rptFilters.quarter">
+                                <option :value="1">1</option>
+                                <option :value="2">2</option>
+                                <option :value="3">3</option>
+                                <option :value="4">4</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -97,7 +124,7 @@
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex'
 import { getBaseUrl, toHour, toISOStart, toISOEnd, getMonthRange, extractLocations } from '@/helpers'
-import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from "@/components"
+import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider, WeekSelect } from "@/components"
 import { HierarchyGraph } from '@/components/partials'
 import { CaretIcon, CaretLeftIcon } from "@/components/icons"
 export default {
@@ -110,7 +137,8 @@ export default {
         GraphFilter,
         Modal,
         TimeSlider,
-        HierarchyGraph
+        HierarchyGraph,
+        WeekSelect
     },
     data: () => ({
         // user: null,
@@ -132,10 +160,14 @@ export default {
             node_id: 'ad9b565d-9082-4808-99cd-32f2f09f63f2'
         },
         filterReport: false,
+        reportPeriods: [],
         monthList: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
         rptFilters: {
+            period: 2,
             year: 0,
-            month: 0,
+            quarter: 1,
+            month: 1,
+            week: 1,
             limit: 50
         }
     }),
@@ -222,23 +254,40 @@ export default {
         },
         toTreeSummary() { this.$router.push({ name: 'tree-summary', query: { df: this.filter.value } }) },
         toLive() { this.$router.push({ name: 'occupancy', query: { bid: this.locationFilter.value } }) },
-        showReport(show) {
-            this.filterReport = show
-
+        async showReport(show) {
             if (show) {
-                setTimeout(() => { this.$refs.rptYear.focus() }, 0)
+                let clientPeriods = this.company && this.company.util_rpt_periods ? this.company.util_rpt_periods.split(',').map(x => parseInt(x)) : []
+
+                if (!this.user.isSuper && clientPeriods.length == 0) {
+                    this.$mdtoast(`You don't have a viewable report period, please contact Intuitive support.`, { type: 'error', duration: 7500 })
+                }
+                else {
+                    let { data } = await axios.get('/api/util-report/periods')
+
+                    this.reportPeriods = data.periods.filter(p => clientPeriods.length > 0 ? clientPeriods.indexOf(p.id) >= 0 : true)
+                    this.filterReport = true
+
+                    setTimeout(() => { this.$refs.rptYear.focus() }, 0)
+                }
             }
+            else this.filterReport = show
         },
         viewReport() {
             let query = {
                 cid: this.company.ref_id,
                 bid: this.locationFilter.value,
+                p: this.rptFilters.period,
                 y: this.rptFilters.year,
-                m: this.rptFilters.month,
+                // m: this.rptFilters.month,
                 sh: this.dataFilters.start_hour,
                 eh: this.dataFilters.stop_hour,
                 lr: this.rptFilters.limit
             }
+
+            if (query.p == 1) query.w = this.rptFilters.week
+            else if (query.p == 2) query.m = this.rptFilters.month
+            else if (query.p == 3) query.q = this.rptFilters.quarter
+
             let route = this.$router.resolve({ name: 'utilisation-rpt', query })
 
             window.open(route.href, '_blank')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WorkSetting;
+use App\Models\UtilRptPeriod;
 use Hashids;
 
 class WorkSettingsController extends Controller
@@ -80,5 +81,14 @@ class WorkSettingsController extends Controller
         }
 
         return response(['r' => false, 'm' => 'Work settings doesn\'t exist']);
+    }
+
+    /* Utilisation report periods */
+    public function getUtilRptPeriods(Request $request) {
+        if ($request->id) {
+            return response(['periods' => UtilRptPeriod::find($request->id)]);
+        }
+
+        return response(['periods' => UtilRptPeriod::all()]);
     }
 }

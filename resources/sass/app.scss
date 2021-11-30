@@ -516,7 +516,7 @@ textarea {
         & + .graph-range-btn { margin-left: 4px; }
 
         &:hover {
-            background-color: rgba($color: var(--app-input-bg-rgb), $alpha: 0.03);
+            background-color: rgba($color: var(--app-input-bg-rgb), $alpha: 0.3);
         }
         
         &.btn--active {

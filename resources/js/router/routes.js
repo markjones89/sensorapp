@@ -120,8 +120,11 @@ export default [
                     trigger: route.query.t ? parseInt(route.query.t) : undefined,
                     cid: route.query.cid,
                     bid: route.query.bid,
+                    period: parseInt(route.query.p),
                     year: parseInt(route.query.y),
-                    month: parseInt(route.query.m),
+                    quarter: parseInt(route.query.q || 1),
+                    month: parseInt(route.query.m || 1),
+                    week: parseInt(route.query.w || 1),
                     start_hour: parseInt(route.query.sh),
                     stop_hour: parseInt(route.query.eh),
                     limit: parseInt(route.query.lr) / 100

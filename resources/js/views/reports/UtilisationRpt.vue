@@ -1,7 +1,7 @@
 <template>
     <div class="report">
         <div class="report-header">
-            <div class="report-name">{{ `${monthName} ${year}` }} Intuitive Report</div>
+            <div class="report-name">{{ `${year} ${reportPeriod.name}` }} Intuitive Report</div>
             <div class="report-options"></div>
         </div>
         <div class="report-content">
@@ -22,7 +22,8 @@
                         <h1>{{ building.name }}</h1>
                         <h2>Utilisation Report Data</h2>
                         <h3>Analytics service</h3>
-                        <span>{{ monthName }} {{ year }}</span>
+                        <!-- <span>{{ monthName }} {{ year }}</span> -->
+                        <span>{{ rptRangeText }}</span>
                     </div>
                 </div>
                 <monthly-workstation-util
@@ -79,8 +80,10 @@ import {
     MeetingRoomPerformance
 } from '@/components/partials'
 import { RippleLoader } from '@/components/loader'
-import { toOrdinal, hourStr, getMonthRange, getMonthName, getBaseUrl, roundNum, getRoomSize, getMeetingSize, padNum } from '@/helpers'
+import { toOrdinal, hourStr, getMonthRange, getMonthName, getBaseUrl, roundNum, getRoomSize, getMeetingSize, padNum, toISOStart, toISOEnd } from '@/helpers'
 import VueApexCharts from 'vue-apexcharts'
+import moment from 'moment'
+import { render } from 'nprogress'
 export default {
     title: 'Intuitive Report',
     components: {
@@ -98,8 +101,11 @@ export default {
         trigger: { type: Number, default: 6 },
         cid: { type: String, required: true },
         bid: { type: String, required: true },
+        period: { type: Number, required: true },
         year: { type: Number, required: true },
-        month: { type: Number, required: true },
+        quarter: { type: Number },
+        month: { type: Number },
+        week: { type: Number },
         start_hour: { type: Number, required: true },
         stop_hour: { type: Number, required: true },
         limit: { type: Number, required: true }
@@ -135,7 +141,65 @@ export default {
         },
         floorNumbers() { return `${this.floors.map(f => toOrdinal(f.number)).join(', ')} Floors` },
         timeRange() { return `${hourStr(this.start_hour)} to ${hourStr(this.stop_hour)}` },
-        monthName() { return getMonthName(this.month) }
+        monthName() { return getMonthName(this.month) },
+        reportPeriod() {
+            let period = { start: null, end: null, moment: null, name: '' }
+            let year = this.year
+
+            if (this.period == 1) {
+                let _moment = moment().hours(0).minutes(0).seconds(0).milliseconds(0)
+                let start = _moment.year(year).isoWeek(this.week).day('monday')
+                let end = start.clone().add(6, 'd')
+
+                period.start = start.toDate()
+                period.end = end.toDate()
+                period.moment = { start, end }
+                period.name = 'Weekly'
+            }
+            else if (this.period == 2) {
+                let month = this.month
+                let start = moment(new Date(year, month, 1))
+                let end = moment(new Date(year, month + 1, 0))
+
+                period.start = start.toDate()
+                period.end = end.toDate()
+                period.moment = { start, end }
+                period.name = 'Monthly'
+            }
+            else if (this.period == 3) {
+                let quarter = this.quarter
+                let _moment = moment().hours(0).minutes(0).seconds(0).milliseconds(0)
+                let start = _moment.year(year).quarter(quarter).startOf('quarter')
+                let end = start.clone().endOf('quarter')
+
+                period.start = start.toDate()
+                period.end = end.toDate()
+                period.moment = { start, end }
+                period.name = 'Quarterly'
+            }
+
+            return period
+        },
+        rptRangeText() {
+            let period = this.period
+            let range = this.reportPeriod.moment
+            let rStart = range.start
+            let rEnd = range.end
+
+            if (period == 1) {
+                return rStart.isSame(rEnd, 'year') ?
+                    `${rStart.format('MMMM D')} - ${rEnd.format('D, YYYY')}` :
+                    `${rStart.format('MMMM D, YYYY')} - ${rEnd.format(rStart.isSame(rEnd, 'month') ? 'D, YYYY' : 'MMMM D, YYYY')}`
+            }
+            else if (period == 2) {
+                return rStart.format('MMMM YYYY')
+            }
+            else if (period == 3) {
+                return `${rStart.format('MMMM')} to ${rEnd.format('MMMM YYYY')}`
+            }
+            
+            return ''
+        }
     },
     methods: {
         async getCustRef() {
@@ -172,13 +236,14 @@ export default {
             this.getBuildingOverview()
         },
         rptApiParams(type, id, hasLimit = false) {
-            let range = getMonthRange(this.year, this.month)
+            // let range = getMonthRange(this.year, this.month)
+            let range = this.reportPeriod
             let obj = {
                 trigger: this.trigger,
                 start_hour: this.start_hour,
                 stop_hour: this.stop_hour,
-                start_date: range.start,
-                stop_date: range.end,
+                start_date: toISOStart(range.start),
+                stop_date: toISOEnd(range.end),
                 node_id: id,
                 node_type: type
             }

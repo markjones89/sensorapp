@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
             AreaTypeSeeder::class,
             GlobalCostSeeder::class,
             RoleSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            UtilRptPeriodSeeder::class
         ]);
     }
 }

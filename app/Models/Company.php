@@ -15,6 +15,12 @@ class Company extends Model
         return $this->hasOne(WorkSetting::class);
     }
 
+    // public function utilRptPeriods() {
+    //     $periods = explode(',', $this->attributes['util_rpt_periods']);
+
+    //     return UtilRptPeriod::whereIn('id', $periods)->get();
+    // }
+
     public function getHIdAttribute() {
         return Hashids::encode($this->attributes['id']);
     }

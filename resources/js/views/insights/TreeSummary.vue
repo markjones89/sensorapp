@@ -147,7 +147,8 @@ export default {
             api_customer_summary: 'backend/api_customer_summary',
             api_graph_view: 'backend/api_graph_view',
             api_building_overview: 'backend/api_building_overview',
-            api_sensors_by_node: 'backend/api_sensors_by_node'
+            api_sensors_by_node: 'backend/api_sensors_by_node',
+            api_low_performing_sensors: 'backend/api_low_performing_sensors'
         }),
         settings() { return this.user.company ? this.user.company.settings : null },
         baseUrl() { return getBaseUrl() },
@@ -369,8 +370,14 @@ export default {
                     delete floor.children
                 }
 
+                let filters = Object.assign({}, this.dataFilters, {
+                    node_type: 'Floor', 
+                    node_id: floor.id,
+                    limit_ratio: 0.5
+                })
                 let sensorData = await axios.all([
                     axios.get(this.api_sensors_by_node(floor.id, 'Floor'), this.api_header()),
+                    // axios.post(this.api_low_performing_sensors, filters, this.api_header()),
                     axios.get('/api/sensors', { fid: floor.id })
                 ])
 
@@ -378,7 +385,7 @@ export default {
                     refs = sensorData[1].data
 
                 sensors.forEach(s => {
-                    let map = refs.find(x => x.ref_id == s.id)
+                    let map = refs.find(x => x.ref_id == s.sensor_id)
 
                     if (map) {
                         s.pos_x = map.pos_x
