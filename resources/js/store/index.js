@@ -1,31 +1,34 @@
-import { initialState } from '@/store/vars'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersistence from 'vuex-persist'
 import Cookies from 'js-cookie'
 
-import mutations from './mutations'
-import getters from './getters'
 import actions from './actions'
 import modules from './modules'
 
 Vue.use(Vuex)
 
-const vuexLocal = new VuexPersistence({
+const vuexCookie = new VuexPersistence({
     // storage: window.localStorage
     restoreState: (key, storage) => Cookies.getJSON(key),
-    saveState: (key, state, storage) => Cookies.set(key, state, { expires: 3, sameSite: 'strict' })
+    saveState: (key, state, storage) => 
+        Cookies.set(key, state, {
+            expires: 3,
+            sameSite: 'strict'
+        }),
+    modules: ['user']
+})
+
+const vuexSession = new VuexPersistence({
+    storage: window.sessionStorage,
+    modules: ['backend', 'homepage', 'locations', 'peakchart']
 })
 
 export const store = new Vuex.Store({
-    state: initialState,
     // mutations: {},
-    mutations,
-    // actions: {},
     actions,
     // getters: {},
-    getters,
     // modules: {}
     modules,
-    plugins: [vuexLocal.plugin]
+    plugins: [vuexCookie.plugin, vuexSession.plugin]
 })

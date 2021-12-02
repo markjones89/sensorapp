@@ -92,9 +92,9 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user,
-            company: state => state.user.company,
-            settings: state => state.user.company ? state.user.company.settings : null,
+            user: state => state.user.info,
+            company: state => state.user.info.company,
+            settings: state => state.user.info?.company ? state.user.info.company.settings : null,
             filter: state => state.homepage.filter,
             cp_range: state => state.homepage.rangeFilter,
             cp_start_time: state => state.homepage.startTime,

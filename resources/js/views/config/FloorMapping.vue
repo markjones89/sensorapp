@@ -96,7 +96,7 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user,
+            user: state => state.user.info,
             company_id: state => state.locations.client
         }),
         ...mapGetters({

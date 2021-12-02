@@ -108,7 +108,7 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user 
+            user: state => state.user.info
         }),
         ...mapGetters({
             api_header: 'backend/api_header',

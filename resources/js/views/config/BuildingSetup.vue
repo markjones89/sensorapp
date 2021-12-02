@@ -177,8 +177,7 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user,
-            // company_id: state => state.user.company_id
+            user: state => state.user.info,
             company_id: state => state.locations.client,
             buildings: state => state.locations.buildings,
             building: state => state.locations.building

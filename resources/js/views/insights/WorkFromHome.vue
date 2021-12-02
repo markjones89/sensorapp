@@ -132,8 +132,8 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user,
-            company: state => state.user.company,
+            user: state => state.user.info,
+            company: state => state.user.info.company,
             summary: state => state.homepage.summary,
             filter: state => state.homepage.filter,
             rangeFilter: state => state.homepage.rangeFilter,

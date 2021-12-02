@@ -1,13 +1,25 @@
 /**
  * Initial app state
  */
-export function initialState () {
+// export function initialState () {
+//     return {
+//         theme: 'dark',
+//         user: null,
+//         api_user: null,
+//         api_pass: null,
+//         clients: []
+//     }
+// }
+
+/**
+ * Initial user state
+ */
+export function userState() {
     return {
         theme: 'dark',
-        user: null,
+        info: null,
         api_user: null,
-        api_pass: null,
-        clients: []
+        api_pass: null
     }
 }
 

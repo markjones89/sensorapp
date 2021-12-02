@@ -17,7 +17,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            setAPIInfo: 'setAPIInfo',
+            setAPIInfo: 'user/setAPIInfo',
             setAPIUrl: 'backend/setAPIUrl'
         }),
         async doBackendAuth(credentials) {

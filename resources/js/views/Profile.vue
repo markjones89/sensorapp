@@ -79,8 +79,8 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
-import { addEvent, getBaseUrl, removeEvent } from '../helpers'
-import { Modal, Loader } from '../components'
+import { addEvent, getBaseUrl, removeEvent } from '@/helpers'
+import { Modal, Loader } from '@/components'
 import { Cropper } from 'vue-advanced-cropper'
 
 const api = '/api/users'
@@ -99,7 +99,7 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user.info
         }),
         baseUrl() { return getBaseUrl() },
         photoUrl() {
@@ -119,9 +119,9 @@ export default {
         }
     },
     methods: {
-        ...mapMutations([
-            'setUserPhoto'
-        ]),
+        ...mapMutations({
+            setUserPhoto: 'user/setUserPhoto'
+        }),
         imageReady() { this.state.img_loading = false },
         imageCropped({canvas}) {
             this.photo = canvas

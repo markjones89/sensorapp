@@ -208,10 +208,10 @@ $skewDeg: 30deg;
 </style>
 <script>
 import { mapState } from 'vuex'
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, FilterDropdown, TimeSlider } from '../../components'
-import { TwoPersonChairSvg } from '../../components/svg'
-import { roomComparer } from '../../components/graphs/RoomCompare'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, TimeSlider } from '@/components'
+import { TwoPersonChairSvg } from '@/components/svg'
+import { roomComparer } from '@/components/graphs/RoomCompare'
 
 function randomNum(limit) {
     return Math.floor((Math.random() * (limit || 100)) + 1)
@@ -247,7 +247,7 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user,
+            user: state => state.user.info,
             filter: state => state.homepage.filter
         }),
         settings() { return this.user.company ? this.user.company.settings : null },

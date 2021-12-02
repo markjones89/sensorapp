@@ -160,10 +160,10 @@ $blue: #0998ff;
 </style>
 <script>
 import { mapState, mapGetters } from 'vuex'
-import { addEvent, removeEvent, getBaseUrl, toOrdinal } from '../../helpers'
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
-import floorMapper from '../../components/FloorMapper'
+import { getBaseUrl, toOrdinal } from '@/helpers'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
+import floorMapper from '@/components/FloorMapper'
 
 const api = {
     building: '/api/locations',
@@ -188,7 +188,7 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user.info
         }),
         ...mapGetters({
             api_header: 'backend/api_header',

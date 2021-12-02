@@ -80,10 +80,9 @@ import {
     MeetingRoomPerformance
 } from '@/components/partials'
 import { RippleLoader } from '@/components/loader'
-import { toOrdinal, hourStr, getMonthRange, getMonthName, getBaseUrl, roundNum, getRoomSize, getMeetingSize, padNum, toISOStart, toISOEnd } from '@/helpers'
+import { toOrdinal, hourStr, getMonthName, getBaseUrl, roundNum, getRoomSize, getMeetingSize, padNum, toISOStart, toISOEnd } from '@/helpers'
 import VueApexCharts from 'vue-apexcharts'
 import moment from 'moment'
-import { render } from 'nprogress'
 export default {
     title: 'Intuitive Report',
     components: {

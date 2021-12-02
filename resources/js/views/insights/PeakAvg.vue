@@ -173,9 +173,9 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user,
-            company: state => state.user.company,
-            settings: state => state.user.company ? state.user.company.settings : null,
+            user: state => state.user.info,
+            company: state => state.user.info.company,
+            settings: state => state.user.info?.company ? state.user.info.company.settings : null,
             summary: state => state.homepage.summary,
             filter: state => state.homepage.filter,
             locationFilter: state => state.homepage.locationFilter,

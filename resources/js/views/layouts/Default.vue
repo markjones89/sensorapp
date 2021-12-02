@@ -27,8 +27,8 @@ export default {
     }),
     computed: {
         ...mapState({
-            theme: state => state.theme,
-            user: state => state.user
+            theme: state => state.user.theme,
+            user: state => state.user.info
         }),
         baseUrl() { return getBaseUrl() },
         isAuth() { return this.user != null }

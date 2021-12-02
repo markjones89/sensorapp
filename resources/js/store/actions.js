@@ -8,16 +8,16 @@ const doLogin = ({ commit, dispatch }, payload) => {
 
                 if (data.r) {
                     // set api info
-                    commit('setAPIInfo', user.apiInfo)
+                    commit('user/setAPIInfo', user.apiInfo)
 
                     dispatch('doBackendAuth')
                         .finally(() => {
+                            // set user
+                            commit('user/setUser', user)
                             // set theme
-                            commit('setTheme', user.app_theme)
+                            commit('user/setTheme', user.app_theme)
                             // set customer ID
                             commit('locations/setClient', user.company_id)
-                            // set user
-                            commit('setUser', user)
 
                             resolve(res)
                         })
@@ -29,19 +29,16 @@ const doLogin = ({ commit, dispatch }, payload) => {
 }
 
 const doBackendAuth = async ({ state, commit }) => {
-    // // set backend api url
-    // if (payload.apiUrl) commit('backend/setAPIUrl', payload.apiUrl)
-
     // backend login
-    let { data } = await axios.post(`${state.backend.url}/login`, { username: state.api_user, password: state.api_pass })
+    let { data } = await axios.post(`${state.backend.url}/login`, { username: state.user.api_user, password: state.user.api_pass })
 
     // set auth token
     if (data.token) commit('backend/setAuthToken', data.token)
 }
 
 const clearStore = ({ commit }) => {
-    commit('resetState')
     // commit('backend/resetState')
+    commit('user/resetState')
     commit('backend/setAuthToken', null)
     commit('homepage/resetState')
     commit('locations/resetState')

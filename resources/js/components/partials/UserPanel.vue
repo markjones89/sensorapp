@@ -46,8 +46,8 @@ export default {
     }),
     computed: {
         ...mapState({
-            theme: state => state.theme,
-            user: state => state.user
+            theme: state => state.user.theme,
+            user: state => state.user.info
         }),
         baseUrl() { return getBaseUrl() },
         userPhoto() {
@@ -59,7 +59,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            setTheme: 'setTheme'
+            setTheme: 'user/setTheme'
         }),
         toggleTheme() {
             let newTheme = this.theme == 'dark' ? 'light' : 'dark'

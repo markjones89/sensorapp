@@ -62,98 +62,11 @@
         <loader :show="!loaded" type="ripple"/>
     </div>
 </template>
-<style lang="scss" scoped>
-.company-logo {
-    display: inline-flex;
-    margin-top: 16px;
 
-    .logo-holder {
-        position: relative;
-        display: flex;
-        align-items: center;
-        height: 48px;
-        width: 150px;
-        padding: 10px;
-        border-radius: 10px;
-        overflow: hidden;
-
-        .upload-trigger {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100% - 2px);
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 10px;
-            border: 1px dashed rgba(255, 255, 255, .1);
-        }
-
-        .upload-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #2B2B2B;
-        }
-
-        img {
-            height: auto;
-            width: 100%;
-        }
-
-        .logo-opt {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            visibility: hidden;
-            opacity: 0;
-            transform: scale(1.25);
-            background-color: rgba($color: #393939, $alpha: 0.8);
-            transition: visibility .24s, opacity .24s, transform .24s;
-        }
-
-        &:hover .logo-opt {
-            visibility: visible;
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-}
-.settings-section {
-    margin: 24px 0;
-
-    .days-list {
-        padding: 10px 0;
-    }
-
-    &.hours-section {
-        margin-bottom: 32px;
-    }
-}
-#trigger-filters {
-    td {
-        padding: 4px 6px;
-    }
-    .input-field {
-        margin-bottom: 0;
-    }
-}
-</style>
 <script>
 import { mapMutations, mapState } from 'vuex'
-// import { store } from '../../store'
-import { getBaseUrl } from '../../helpers'
-import { Checkbox, CircleProgress, Loader, TimeSlider } from '../../components'
+import { getBaseUrl } from '@/helpers'
+import { Checkbox, CircleProgress, Loader, TimeSlider } from '@/components'
 
 const api = '/api/work-configs'
 const atfApi = '/api/area-trigger-filter'
@@ -164,8 +77,7 @@ export default {
     components: { Checkbox, CircleProgress, Loader, TimeSlider },
     data() {
         return {
-            loaded: false, 
-            // user: null, 
+            loaded: false,
             settings: null, 
             areas: [],
             entry: {
@@ -179,7 +91,7 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user
+            user: state => state.user.info
         }),
         baseUrl() { return getBaseUrl() },
         daysArr() {
@@ -189,7 +101,9 @@ export default {
         }
     },
     methods: {
-        ...mapMutations(['setCompanyLogo']),
+        ...mapMutations({
+            setCompanyLogo: 'user/setCompanyLogo'
+        }),
         getMinutes(area) {
             if (area.name == 'Meeting Rooms') {
                 let arr = [];
@@ -316,3 +230,93 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.company-logo {
+    display: inline-flex;
+    margin-top: 16px;
+
+    .logo-holder {
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        width: 150px;
+        padding: 10px;
+        border-radius: 10px;
+        overflow: hidden;
+
+        .upload-trigger {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            align-items: center;
+            height: 48px;
+            margin: -10px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 10px;
+            border: 1px dashed rgba(255, 255, 255, .1);
+        }
+
+        .upload-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2B2B2B;
+        }
+
+        img {
+            height: auto;
+            width: 100%;
+        }
+
+        .logo-opt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(1.25);
+            background-color: rgba($color: #393939, $alpha: 0.8);
+            transition: visibility .24s, opacity .24s, transform .24s;
+        }
+
+        &:hover .logo-opt {
+            visibility: visible;
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+}
+.settings-section {
+    margin: 24px 0;
+
+    .days-list {
+        padding: 10px 0;
+    }
+
+    &.hours-section {
+        margin-bottom: 32px;
+    }
+}
+#trigger-filters {
+    td {
+        padding: 4px 6px;
+    }
+    .input-field {
+        margin-bottom: 0;
+    }
+}
+</style>

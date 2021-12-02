@@ -79,7 +79,6 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Modal, TimeSlider },
     data() {
         return {
-            // user: null,
             showPageOpts: false, showEmbed: false, showHeatMap: false,
             timeGraph: null, heatMap: null,
             timeFilter: {
@@ -90,7 +89,7 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user,
+            user: state => state.user.info,
             filter: state => state.homepage.filter
         }),
         baseUrl() { return getBaseUrl() },

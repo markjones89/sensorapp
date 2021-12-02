@@ -29,8 +29,15 @@ export default {
     }),
     computed: {
         ...mapState({
-            theme: state => state.theme
+            theme: state => state.user.theme
         })
+    },
+    watch: {
+        theme: function(theme) {
+            let dpTheme = theme == 'dark' ? 'dark' : 'orange'
+            
+            this.$refs.datepicker.setTheme(dpTheme)
+        }
     },
     methods: {
         getDateRange(range) {
@@ -59,7 +66,6 @@ export default {
         },
         selectRange(range) {
             if (range === 'custom') {
-                // this.showDatePicker = true
                 this.$refs.datepicker.show()
             } else {
                 let dateRange = this.getDateRange(range)

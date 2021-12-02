@@ -132,7 +132,7 @@ export default {
     title: 'Locations',
     components: { CaretIcon, FilterDropdown, LocationItem, Loader, Modal },
     data: () => ({
-        // clients: [], 
+        clients: [],
         locations: [], cityRef: [], gCostsRef: [], cCostsRef: [],
         filterClient: false, clientId: null, clientName: null, apiError: null,
         entry: {
@@ -148,8 +148,8 @@ export default {
     }),
     computed: {
         ...mapState({
-            user: state => state.user,
-            clients: state => state.clients,
+            user: state => state.user.info,
+            // clients: state => state.clients,
             client: state => state.locations.client
         }),
         ...mapGetters({
@@ -256,7 +256,7 @@ export default {
     },
     methods: {
         ...mapMutations({
-            setClients: 'setClients',
+            // setClients: 'setClients',
             setClient: 'locations/setClient',
             setBuildings: 'locations/setBuildings',
             setBuilding: 'locations/setBuilding',
@@ -532,7 +532,8 @@ export default {
             if (this.clients.length == 0) {
                 let { data } = await axios.get(this.api_customers, this.api_header())
             
-                this.setClients(data)
+                // this.setClients(data)
+                this.clients = data
             }
             
             if (this.client) {

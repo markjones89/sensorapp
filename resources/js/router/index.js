@@ -19,7 +19,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.needsAuth)) {
         // this route requires auth, check if logged in
         // if not, redirect to login page.
-        if (store.getters['getUser'] == null) {
+        if (store.getters['user/getUser'] == null) {
           next({ path: '/login', query: { to: to.fullPath }})
         } else next()
       } else next()

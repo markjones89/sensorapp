@@ -86,10 +86,10 @@
 </style>
 <script>
 import { mapState, mapGetters } from "vuex";
-import { CaretIcon, CaretLeftIcon } from '../../components/icons'
-import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '../../components'
-import areaChart from '../../components/graphs/AreaChart'
-import { toOrdinal } from '../../helpers'
+import { CaretIcon, CaretLeftIcon } from '@/components/icons'
+import { Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider } from '@/components'
+import areaChart from '@/components/graphs/AreaChart'
+import { toOrdinal } from '@/helpers'
 
 const api = {
     building: '/api/locations',
@@ -107,7 +107,6 @@ export default {
     components: { CaretIcon, CaretLeftIcon, Checkbox, DateRangeToggle, FilterDropdown, Loader, TimeSlider },
     data() {
         return {
-            // user: null, 
             loaded: false, showPageOpts: false, showEmbed: false,
             buildings: [], building: null,
             areas: ['All Areas', 'Department', 'Informal Meeting Spaces', 'Meeting Rooms', 'Workspace Desk Area'], 
@@ -121,7 +120,7 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state => state.user,
+            user: state => state.user.info,
             filter: state => state.homepage.filter
         }),
         ...mapGetters({
