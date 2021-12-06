@@ -18,7 +18,7 @@ const getBuildings = async ({ state, commit, getters }, customer) => {
 
 const getBuilding = async ({ commit, getters }, payload) => {
     let res = await axios.all([
-        axios.get('/api/floors', { bid: payload.bldg_id }),
+        axios.get('/api/floors', { params: { bid: payload.bldg_id } }),
         axios.get(getters.api_building_overview(payload.company_id, payload.bldg_id), getters.api_header())
     ])
 

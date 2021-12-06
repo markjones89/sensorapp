@@ -230,7 +230,7 @@ export default {
         },
         async getFloors() {
             let res = await axios.all([
-                axios.get(api.floors, { bid: this.bldg_id }),
+                axios.get(api.floors, { params: { bid: this.bldg_id }}),
                 axios.get(this.api_building_overview(this.company_id, this.bldg_id), this.api_header())
             ])
 

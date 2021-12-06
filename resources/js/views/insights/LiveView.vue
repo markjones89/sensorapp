@@ -258,7 +258,7 @@ export default {
 
             let res = await axios.all([
                 axios.get(this.api_sensors_by_node(fid, 'Floor'), this.api_header()),
-                axios.get(api.sensor, { fid: fid })
+                axios.get(api.sensor, { params: { fid: fid } })
             ])
 
             let sensors = res[0].data,

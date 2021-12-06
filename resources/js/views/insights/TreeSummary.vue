@@ -378,7 +378,7 @@ export default {
                 let sensorData = await axios.all([
                     axios.get(this.api_sensors_by_node(floor.id, 'Floor'), this.api_header()),
                     // axios.post(this.api_low_performing_sensors, filters, this.api_header()),
-                    axios.get('/api/sensors', { fid: floor.id })
+                    axios.get('/api/sensors', { params: { fid: floor.id } })
                 ])
 
                 let sensors = sensorData[0].data,
