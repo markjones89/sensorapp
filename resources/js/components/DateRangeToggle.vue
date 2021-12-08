@@ -8,6 +8,7 @@
     </div>
 </template>
 <script>
+import moment from 'moment'
 import { isoToDate, isSameDate, padNum } from '@/helpers'
 import { mapState } from 'vuex'
 export default {
@@ -41,25 +42,21 @@ export default {
     },
     methods: {
         getDateRange(range) {
-            let now = new Date(),
-                today = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+            let _today = moment().hours(0).minutes(0).seconds(0).milliseconds(0),
                 from = null, to = null
 
             if (range === 'today') {
-                from = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0)
-                to = today
+                from = _today.clone().toDate()
+                to = _today.toDate()
             } else if (range === 'week') {
-                let w_f = now.getDate() - now.getDay()
-                    //,w_l = w_f + 6
-
-                from = new Date(today.setDate(w_f))
-                to = today
+                from = _today.clone().startOf('isoWeek').toDate()
+                to = _today.toDate()
             } else if (range === 'month') {
-                from = new Date(now.getFullYear(), now.getMonth(), 1)
-                to = today
+                from = _today.clone().startOf('month').toDate()
+                to = _today.toDate()
             } else if (range === 'year') {
-                from = new Date(now.getFullYear(), 0, 1)
-                to = today
+                from = _today.clone().startOf('year').toDate()
+                to = _today.toDate()
             }
 
             return { from, to }
