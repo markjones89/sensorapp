@@ -68,10 +68,10 @@ export default {
     methods: {
         getChartData() {
             let categories = [
-                    { name: 'Meeting Room Occupancy Average', key: 'meeting_room_occupancy.average_percentage' },
-                    { name: 'Meeting Room Occupancy Peak', key: 'meeting_room_occupancy.max_percentage' },
+                    { name: 'Meeting Room Occupancy Average', key: 'meeting_room_occupancy.average_percentage', roomKey: 'room_occupancy.average_percentage' },
+                    { name: 'Meeting Room Occupancy Peak', key: 'meeting_room_occupancy.max_percentage', roomKey: 'room_occupancy.max_percentage' },
                     { name: 'Meeting Room Efficiency Average', key: 'meeting_room_efficiency.average_percentage' },
-                    { name: 'Meeting Room Efficiency Peak', key: 'meeting_room_efficiency.max_percentage' },
+                    { name: 'Meeting Room Efficiency Peak', key: 'meeting_room_efficiency.max_percentage', roomKey: 'efficiency.max_percentage' },
                     { name: 'Workspace Utilisation Average', key: 'work_space_utils.average_percentage' },
                     { name: 'Workspace Utilisation Peak', key: 'work_space_utils.max_percentage' },
                     { name: 'Low performing spaces', key: 'low_perform_workspace.average_percentage' }
@@ -105,7 +105,7 @@ export default {
             }
             else groupKeys = ['building_country', 'building_city']
 
-            let formatFloorSummary = (a, dataKey) => {
+            let formatFloorSummary = (a, dataKey, roomKey) => {
                 // let isWeighted = dataKey == 'meeting_room_occupancy.average_percentage'
                 let floorSummary = this.floorSummary.find(x => x.building_id == a.building_id)
 
@@ -123,7 +123,7 @@ export default {
                             floor.children = f.area_summary.map(area => {
                                 return {
                                     name: area.group_id,
-                                    value: getObjValue(area, dataKey, 0),
+                                    value: getObjValue(area, roomKey || dataKey, 0),
                                     weight: getObjValue(area, weightKey, 0),
                                     route: 'bar-chart',
                                     routeParams: {
@@ -161,9 +161,11 @@ export default {
                 let grouped = [],
                     temp = { _: grouped },
                     dataKey = c.key,
+                    roomKey = c.roomKey,
                     isWeighted = dataKey == 'meeting_room_occupancy.average_percentage'
 
                 delete c.key
+                if (c.roomKey) delete c.roomKey
                 c.title = graphTitle
                 c.subtitle = c.name
                 c.weighted = isWeighted
@@ -171,7 +173,7 @@ export default {
                 if (this.locFilter?.building) {
                     let building = buildings.find(x => x.building_id == this.locFilter.value)
                     let fsBldg = this.floorSummary.find(x => x.building_id == this.locFilter.value)
-                    let floors = formatFloorSummary(building, dataKey)
+                    let floors = formatFloorSummary(building, dataKey, roomKey)
 
                     c.value = getObjValue(building, dataKey, null)
 
@@ -193,7 +195,7 @@ export default {
 
                         if (isWeighted) bldg.weight = getObjValue(fsBldg, weightKey, 0)
 
-                        let floors = formatFloorSummary(a, dataKey)
+                        let floors = formatFloorSummary(a, dataKey, roomKey)
 
                         if (floors) bldg.children = floors
 
