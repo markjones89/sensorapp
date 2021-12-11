@@ -280,7 +280,7 @@ export default {
             this.floor.sensors = this.sensors
             this.wsConnect()
         },
-        setFloorMap() { this.mapper = new floorMapper('#floor-map', this.floor) },
+        setFloorMap() { this.mapper = new floorMapper('#floor-map', this.floor, { livePulse: true }) },
         // windowResize() { if(this.mapper) this.mapper.redraw() }
     },
     mounted() {

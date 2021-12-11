@@ -800,6 +800,20 @@ textarea {
 }
 
 /* floor mapper */
+@keyframes sensorPulse {
+    0% {
+        stroke: rgba(1,254,1,0.5);
+        stroke-width: 1;
+    }
+    70% {
+        stroke: rgba(1,254,1,0);
+        stroke-width: 10;
+    }
+    100% {
+        stroke: rgba(1,254,1,0);
+        stroke-width: 1;
+    }
+}
 .floor-map {
     position: relative;
     height: 100%;
@@ -840,6 +854,12 @@ textarea {
     
     svg {
         pointer-events: initial !important;
+    }
+
+    .live-pulse {
+        .sensor {
+            animation: sensorPulse 2s infinite;
+        }
     }
 }
 

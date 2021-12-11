@@ -83,6 +83,8 @@ function mapper(wrapper, data, options) {
             }
         })
 
+    if (config.livePulse) svg.attr('class', 'live-pulse')
+
     if (config.events) {
         svg.style('pointer-events', 'all')
     }
@@ -264,8 +266,8 @@ function mapper(wrapper, data, options) {
             .append('circle')
             .attr('class', 'sensor').attr('data-id', d => d.id)
             .attr('r', sensorSize())
-            .attr('stroke-width', config.heatmap || config.comfortmap ? null : 5)
-            .attr('stroke', config.heatmap || config.comfortmap ? null : sensorStroke(0))
+            .attr('stroke-width', config.livePulse || config.heatmap || config.comfortmap ? null : 5)
+            .attr('stroke', config.livePulse || config.heatmap || config.comfortmap ? null : sensorStroke(0))
             .style('fill', sensorColor(0))
             .attr("filter", config.heatmap || config.comfortmap ? "url(#blur)" : null)
             .style('cursor', function () { return canEdit ? 'move' : 'default' })
