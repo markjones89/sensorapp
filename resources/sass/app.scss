@@ -802,12 +802,12 @@ textarea {
 /* floor mapper */
 @keyframes sensorPulse {
     0% {
-        stroke: rgba(1,254,1,0.5);
+        stroke: rgba(1,254,1,0.9);
         stroke-width: 1;
     }
     70% {
         stroke: rgba(1,254,1,0);
-        stroke-width: 10;
+        stroke-width: 14;
     }
     100% {
         stroke: rgba(1,254,1,0);
@@ -817,12 +817,12 @@ textarea {
 
 @keyframes pulseOccupied {
     0% {
-        stroke: rgba(255,134,0,0.5);
+        stroke: rgba(255,134,0,0.9);
         stroke-width: 1;
     }
     70% {
         stroke: rgba(255,134,0,0);
-        stroke-width: 10;
+        stroke-width: 14;
     }
     100% {
         stroke: rgba(255,134,0,0);
