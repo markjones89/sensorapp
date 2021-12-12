@@ -814,6 +814,22 @@ textarea {
         stroke-width: 1;
     }
 }
+
+@keyframes pulseOccupied {
+    0% {
+        stroke: rgba(255,134,0,0.5);
+        stroke-width: 1;
+    }
+    70% {
+        stroke: rgba(255,134,0,0);
+        stroke-width: 10;
+    }
+    100% {
+        stroke: rgba(255,134,0,0);
+        stroke-width: 1;
+    }
+}
+
 .floor-map {
     position: relative;
     height: 100%;
@@ -858,7 +874,16 @@ textarea {
 
     .live-pulse {
         .sensor {
-            animation: sensorPulse 2s infinite;
+            stroke: rgba(1,254,1,0.3);
+            stroke-width: 5;
+
+            &.available {
+                animation: sensorPulse 2s infinite;
+            }
+
+            &.occupied {
+                animation: pulseOccupied 2s infinite;
+            }
         }
     }
 }

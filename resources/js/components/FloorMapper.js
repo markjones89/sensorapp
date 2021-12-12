@@ -291,7 +291,7 @@ function mapper(wrapper, data, options) {
 
                 let ttRect = tooltip.node().getBoundingClientRect()
                 let tooltipX = d3.event.pageX - (ttRect.width / 2) //d3.event.offsetX + tooltipOffsetX
-                let tooltipY = d3.event.pageY - (ttRect.height + 10) //d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2)
+                let tooltipY = d3.event.pageY - (ttRect.height + 10) - window.scrollY //d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2)
 
                 setTooltip(tooltipX, tooltipY,
                     `<div>ID: ${s.sensor_id}</div>
@@ -303,7 +303,7 @@ function mapper(wrapper, data, options) {
 
                 let ttRect = tooltip.node().getBoundingClientRect()
                 let tooltipX = d3.event.pageX - (ttRect.width / 2) //d3.event.offsetX + tooltipOffsetX
-                let tooltipY = d3.event.pageY - (ttRect.height + 10) //d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2)
+                let tooltipY = d3.event.pageY - (ttRect.height + 10) - window.scrollY //d3.event.offsetY - (tooltip.node().getBoundingClientRect().height / 2)
 
                 setTooltip(tooltipX, tooltipY)
             })
@@ -330,6 +330,7 @@ function mapper(wrapper, data, options) {
         sensorLayer.select(`.sensor[data-id="${id}"]`)
             .style('fill', sensorColor(range))
             .attr('stroke', sensorStroke(range))
+            .attr('class', `sensor ${status}`)
     }
 
     /**
