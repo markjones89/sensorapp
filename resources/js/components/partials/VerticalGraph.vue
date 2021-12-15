@@ -5,7 +5,7 @@
                 <span class="chart-title">{{ graphTitle }}</span>
                 <!-- <span class="chart-subtitle">{{ subtitle }}</span> -->
             </div>
-            <div id="bar-chart"></div>
+            <div id="bar-chart" class="bar-chart"></div>
         </template>
         <div v-else class="error-display" style="height: 60vh">
             <p>{{ dataError }}</p>
@@ -119,7 +119,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

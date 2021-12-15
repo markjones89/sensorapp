@@ -13,7 +13,8 @@ export default function hierarchyBarChart(wrapper, data, options) {
             // .sum(d => d.value)
             // .sort((a, b) => b.value - a.value)
             .eachAfter(d => d.index = d.parent ? d.parent.index = d.parent.index + 1 || 0 : 0),
-        color = d3.scaleOrdinal([true, false], ["#FF5A09", "#953100"]),
+        // color = d3.scaleOrdinal([true, false], ["#FF5A09", "#953100"]),
+        color = d3.scaleOrdinal([true, false], ["#ed762c", "#ed762c"]),
         barStep = 30,
         barPadding = 3 / barStep,
         duration = 750,

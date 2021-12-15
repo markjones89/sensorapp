@@ -109,6 +109,15 @@ export default {
             return this.buildings.map(b => { return { value: b.id, label: b.name } })
         }
     },
+    watch: {
+        sensors: {
+            deep: true,
+            handler() {
+                // calculate live occupancy
+                this.floors.forEach(f => f.occupancy_live = this.sensors.filter(x => x.fid == f.id && x.sensor_state == 'occupied').length)
+            }
+        }
+    },
     methods: {
         wsConnect() {
             let wsClient = process.env.MIX_LIVE_CLIENT
@@ -128,16 +137,9 @@ export default {
                 const sid = data.sensorId
                 const occupancy = data.occupancy_status
                 const state = occupancy == '0' ? 'available' : occupancy == '1' ? 'occupied' : null
-                let sensor = this.sensors.find(s => s.id === sid)
+                let sensor = this.sensors.find(s => s.sensor_id === sid)
 
-                if (sensor && state) {
-                    let floor = this.floors.find(f => f.id == sensor.fid)
-
-                    sensor.sensor_state = state
-                    if (floor && state == 'occupied') floor.occupancy_limit += 1
-                    else if (floor && state == 'available') floor.occupancy_limit -= 1
-                }
-                // console.log('onMessageArrived', sensor, data)
+                if (sensor && state) sensor.sensor_state = state
             }
 
             this.liveWS.connect({
@@ -146,7 +148,7 @@ export default {
                 password: process.env.MIX_LIVE_PASS,
                 onSuccess: (res) => {
                     this.wsConnected = true
-                    this.sensors.forEach(s => { this.liveWS.subscribe(`sensor_data/${s.id}/data`) })
+                    this.sensors.forEach(s => { this.liveWS.subscribe(`sensor_data/${s.sensor_id}/data`) })
                     console.log('wsConnect.onSuccess', res)
                 },
                 onFailure: (e) => {

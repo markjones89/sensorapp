@@ -56,7 +56,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { getBaseUrl, toOrdinal } from '@/helpers'
+import { getBaseUrl, toISOEnd, toISOStart, toOrdinal } from '@/helpers'
 import { Checkbox, DateRangeToggle, GraphFilter, Modal, TimeSlider } from '@/components'
 import { VerticalGraph } from '@/components/partials'
 import { CaretIcon, CaretLeftIcon } from '@/components/icons'
@@ -116,8 +116,9 @@ export default {
             // console.log('rangeSelect', range, from, to)
             // console.log('rangeSelect', this.rangeFilter)
             this.rangeFilter.type = range
-            this.dataFilters.start_date = from.toISOString()
-            this.dataFilters.stop_date = to.toISOString()
+            // this.setRange({ type: range, start: toISOStart(from), end: toISOEnd(to) })
+            this.rangeFilter.start = this.dataFilters.start_date = from.toISOString()
+            this.rangeFilter.end = this.dataFilters.stop_date = to.toISOString()
         },
         selectLocation(value, label, item) {
             // console.log('selectLocation', value, label, item)
@@ -144,6 +145,30 @@ export default {
         }
     },
     created() {
+        let now = new Date()
+        let start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+            end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
+            
+        this.rangeFilter.type = 'today'
+        this.rangeFilter.start = this.dataFilters.start_date = toISOStart(start)
+        this.rangeFilter.end = this.dataFilters.stop_date = toISOEnd(end)
+
+        // if (this.cp_range.type) {
+        //     this.rangeFilter = JSON.parse(JSON.stringify(this.cp_range))
+        //     this.dataFilters.start_date = this.rangeFilter.start
+        //     this.dataFilters.stop_date = this.rangeFilter.end
+        // }
+        // else {
+        //     let start = new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+        //         end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23)
+            
+        //     this.rangeFilter.type = 'today'
+        //     this.rangeFilter.start = this.dataFilters.start_date = toISOStart(start)
+        //     this.rangeFilter.end = this.dataFilters.stop_date = toISOEnd(end)
+
+        //     // this.setRange({ type: 'today', start: toISOStart(start), end: toISOEnd(end) })
+        // }
+
         let query = this.$route.query
         let hasQuery = query.building && query.floor
 
@@ -162,9 +187,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss">
-.bar-chart svg {
-    pointer-events: initial;
-}
-</style>

@@ -888,6 +888,12 @@ textarea {
     }
 }
 
+.bar-chart {
+    svg {
+        pointer-events: initial !important;
+    }
+}
+
 /* nprogress override */
 #nprogress {
     .bar {

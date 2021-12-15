@@ -20,11 +20,13 @@ export default function barChart(wrapper, data, options) {
     
     var color = d3.scaleOrdinal()
         .domain(subgroups)
-        .range(['rgb(149,49,0)','rgb(25,116,88)'])
+        // .range(['rgb(149,49,0)','rgb(25,116,88)'])
+        .range(['#ed762c', '#46D2A3'])
 
     var lightColor = d3.scaleOrdinal()
         .domain(subgroups)
-        .range(['rgb(255,90,0)', 'rgb(61,207,163)'])
+        // .range(['rgb(255,90,0)', 'rgb(61,207,163)'])
+        .range(['#ed762c', '#46D2A3'])
 
     // x-axis
     let x = d3.scaleBand()
@@ -91,7 +93,8 @@ export default function barChart(wrapper, data, options) {
                 legend.append("text")
                     .attr('x', 24)
                     .attr('y', 10)
-                    .style("fill", '#fff')
+                    // .style("fill", '#fff')
+                    .style('fill', 'currentColor')
                     .text(d => d)
             })
 
@@ -197,7 +200,8 @@ export default function barChart(wrapper, data, options) {
                 let pdata = d3.select(this.parentNode).datum()
                 return `${d.key}:${pdata[xKey]}`
             })
-            .style('fill', '#fff').style('font-size', '13px')
+            // .style('fill', '#fff')
+            .style('font-size', '11px')
             .style('opacity', 0)
             .text(d => `${d.value}%`)
             .style('transform', function(d) {
